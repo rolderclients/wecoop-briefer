@@ -1,0 +1,19 @@
+version: 43
+jobs:
+- name: Push to github
+  jobExecutor: tin
+  steps:
+  - type: PushRepository
+    name: Push
+    remoteUrl: https://github.com/rolderclients/wecoop-briefer
+    passwordSecret: decard-github
+    force: false
+    condition: SUCCESSFUL
+    optional: false
+  triggers:
+  - type: BranchUpdateTrigger
+    userMatch: anyone
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 14400
