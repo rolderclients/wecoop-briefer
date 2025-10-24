@@ -5,12 +5,14 @@ import axios from 'redaxios';
 import { Page } from '@/components';
 import type { Service } from '@/db';
 
+const backendURL = process.env.BACKEND_URL;
+
 const servicesQueryOptions = () =>
   queryOptions<Service[]>({
     queryKey: ['services'],
     queryFn: () =>
       axios
-        .get<Array<Service>>('http://localhost:3000/api/services')
+        .get<Array<Service>>(`${backendURL}/api/services`)
         .then((r) => r.data)
         .catch(() => {
           throw new Error('Failed to fetch services');
