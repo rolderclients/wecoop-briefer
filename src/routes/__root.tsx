@@ -9,8 +9,10 @@ import {
 } from '@mantine/core';
 import mantineCss from '@mantine/core/styles.css?url';
 import { Default404Page } from '@rolder/ui-kit-react';
+import type { QueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
-  createRootRoute,
+  createRootRouteWithContext,
   HeadContent,
   Link,
   Outlet,
@@ -20,7 +22,9 @@ import type { ReactNode } from 'react';
 import { Navbar } from '@/components';
 import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary';
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   head: () => ({
     meta: [
       {
@@ -103,6 +107,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body>
         <MantineProvider defaultColorScheme="light">
           {children}
+          <ReactQueryDevtools buttonPosition="bottom-right" />
           <Scripts />
         </MantineProvider>
       </body>
