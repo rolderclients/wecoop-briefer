@@ -30,15 +30,7 @@ function Home() {
   return (
     <Page>
       <Title>{data[0].title}</Title>
-      <Button
-        onClick={async () => {
-          const startTime = Date.now();
-          await refetch();
-          console.log(`Refetch took ${Date.now() - startTime}ms`);
-        }}
-      >
-        refetch
-      </Button>
+      <Button onClick={() => refetch()}>refetch</Button>
     </Page>
   );
 }
