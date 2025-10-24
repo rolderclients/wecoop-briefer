@@ -6,6 +6,7 @@ import { Page } from '@/components';
 import type { Service } from '@/db';
 
 const backendURL = process.env.BACKEND_URL;
+console.log(backendURL);
 
 const servicesQueryOptions = () =>
   queryOptions<Service[]>({
