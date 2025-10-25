@@ -1,0 +1,48 @@
+import {
+  AppShell,
+  ColorSchemeScript,
+  Group,
+  MantineProvider,
+  mantineHtmlProps,
+  Title,
+} from '@mantine/core';
+import { HeadContent, Outlet, Scripts } from '@tanstack/react-router';
+import { Navbar } from '@/components';
+
+export const App = () => (
+  <html lang="ru" {...mantineHtmlProps}>
+    <head>
+      <HeadContent />
+      <ColorSchemeScript defaultColorScheme="light" />
+    </head>
+    <body>
+      <MantineProvider defaultColorScheme="light">
+        <AppShell
+          header={{ height: 64 }}
+          navbar={{
+            width: 160,
+            breakpoint: 'sm',
+          }}
+          padding="xl"
+        >
+          <AppShell.Header
+            style={{
+              borderBottom: '1px solid var(--app-shell-border-color)',
+              backgroundColor:
+                'color-mix(in srgb,var(--mantine-color-body),transparent 85%)',
+              backdropFilter: 'blur(5px)',
+            }}
+          >
+            <Group h="100%" px="xl" justify="space-between">
+              <Title order={3}>Wecoop</Title>
+              <Title order={5}>Пользователь</Title>
+            </Group>
+          </AppShell.Header>
+          <Navbar />
+          <Outlet />
+        </AppShell>
+        <Scripts />
+      </MantineProvider>
+    </body>
+  </html>
+);

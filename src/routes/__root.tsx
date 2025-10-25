@@ -1,26 +1,10 @@
-import {
-  AppShell,
-  Button,
-  ColorSchemeScript,
-  Group,
-  MantineProvider,
-  mantineHtmlProps,
-  Title,
-} from '@mantine/core';
+import { Button } from '@mantine/core';
 import mantineCss from '@mantine/core/styles.css?url';
 import { Default404Page } from '@rolder/ui-kit-react';
 import type { QueryClient } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import {
-  createRootRouteWithContext,
-  HeadContent,
-  Link,
-  Outlet,
-  Scripts,
-} from '@tanstack/react-router';
-import type { ReactNode } from 'react';
-import { Navbar } from '@/components';
+import { createRootRouteWithContext, Link } from '@tanstack/react-router';
 import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary';
+import { App } from './-App';
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -63,54 +47,5 @@ export const Route = createRootRouteWithContext<{
       }
     />
   ),
-  component: RootComponent,
+  component: App,
 });
-
-function RootComponent() {
-  return (
-    <RootDocument>
-      <AppShell
-        header={{ height: 64 }}
-        navbar={{
-          width: 160,
-          breakpoint: 'sm',
-        }}
-        padding="xl"
-      >
-        <AppShell.Header
-          style={{
-            borderBottom: '1px solid var(--app-shell-border-color)',
-            backgroundColor:
-              'color-mix(in srgb,var(--mantine-color-body),transparent 85%)',
-            backdropFilter: 'blur(5px)',
-          }}
-        >
-          <Group h="100%" px="xl" justify="space-between">
-            <Title order={3}>Wecoop</Title>
-            <Title order={5}>Пользователь</Title>
-          </Group>
-        </AppShell.Header>
-        <Navbar />
-        <Outlet />
-      </AppShell>
-    </RootDocument>
-  );
-}
-
-function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
-  return (
-    <html lang="ru" {...mantineHtmlProps}>
-      <head>
-        <HeadContent />
-        <ColorSchemeScript defaultColorScheme="light" />
-      </head>
-      <body>
-        <MantineProvider defaultColorScheme="light">
-          {children}
-          <ReactQueryDevtools buttonPosition="bottom-right" />
-          <Scripts />
-        </MantineProvider>
-      </body>
-    </html>
-  );
-}

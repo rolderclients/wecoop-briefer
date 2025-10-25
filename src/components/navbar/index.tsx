@@ -4,7 +4,7 @@ import { useLocation } from '@tanstack/react-router';
 import { NavbarLink, type NavbarLinkProps } from './NavbarLink';
 
 const menu: NavbarLinkProps[] = [
-  { label: 'Услуги', icon: IconList, pathname: '/' },
+  { label: 'Услуги', icon: IconList, pathname: '/services' },
   { label: 'Промты', icon: IconAi, pathname: '/prompts' },
   { label: 'Ассистент', icon: IconMessage, pathname: '/assistant' },
 ];
