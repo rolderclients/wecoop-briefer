@@ -10,7 +10,7 @@ const getServices = createServerFn({ method: 'GET' })
     const db = await getDB();
 
     const result = await db.query<[Service[]]>(
-      'SELECT *, category.title as categoryTitle FROM service WHERE archived = $archived;',
+      'SELECT *, category.title as categoryTitle FROM service WHERE archived = $archived ORDER BY categoryTitle, title;',
       {
         archived,
       },
@@ -45,9 +45,7 @@ export const updateService = createServerFn({ method: 'POST' })
 
     const i = fromDTO(serviceData);
 
-    const result = await db.query<Service[]>('UPDATE $service.id MERGE $i', {
-      i,
-    });
+    const result = await db.query<Service[]>('UPDATE $i.id MERGE $i', { i });
 
     return toDTO(result[0]);
   });

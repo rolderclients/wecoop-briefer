@@ -9,50 +9,68 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ServicesIndexRouteImport } from './routes/services/index'
+import { Route as ServicesRouteRouteImport } from './routes/services/route'
+import { Route as IndexRouteImport } from './routes/index'
 
-const ServicesIndexRoute = ServicesIndexRouteImport.update({
-  id: '/services/',
-  path: '/services/',
+const ServicesRouteRoute = ServicesRouteRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/services': typeof ServicesIndexRoute
+  '/': typeof IndexRoute
+  '/services': typeof ServicesRouteRoute
 }
 export interface FileRoutesByTo {
-  '/services': typeof ServicesIndexRoute
+  '/': typeof IndexRoute
+  '/services': typeof ServicesRouteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/services/': typeof ServicesIndexRoute
+  '/': typeof IndexRoute
+  '/services': typeof ServicesRouteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/services'
+  fullPaths: '/' | '/services'
   fileRoutesByTo: FileRoutesByTo
-  to: '/services'
-  id: '__root__' | '/services/'
+  to: '/' | '/services'
+  id: '__root__' | '/' | '/services'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  ServicesIndexRoute: typeof ServicesIndexRoute
+  IndexRoute: typeof IndexRoute
+  ServicesRouteRoute: typeof ServicesRouteRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/services/': {
-      id: '/services/'
+    '/services': {
+      id: '/services'
       path: '/services'
       fullPath: '/services'
-      preLoaderRoute: typeof ServicesIndexRouteImport
+      preLoaderRoute: typeof ServicesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  ServicesIndexRoute: ServicesIndexRoute,
+  IndexRoute: IndexRoute,
+  ServicesRouteRoute: ServicesRouteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -8,6 +8,7 @@ export interface Item {
 
 export interface Service extends Item {
   title: string;
+  category: string;
   categoryTitle: string;
   archived: boolean;
 }
@@ -22,4 +23,9 @@ export interface UpdateService {
   title?: string;
   category?: string;
   archived?: boolean;
+}
+
+export interface Category extends Item {
+  title: string;
+  services: string[];
 }
