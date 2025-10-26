@@ -29,7 +29,10 @@ export const CreateEdit = () => {
 
       <Modal
         opened={opened}
-        onClose={close}
+        onClose={() => {
+          close();
+          form.reset();
+        }}
         centered
         title={formType === 'edit' ? form.getValues().title : 'Новая услуга'}
       >
