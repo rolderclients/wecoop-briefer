@@ -1,52 +1,41 @@
 import { Button, Group, Modal, Select, Stack, TextInput } from '@mantine/core';
+import { isNotEmpty, useForm } from '@mantine/form';
+import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconCancel, IconPlus } from '@tabler/icons-react';
-import type { UpdateService } from '@/api';
 import { useServices } from './-ServicesProvider';
 
-export const CreateEdit = () => {
-  const {
-    categories,
-    createService,
-    updateService,
-    opened,
-    open,
-    close,
-    archived,
-    form,
-    formType,
-  } = useServices();
+export const Create = () => {
+  const { categories, createService, archived } = useServices();
+
+  const form = useForm({
+    mode: 'uncontrolled',
+    initialValues: { title: '', category: '' },
+    validate: { title: isNotEmpty(), category: isNotEmpty() },
+  });
+
+  const [opened, { open, close }] = useDisclosure(false);
 
   return (
     <>
       <Button
         leftSection={<IconPlus size={20} />}
         disabled={archived}
-        onClick={open}
+        onClick={() => {
+          form.reset();
+          open();
+        }}
       >
         Добавить
       </Button>
 
-      <Modal
-        opened={opened}
-        onClose={() => {
-          close();
-          form.reset();
-        }}
-        centered
-        title={
-          formType === 'edit' ? form.getInitialValues().title : 'Новая услуга'
-        }
-      >
+      <Modal opened={opened} onClose={close} centered title="Новая услуга">
         <form
           onSubmit={form.onSubmit((values) => {
-            if (formType === 'edit') updateService(values as UpdateService);
-            else
-              createService({ title: values.title, category: values.category });
+            createService({ title: values.title, category: values.category });
             close();
-            form.reset();
             notifications.show({
-              message: `Услуга "${values.title}" ${formType === 'edit' ? 'обновлена' : 'создана'}`,
+              message: `Услуга "${values.title}" создана`,
               color: 'green',
             });
           })}
@@ -74,10 +63,7 @@ export const CreateEdit = () => {
                 size="xs"
                 variant="light"
                 leftSection={<IconCancel size={16} />}
-                onClick={() => {
-                  close();
-                  form.reset();
-                }}
+                onClick={close}
               >
                 Отмена
               </Button>
@@ -87,7 +73,7 @@ export const CreateEdit = () => {
                 leftSection={<IconPlus size={20} />}
                 type="submit"
               >
-                {formType === 'edit' ? 'Сохранить' : 'Добавить'}
+                Добавить
               </Button>
             </Group>
           </Stack>

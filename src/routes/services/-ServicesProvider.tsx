@@ -1,5 +1,3 @@
-import { isNotEmpty, type UseFormReturnType, useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
 import {
   useMutation,
   useQueryClient,
@@ -31,12 +29,6 @@ interface ServicesContext {
   setSelectedIds: (ids: string[]) => void;
   archived?: boolean;
   setArchived: (archived: boolean) => void;
-  opened: boolean;
-  open: () => void;
-  close: () => void;
-  form: UseFormReturnType<{ id: string; title: string; category: string }>;
-  formType: 'create' | 'edit';
-  setFormType: (type: 'create' | 'edit') => void;
 }
 
 const ServicesContext = createContext<ServicesContext | null>(null);
@@ -51,21 +43,6 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
   const { data: services } = useSuspenseQuery(
     servicesQueryOptions(initialArchived),
   );
-  const [opened, { open, close }] = useDisclosure(false);
-  const form = useForm({
-    mode: 'uncontrolled',
-    initialValues: {
-      id: '',
-      title: '',
-      category: '',
-    },
-
-    validate: {
-      title: isNotEmpty(),
-      category: isNotEmpty(),
-    },
-  });
-  const [formType, setFormType] = useState<'create' | 'edit'>('create');
 
   const createServiceMutation = useMutation({
     mutationFn: (serviceData: NewService) =>
@@ -101,12 +78,6 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
     setSelectedIds,
     archived,
     setArchived,
-    opened,
-    open,
-    close,
-    form,
-    formType,
-    setFormType,
   };
 
   return (
