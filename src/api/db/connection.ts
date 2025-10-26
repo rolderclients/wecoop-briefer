@@ -1,8 +1,9 @@
+import { createServerOnlyFn } from '@tanstack/react-start';
 import Surreal from 'surrealdb';
 
 let db: Surreal | null = null;
 
-export async function getDB(): Promise<Surreal> {
+export const getDB = createServerOnlyFn(async (): Promise<Surreal> => {
   if (db) {
     return db;
   }
@@ -42,6 +43,4 @@ export async function getDB(): Promise<Surreal> {
     db = null;
     throw error;
   }
-}
-
-export default getDB;
+});

@@ -1,0 +1,21 @@
+import { queryOptions } from '@tanstack/react-query';
+import { createServerFn } from '@tanstack/react-start';
+import { getDB } from '../db';
+import type { Category } from '../types';
+import { toDTOs } from '../utils';
+
+const getCategories = createServerFn({ method: 'GET' }).handler(async () => {
+  const db = await getDB();
+
+  const result = await db.query<[Category[]]>(
+    'SELECT * FROM category ORDER BY title;',
+  );
+
+  return toDTOs(result[0]);
+});
+
+export const categoriesQueryOptions = () =>
+  queryOptions<Category[]>({
+    queryKey: ['categories'],
+    queryFn: getCategories,
+  });
