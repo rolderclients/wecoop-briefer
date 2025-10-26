@@ -9,14 +9,16 @@ const getServices = createServerFn({ method: 'GET' })
   .handler(async ({ data: { archived = false } }) => {
     const db = await getDB();
 
-    const result = await db.query<[Service[]]>(
-      'SELECT *, category.title as categoryTitle FROM service WHERE archived = $archived ORDER BY categoryTitle, title;',
-      {
-        archived,
-      },
-    );
+    const [result] = await db
+      .query(
+        'SELECT *, category.title as categoryTitle FROM service WHERE archived = $archived ORDER BY categoryTitle, title;',
+        {
+          archived,
+        },
+      )
+      .collect<[Service[]]>();
 
-    return toDTOs(result[0]);
+    return toDTOs(result);
   });
 
 export const servicesQueryOptions = (archived?: boolean) =>
@@ -30,12 +32,14 @@ export const createService = createServerFn({ method: 'POST' })
   .handler(async ({ data: { serviceData } }) => {
     const db = await getDB();
 
-    const i = fromDTO(serviceData);
-    const result = await db.query<Service[]>('CREATE service CONTENT $i', {
-      i,
-    });
+    const data = fromDTO(serviceData);
+    const [result] = await db
+      .query('CREATE service CONTENT $data', {
+        data,
+      })
+      .collect<[Service]>();
 
-    return toDTO(result[0]);
+    return toDTO(result);
   });
 
 export const updateService = createServerFn({ method: 'POST' })
@@ -43,11 +47,12 @@ export const updateService = createServerFn({ method: 'POST' })
   .handler(async ({ data: { serviceData } }) => {
     const db = await getDB();
 
-    const i = fromDTO(serviceData);
+    const item = fromDTO(serviceData);
+    const [result] = await db
+      .query('UPDATE $item.id MERGE $item', { item })
+      .collect<[Service]>();
 
-    const result = await db.query<Service[]>('UPDATE $i.id MERGE $i', { i });
-
-    return toDTO(result[0]);
+    return toDTO(result);
   });
 
 export const updateServices = createServerFn({ method: 'POST' })
@@ -56,14 +61,15 @@ export const updateServices = createServerFn({ method: 'POST' })
     const db = await getDB();
 
     const items = fromDTO(servicesData);
-
-    const result = await db.query<[undefined, Service[]]>(
-      `FOR $item IN $items { UPDATE $item.id MERGE $item };
+    const [, result] = await db
+      .query(
+        `FOR $item IN $items { UPDATE $item.id MERGE $item };
   RETURN $items.id.*;`,
-      { items },
-    );
+        { items },
+      )
+      .collect<[undefined, [Service]]>();
 
-    return toDTOs(result[1]);
+    return toDTOs(result);
   });
 
 export const deleteServices = createServerFn({ method: 'POST' })

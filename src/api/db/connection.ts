@@ -1,5 +1,5 @@
 import { createServerOnlyFn } from '@tanstack/react-start';
-import Surreal from 'surrealdb';
+import { Surreal } from 'surrealdb';
 
 let db: Surreal | null = null;
 

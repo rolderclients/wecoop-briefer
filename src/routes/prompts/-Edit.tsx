@@ -2,19 +2,19 @@ import { Button, Group, Modal, Select, Stack, TextInput } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconCancel, IconPlus } from '@tabler/icons-react';
-import type { FormService } from '@/api';
-import { useServices } from './-ServicesProvider';
+import type { FormPrompt } from '@/api';
+import { usePrompts } from './-PromptsProvider';
 
 export const Edit = ({
   form,
   opened,
   close,
 }: {
-  form: UseFormReturnType<FormService>;
+  form: UseFormReturnType<FormPrompt>;
   opened: boolean;
   close: () => void;
 }) => {
-  const { categories, updateService } = useServices();
+  const { services, models, updatePrompt } = usePrompts();
 
   return (
     <Modal
@@ -25,10 +25,10 @@ export const Edit = ({
     >
       <form
         onSubmit={form.onSubmit((values) => {
-          updateService(values);
+          updatePrompt(values);
           close();
           notifications.show({
-            message: `Услуга "${values.title}" обновлена`,
+            message: `Промт "${values.title}" обновлен`,
             color: 'green',
           });
         })}
@@ -42,12 +42,21 @@ export const Edit = ({
           />
 
           <Select
-            label="Категория"
-            placeholder="Выберите категорию"
-            data={categories.map((i) => ({ label: i.title, value: i.id }))}
+            label="Услуга"
+            placeholder="Выберите услугу"
+            data={services.map((i) => ({ label: i.title, value: i.id }))}
             searchable
-            key={form.key('category')}
-            {...form.getInputProps('category')}
+            key={form.key('service')}
+            {...form.getInputProps('service')}
+          />
+
+          <Select
+            label="Модель ИИ"
+            placeholder="Выберите модель ИИ"
+            data={models.map((i) => ({ label: i.title, value: i.id }))}
+            searchable
+            key={form.key('model')}
+            {...form.getInputProps('model')}
           />
 
           <Group ml="auto" mt="lg">

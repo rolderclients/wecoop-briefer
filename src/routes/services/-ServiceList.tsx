@@ -2,7 +2,7 @@ import { ActionIcon, Checkbox, Group, Paper, Text } from '@mantine/core';
 import { isNotEmpty, type UseFormReturnType, useForm } from '@mantine/form';
 import { useDisclosure, useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
-import type { Service } from '@/api';
+import type { FormService, Service } from '@/api';
 import { Edit } from './-Edit';
 import { useServices } from './-ServicesProvider';
 
@@ -56,7 +56,7 @@ const ServicePaper = ({
 }: {
   children: React.ReactNode;
   service: Service;
-  form: UseFormReturnType<{ id: string; title: string; category: string }>;
+  form: UseFormReturnType<FormService>;
   open: () => void;
 }) => {
   const { hovered, ref } = useHover();
