@@ -2,7 +2,7 @@ import { Group, Paper, Switch } from '@mantine/core';
 import { IconArchive, IconRestore, IconTrash } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
 import { ArchivateRestoreDelete } from './-ArchivateRestoreDelete';
-import { CreateEdit } from './-CreateEdit';
+import { Create } from './-Create';
 import { useServices } from './-ServicesProvider';
 import { Route } from './route';
 
@@ -50,7 +50,7 @@ export const Panel = () => {
           )}
         </Group>
 
-        <CreateEdit />
+        <Create />
       </Group>
     </Paper>
   );

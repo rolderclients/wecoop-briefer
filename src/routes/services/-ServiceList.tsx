@@ -1,42 +1,66 @@
 import { ActionIcon, Checkbox, Group, Paper, Text } from '@mantine/core';
-import { useHover } from '@mantine/hooks';
+import { isNotEmpty, type UseFormReturnType, useForm } from '@mantine/form';
+import { useDisclosure, useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
 import type { Service } from '@/api';
-
+import { Edit } from './-Edit';
 import { useServices } from './-ServicesProvider';
 
 export const ServiceList = () => {
   const { services, selectedIds, setSelectedIds } = useServices();
 
-  return services.map((service) => (
-    <ServicePaper key={service.id} service={service}>
-      <Group px="md" wrap="nowrap">
-        <Checkbox
-          checked={selectedIds.includes(service.id)}
-          onChange={(e) =>
-            setSelectedIds(
-              e.currentTarget.checked
-                ? [...selectedIds, service.id]
-                : selectedIds.filter((id) => id !== service.id),
-            )
-          }
-        />
-        <Text w="47%">{service.title}</Text>
-        <Text w="47%">{service.categoryTitle}</Text>
-      </Group>
-    </ServicePaper>
-  ));
+  const form = useForm({
+    mode: 'uncontrolled',
+    initialValues: { id: '', title: '', category: '' },
+    validate: { title: isNotEmpty(), category: isNotEmpty() },
+  });
+
+  const [opened, { open, close }] = useDisclosure(false);
+
+  return (
+    <>
+      {services.map((service) => (
+        <ServicePaper
+          key={service.id}
+          service={service}
+          form={form}
+          open={open}
+        >
+          <Group px="md" wrap="nowrap">
+            <Checkbox
+              checked={selectedIds.includes(service.id)}
+              onChange={(e) =>
+                setSelectedIds(
+                  e.currentTarget.checked
+                    ? [...selectedIds, service.id]
+                    : selectedIds.filter((id) => id !== service.id),
+                )
+              }
+            />
+            <Text w="47%">{service.title}</Text>
+            <Text w="47%">{service.categoryTitle}</Text>
+          </Group>
+        </ServicePaper>
+      ))}
+
+      <Edit form={form} opened={opened} close={close} />
+    </>
+  );
 };
 
 const ServicePaper = ({
   children,
   service,
+  form,
+  open,
 }: {
   children: React.ReactNode;
   service: Service;
+  form: UseFormReturnType<{ id: string; title: string; category: string }>;
+  open: () => void;
 }) => {
   const { hovered, ref } = useHover();
-  const { open, setFormType, form, archived } = useServices();
+  const { archived } = useServices();
 
   return (
     <Paper ref={ref} radius="md" withBorder py="sm" pos="relative">
@@ -54,12 +78,13 @@ const ServicePaper = ({
             transition: 'opacity 0.2s ease-in-out',
           }}
           onClick={() => {
-            setFormType('edit');
-            form.setValues({
+            const values = {
               id: service.id,
               title: service.title,
               category: service.category,
-            });
+            };
+            form.setInitialValues(values);
+            form.reset();
             open();
           }}
         >
