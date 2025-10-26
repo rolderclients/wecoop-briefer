@@ -6,6 +6,7 @@ import {
   mantineHtmlProps,
   Title,
 } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 import { HeadContent, Outlet, Scripts } from '@tanstack/react-router';
 import { Navbar } from '@/components';
 
@@ -17,6 +18,7 @@ export const App = () => (
     </head>
     <body>
       <MantineProvider defaultColorScheme="light">
+        <Notifications />
         <AppShell
           header={{ height: 64 }}
           navbar={{

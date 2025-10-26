@@ -1,5 +1,6 @@
 import { Button } from '@mantine/core';
 import mantineCss from '@mantine/core/styles.css?url';
+import mantineNotificationsCss from '@mantine/notifications/styles.css?url';
 import { Default404Page } from '@rolder/ui-kit-react';
 import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext, Link } from '@tanstack/react-router';
@@ -30,6 +31,10 @@ export const Route = createRootRouteWithContext<{
       {
         rel: 'stylesheet',
         href: mantineCss,
+      },
+      {
+        rel: 'stylesheet',
+        href: mantineNotificationsCss,
       },
     ],
   }),
