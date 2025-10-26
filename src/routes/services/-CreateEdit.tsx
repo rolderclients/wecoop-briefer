@@ -34,7 +34,9 @@ export const CreateEdit = () => {
           form.reset();
         }}
         centered
-        title={formType === 'edit' ? form.getValues().title : 'Новая услуга'}
+        title={
+          formType === 'edit' ? form.getInitialValues().title : 'Новая услуга'
+        }
       >
         <form
           onSubmit={form.onSubmit((values) => {
