@@ -14,8 +14,13 @@ export interface Category extends Item {
 export interface Service extends Item {
   title: string;
   category: string;
-  categoryTitle: string;
+  // categoryTitle: string;
   archived: boolean;
+}
+
+export interface CategoryWithServices extends Item {
+  title: string;
+  services: Service[];
 }
 
 export interface NewService {
@@ -52,6 +57,7 @@ export interface ServiceWithPrompts extends Item {
   title: string;
   prompts: Prompt[];
 }
+
 export interface NewPrompt {
   title: string;
   service: string;

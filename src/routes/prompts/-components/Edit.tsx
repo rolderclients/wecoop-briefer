@@ -14,7 +14,8 @@ export const Edit = ({
   opened: boolean;
   close: () => void;
 }) => {
-  const { services, models, updatePrompt } = usePrompts();
+  const { services, servicesWithPrompts, prompts, models, updatePrompt } =
+    usePrompts();
 
   return (
     <Modal
@@ -25,11 +26,21 @@ export const Edit = ({
     >
       <form
         onSubmit={form.onSubmit((values) => {
-          updatePrompt(values);
+          const prompt = prompts.find((p) => p.id === values.id);
+          const serviceChanged = values.service !== prompt?.service;
+          const willDisabled = servicesWithPrompts
+            .find((i) => i.id === values.service)
+            ?.prompts.some((p) => p.enabled);
+          let enabled = prompt?.enabled;
+
+          if (enabled && serviceChanged && willDisabled) enabled = false;
+
+          updatePrompt({ ...values, enabled });
+
           close();
           notifications.show({
-            message: `Промт "${values.title}" обновлен`,
-            color: 'green',
+            message: `Промт "${values.title}" обновлен${willDisabled ? ' и выключен' : ''}`,
+            color: willDisabled ? 'orange' : 'green',
           });
         })}
       >

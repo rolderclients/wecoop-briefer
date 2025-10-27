@@ -1,7 +1,12 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { getDB } from '../db';
-import type { NewService, Service, UpdateService } from '../types';
+import type {
+  CategoryWithServices,
+  NewService,
+  Service,
+  UpdateService,
+} from '../types';
 import { fromDTO, fromDTOs, toDTO, toDTOs } from '../utils';
 
 const getServices = createServerFn({ method: 'GET' })
@@ -11,7 +16,7 @@ const getServices = createServerFn({ method: 'GET' })
 
     const [result] = await db
       .query(
-        'SELECT *, category.title as categoryTitle FROM service WHERE archived = $archived ORDER BY categoryTitle, title;',
+        `SELECT * FROM service WHERE archived == $archived ORDER BY title;`,
         {
           archived,
         },
@@ -25,6 +30,40 @@ export const servicesQueryOptions = (archived?: boolean) =>
   queryOptions<Service[]>({
     queryKey: ['services', archived],
     queryFn: () => getServices({ data: { archived } }),
+  });
+
+const getCategoriesWithServices = createServerFn({ method: 'GET' })
+  .inputValidator((data: { archived?: boolean }) => data)
+  .handler(async ({ data: { archived = false } }) => {
+    const db = await getDB();
+
+    const [result] = await db
+      .query(
+        `SELECT
+            id,
+            title,
+            (
+                SELECT *
+                FROM id.services
+                WHERE archived == $archived
+                ORDER BY title
+            ) AS services
+        FROM category
+        WHERE count(services[WHERE archived == $archived]) > 0
+        ORDER BY title;`,
+        {
+          archived,
+        },
+      )
+      .collect<[CategoryWithServices[]]>();
+
+    return toDTOs(result);
+  });
+
+export const categoriesWithServicesQueryOptions = (archived?: boolean) =>
+  queryOptions<CategoryWithServices[]>({
+    queryKey: ['categoriesWithServices', archived],
+    queryFn: () => getCategoriesWithServices({ data: { archived } }),
   });
 
 export const createService = createServerFn({ method: 'POST' })

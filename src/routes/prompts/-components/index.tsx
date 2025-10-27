@@ -4,15 +4,13 @@ import { Panel } from './Panel';
 import { PromptsProvider } from './PromptsProvider';
 import { Services } from './Services';
 
-export const Prompts = () => {
-  return (
-    <PromptsProvider>
-      <Page>
-        <Stack>
-          <Panel />
-          <Services />
-        </Stack>
-      </Page>
-    </PromptsProvider>
-  );
-};
+export const PromptsPage = () => (
+  <PromptsProvider>
+    <Page>
+      <Stack>
+        <Panel />
+        <Services />
+      </Stack>
+    </Page>
+  </PromptsProvider>
+);

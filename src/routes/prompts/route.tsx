@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import {
   modelsQueryOptions,
-  servicesPromptsQueryOptions,
   servicesQueryOptions,
+  servicesWithPromptsQueryOptions,
 } from '@/api/repositories';
-import { Prompts } from './-components/Prompts';
+import { PromptsPage } from './-components';
 
 export const Route = createFileRoute('/prompts')({
   loaderDeps: ({ search: { archived } }) => ({ archived }),
@@ -12,10 +12,10 @@ export const Route = createFileRoute('/prompts')({
     await context.queryClient.ensureQueryData(servicesQueryOptions());
     await context.queryClient.ensureQueryData(modelsQueryOptions());
     await context.queryClient.ensureQueryData(
-      servicesPromptsQueryOptions(archived),
+      servicesWithPromptsQueryOptions(archived),
     );
   },
-  component: Prompts,
+  component: PromptsPage,
   validateSearch: (search: Record<string, unknown>): { archived?: boolean } => {
     return {
       archived: search?.archived === true ? true : undefined,

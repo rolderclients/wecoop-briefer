@@ -56,6 +56,7 @@ export const ArchivateRestoreDelete = ({
               const selected = prompts.filter((i) =>
                 selectedIds.includes(i.id),
               );
+              const enabledCount = selected.filter((i) => i.enabled).length;
 
               switch (type) {
                 case 'archivate':
@@ -70,9 +71,13 @@ export const ArchivateRestoreDelete = ({
                     notifications.show({
                       message:
                         selected.length === 1
-                          ? `Промт выключен и отпрален в архив`
-                          : `Промты выключены и отпралены в архив`,
-                      color: 'green',
+                          ? enabledCount
+                            ? `Промт выключен и отпрален в архив`
+                            : `Промт отпрален в архив`
+                          : enabledCount
+                            ? `Промты отпралены в архив, из них выключено ${enabledCount}`
+                            : `Промты отпралены в архив`,
+                      color: enabledCount ? 'orange' : 'green',
                     });
                   }
                   break;

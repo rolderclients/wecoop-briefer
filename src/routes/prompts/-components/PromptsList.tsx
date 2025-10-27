@@ -10,7 +10,7 @@ import {
 import type { UseFormReturnType } from '@mantine/form';
 import { useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormPrompt, Prompt } from '@/api';
 import classes from '../../styles.module.css';
 import { usePrompts } from './PromptsProvider';
@@ -25,11 +25,15 @@ export const PromptsList = ({
   open: () => void;
 }) => {
   const { selectedIds, setSelectedIds, updatePrompts } = usePrompts();
-  const [enabledPromptId, setEnabledPromptId] = useState<string | null>(
-    prompts.some((p) => p.enabled)
-      ? prompts.find((p) => p.enabled)?.id || null
-      : null,
-  );
+  const [enabledPromptId, setEnabledPromptId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setEnabledPromptId(
+      prompts.some((p) => p.enabled)
+        ? prompts.find((p) => p.enabled)?.id || null
+        : null,
+    );
+  }, [prompts]);
 
   return (
     <Chip.Group

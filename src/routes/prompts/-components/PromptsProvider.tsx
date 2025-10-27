@@ -16,8 +16,8 @@ import {
   createPrompt,
   deletePrompts,
   modelsQueryOptions,
-  servicesPromptsQueryOptions,
   servicesQueryOptions,
+  servicesWithPromptsQueryOptions,
   updatePrompt,
   updatePrompts,
 } from '@/api/repositories';
@@ -49,37 +49,41 @@ export const PromptsProvider = ({ children }: { children: ReactNode }) => {
   const { data: services } = useSuspenseQuery(servicesQueryOptions());
   const { data: models } = useSuspenseQuery(modelsQueryOptions());
   const { data: servicesWithPrompts } = useSuspenseQuery(
-    servicesPromptsQueryOptions(initialArchived),
+    servicesWithPromptsQueryOptions(initialArchived),
   );
 
   const createPromptMutation = useMutation({
     mutationFn: (promptData: NewPrompt) =>
       createPrompt({ data: { promptData } }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['prompts'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['servicesWithPrompts'] }),
   });
 
   const updatePromptMutation = useMutation({
     mutationFn: (promptData: UpdatePrompt) =>
       updatePrompt({ data: { promptData } }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['prompts'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['servicesWithPrompts'] }),
   });
 
   const updatePromptsMutation = useMutation({
     mutationFn: (promptsData: UpdatePrompt[]) =>
       updatePrompts({ data: { promptsData } }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['prompts'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['servicesWithPrompts'] }),
   });
 
   const deletePromptsMutation = useMutation({
     mutationFn: (ids: string[]) => deletePrompts({ data: { ids } }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['prompts'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['servicesWithPrompts'] }),
   });
 
   const value = {
     services,
     models,
     servicesWithPrompts,
-    prompts: servicesWithPrompts.flatMap((service) => service.prompts),
+    prompts: servicesWithPrompts.flatMap((i) => i.prompts),
     createPrompt: createPromptMutation.mutate,
     updatePrompt: updatePromptMutation.mutate,
     updatePrompts: updatePromptsMutation.mutate,

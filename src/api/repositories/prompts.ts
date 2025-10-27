@@ -9,27 +9,25 @@ import type {
 } from '../types';
 import { fromDTO, fromDTOs, toDTO, toDTOs } from '../utils';
 
-const getServicesPrompts = createServerFn({ method: 'GET' })
+const getServicesWithPrompts = createServerFn({ method: 'GET' })
   .inputValidator((data: { archived?: boolean }) => data)
   .handler(async ({ data: { archived = false } }) => {
     const db = await getDB();
 
     const [result] = await db
       .query(
-        `SELECT id, title, prompts[WHERE archived == $archived].{
-	id,
-	title,
-	content,
-	enabled,
-	service,
-	model.{
-		id,
-		name,
-		title
-	},
-	time,
-	archived
-        } FROM service WHERE count(prompts[WHERE archived == $archived]) > 0 AND archived == false ORDER BY title;`,
+        `SELECT
+            id,
+            title,
+            (
+                SELECT *, model.{ id, name, title }
+                FROM id.prompts
+                WHERE archived == $archived
+                ORDER BY title
+            ) AS prompts
+        FROM service
+        WHERE count(prompts[WHERE archived == $archived]) > 0 AND archived == false
+        ORDER BY title;`,
         {
           archived,
         },
@@ -39,10 +37,10 @@ const getServicesPrompts = createServerFn({ method: 'GET' })
     return toDTOs(result);
   });
 
-export const servicesPromptsQueryOptions = (archived?: boolean) =>
+export const servicesWithPromptsQueryOptions = (archived?: boolean) =>
   queryOptions<ServiceWithPrompts[]>({
-    queryKey: ['prompts', archived],
-    queryFn: () => getServicesPrompts({ data: { archived } }),
+    queryKey: ['servicesWithPrompts', !!archived],
+    queryFn: () => getServicesWithPrompts({ data: { archived } }),
   });
 
 export const createPrompt = createServerFn({ method: 'POST' })
