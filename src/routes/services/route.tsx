@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { categoriesQueryOptions, servicesQueryOptions } from '@/api';
-import { Services } from './-Services';
+import { Services } from './-components/Services';
 
 export const Route = createFileRoute('/services')({
   loaderDeps: ({ search: { archived } }) => ({ archived }),

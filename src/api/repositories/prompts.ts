@@ -16,20 +16,20 @@ const getServicesPrompts = createServerFn({ method: 'GET' })
 
     const [result] = await db
       .query(
-        `SELECT id, title, prompts[WHERE archived == false][*].{
+        `SELECT id, title, prompts[WHERE archived == $archived].{
 	id,
 	title,
 	content,
 	enabled,
 	service,
 	model.{
-	  id,
+		id,
 		name,
 		title
 	},
 	time,
 	archived
-      } FROM service WHERE !prompts.is_empty() AND archived == false ORDER BY title;`,
+        } FROM service WHERE count(prompts[WHERE archived == $archived]) > 0 AND archived == false ORDER BY title;`,
         {
           archived,
         },
@@ -71,28 +71,28 @@ export const updatePrompt = createServerFn({ method: 'POST' })
     return toDTO(result);
   });
 
-// export const updateServices = createServerFn({ method: 'POST' })
-//   .inputValidator((data: { servicesData: UpdateService[] }) => data)
-//   .handler(async ({ data: { servicesData } }) => {
-//     const db = await getDB();
+export const updatePrompts = createServerFn({ method: 'POST' })
+  .inputValidator((data: { promptsData: UpdatePrompt[] }) => data)
+  .handler(async ({ data: { promptsData } }) => {
+    const db = await getDB();
 
-//     const items = fromDTO(servicesData);
+    const items = fromDTO(promptsData);
+    const [, result] = await db
+      .query(
+        `FOR $item IN $items { UPDATE $item.id MERGE $item };
+  RETURN $items.id.*;`,
+        { items },
+      )
+      .collect<[undefined, Prompt[]]>();
 
-//     const result = await db.query<[undefined, Service[]]>(
-//       `FOR $item IN $items { UPDATE $item.id MERGE $item };
-//   RETURN $items.id.*;`,
-//       { items },
-//     );
+    return toDTOs(result);
+  });
 
-//     return toDTOs(result[1]);
-//   });
+export const deletePrompts = createServerFn({ method: 'POST' })
+  .inputValidator((data: { ids: string[] }) => data)
+  .handler(async ({ data }) => {
+    const db = await getDB();
 
-// export const deleteServices = createServerFn({ method: 'POST' })
-//   .inputValidator((data: { ids: string[] }) => data)
-//   .handler(async ({ data }) => {
-//     const db = await getDB();
-
-//     const ids = fromDTOs(data.ids);
-
-//     await db.query('FOR $id IN $ids { DELETE $id };', { ids });
-//   });
+    const ids = fromDTOs(data.ids);
+    await db.query('FOR $id IN $ids { DELETE $id };', { ids });
+  });

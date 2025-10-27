@@ -4,7 +4,7 @@ import {
   servicesPromptsQueryOptions,
   servicesQueryOptions,
 } from '@/api/repositories';
-import { Prompts } from './-Prompts';
+import { Prompts } from './-components/Prompts';
 
 export const Route = createFileRoute('/prompts')({
   loaderDeps: ({ search: { archived } }) => ({ archived }),

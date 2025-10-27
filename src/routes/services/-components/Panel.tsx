@@ -1,10 +1,10 @@
 import { Group, Paper, Switch } from '@mantine/core';
 import { IconArchive, IconRestore, IconTrash } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
-import { ArchivateRestoreDelete } from './-ArchivateRestoreDelete';
-import { Create } from './-Create';
-import { useServices } from './-ServicesProvider';
-import { Route } from './route';
+import { Route } from '../route';
+import { ArchivateRestoreDelete } from './ArchivateRestoreDelete';
+import { Create } from './Create';
+import { useServices } from './ServicesProvider';
 
 export const Panel = () => {
   const navigate = useNavigate({ from: Route.fullPath });

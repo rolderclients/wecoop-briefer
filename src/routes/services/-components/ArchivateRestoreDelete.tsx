@@ -2,7 +2,7 @@ import { Button, Group, type MantineColor, Modal, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { type Icon, IconCancel } from '@tabler/icons-react';
-import { usePrompts } from './-PromptsProvider';
+import { useServices } from './ServicesProvider';
 
 export const ArchivateRestoreDelete = ({
   type,
@@ -16,12 +16,12 @@ export const ArchivateRestoreDelete = ({
   color?: MantineColor;
 }) => {
   const {
-    prompts,
-    // updateServices,
-    // deleteServices,
+    services,
+    updateServices,
+    deleteServices,
     selectedIds,
     setSelectedIds,
-  } = usePrompts();
+  } = useServices();
   const [opened, { open, close }] = useDisclosure(false);
 
   return (
@@ -58,16 +58,16 @@ export const ArchivateRestoreDelete = ({
             leftSection={<Icon size={16} />}
             rightSection={selectedIds.length}
             onClick={() => {
-              const selected = prompts.filter((i) =>
+              const selected = services.filter((i) =>
                 selectedIds.includes(i.id),
               );
 
               switch (type) {
                 case 'archivate':
                   {
-                    // updateServices(
-                    //   selected.map((i) => ({ id: i.id, archived: true })),
-                    // );
+                    updateServices(
+                      selected.map((i) => ({ id: i.id, archived: true })),
+                    );
                     notifications.show({
                       message:
                         selected.length === 1
@@ -79,9 +79,9 @@ export const ArchivateRestoreDelete = ({
                   break;
                 case 'restore':
                   {
-                    // updateServices(
-                    //   selected.map((i) => ({ id: i.id, archived: false })),
-                    // );
+                    updateServices(
+                      selected.map((i) => ({ id: i.id, archived: false })),
+                    );
                     notifications.show({
                       message:
                         selected.length === 1
@@ -93,7 +93,7 @@ export const ArchivateRestoreDelete = ({
                   break;
                 case 'delete':
                   {
-                    // deleteServices(selectedIds);
+                    deleteServices(selectedIds);
                     notifications.show({
                       message:
                         selected.length === 1

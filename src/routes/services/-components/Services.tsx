@@ -1,8 +1,8 @@
 import { Group, Space, Stack, Text } from '@mantine/core';
 import { Page } from '@/components';
-import { Panel } from './-Panel';
-import { ServiceList } from './-ServiceList';
-import { ServicesProvider } from './-ServicesProvider';
+import { Panel } from './Panel';
+import { ServiceList } from './ServiceList';
+import { ServicesProvider } from './ServicesProvider';
 
 export const Services = () => (
   <ServicesProvider>

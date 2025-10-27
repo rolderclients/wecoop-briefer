@@ -1,0 +1,13 @@
+.editActionIcon {
+  position: absolute;
+  right: 12px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  transition: opacity 0.2s ease-in-out;
+  opacity: 0;
+  &[data-hovered] {
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+  }
+}

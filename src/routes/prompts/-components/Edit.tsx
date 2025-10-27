@@ -3,7 +3,7 @@ import type { UseFormReturnType } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconCancel, IconPlus } from '@tabler/icons-react';
 import type { FormPrompt } from '@/api';
-import { usePrompts } from './-PromptsProvider';
+import { usePrompts } from './PromptsProvider';
 
 export const Edit = ({
   form,

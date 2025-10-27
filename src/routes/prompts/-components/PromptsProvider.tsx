@@ -14,12 +14,14 @@ import type {
 } from '@/api';
 import {
   createPrompt,
+  deletePrompts,
   modelsQueryOptions,
   servicesPromptsQueryOptions,
   servicesQueryOptions,
   updatePrompt,
+  updatePrompts,
 } from '@/api/repositories';
-import { Route } from './route';
+import { Route } from '../route';
 
 interface PromptsContext {
   services: Service[];
@@ -28,8 +30,8 @@ interface PromptsContext {
   prompts: Prompt[];
   createPrompt: (promptData: NewPrompt) => void;
   updatePrompt: (promptData: UpdatePrompt) => void;
-  // updateServices: (servicesData: UpdateService[]) => void;
-  // deleteServices: (ids: string[]) => void;
+  updatePrompts: (promptData: UpdatePrompt[]) => void;
+  deletePrompts: (ids: string[]) => void;
   selectedIds: string[];
   setSelectedIds: (ids: string[]) => void;
   archived?: boolean;
@@ -62,16 +64,16 @@ export const PromptsProvider = ({ children }: { children: ReactNode }) => {
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['prompts'] }),
   });
 
-  // const updateServicesMutation = useMutation({
-  //   mutationFn: (servicesData: UpdateService[]) =>
-  //     updateServices({ data: { servicesData } }),
-  //   onSettled: () => queryClient.invalidateQueries({ queryKey: ['services'] }),
-  // });
+  const updatePromptsMutation = useMutation({
+    mutationFn: (promptsData: UpdatePrompt[]) =>
+      updatePrompts({ data: { promptsData } }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['prompts'] }),
+  });
 
-  // const deleteServicesMutation = useMutation({
-  //   mutationFn: (ids: string[]) => deleteServices({ data: { ids } }),
-  //   onSettled: () => queryClient.invalidateQueries({ queryKey: ['services'] }),
-  // });
+  const deletePromptsMutation = useMutation({
+    mutationFn: (ids: string[]) => deletePrompts({ data: { ids } }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['prompts'] }),
+  });
 
   const value = {
     services,
@@ -80,8 +82,8 @@ export const PromptsProvider = ({ children }: { children: ReactNode }) => {
     prompts: servicesWithPrompts.flatMap((service) => service.prompts),
     createPrompt: createPromptMutation.mutate,
     updatePrompt: updatePromptMutation.mutate,
-    // updateServices: updateServicesMutation.mutate,
-    // deleteServices: deleteServicesMutation.mutate,
+    updatePrompts: updatePromptsMutation.mutate,
+    deletePrompts: deletePromptsMutation.mutate,
     selectedIds,
     setSelectedIds,
     archived,

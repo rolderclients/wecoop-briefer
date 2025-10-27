@@ -78,6 +78,5 @@ export const deleteServices = createServerFn({ method: 'POST' })
     const db = await getDB();
 
     const ids = fromDTOs(data.ids);
-
     await db.query('FOR $id IN $ids { DELETE $id };', { ids });
   });

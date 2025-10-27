@@ -3,8 +3,9 @@ import { isNotEmpty, type UseFormReturnType, useForm } from '@mantine/form';
 import { useDisclosure, useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
 import type { FormService, Service } from '@/api';
-import { Edit } from './-Edit';
-import { useServices } from './-ServicesProvider';
+import classes from '../../styles.module.css';
+import { Edit } from './Edit';
+import { useServices } from './ServicesProvider';
 
 export const ServiceList = () => {
   const { services, selectedIds, setSelectedIds } = useServices();
@@ -69,14 +70,8 @@ const ServicePaper = ({
       {!archived && (
         <ActionIcon
           aria-label="Изменить"
-          style={{
-            position: 'absolute',
-            right: 12,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            opacity: hovered ? 1 : 0,
-            transition: 'opacity 0.2s ease-in-out',
-          }}
+          className={classes.editActionIcon}
+          mod={{ hovered }}
           onClick={() => {
             const values = {
               id: service.id,

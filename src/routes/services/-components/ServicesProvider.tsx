@@ -16,7 +16,7 @@ import {
   updateService,
   updateServices,
 } from '@/api';
-import { Route } from './route';
+import { Route } from '../route';
 
 interface ServicesContext {
   categories: Category[];

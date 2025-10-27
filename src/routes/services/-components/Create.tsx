@@ -3,19 +3,15 @@ import { isNotEmpty, useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconCancel, IconPlus } from '@tabler/icons-react';
-import { usePrompts } from './-PromptsProvider';
+import { useServices } from './ServicesProvider';
 
 export const Create = () => {
-  const { services, models, archived, createPrompt } = usePrompts();
+  const { categories, createService, archived } = useServices();
 
   const form = useForm({
     mode: 'uncontrolled',
-    initialValues: { title: '', service: '', model: '' },
-    validate: {
-      title: isNotEmpty(),
-      service: isNotEmpty(),
-      model: isNotEmpty(),
-    },
+    initialValues: { title: '', category: '' },
+    validate: { title: isNotEmpty(), category: isNotEmpty() },
   });
 
   const [opened, { open, close }] = useDisclosure(false);
@@ -33,17 +29,13 @@ export const Create = () => {
         Добавить
       </Button>
 
-      <Modal opened={opened} onClose={close} centered title="Новый промт">
+      <Modal opened={opened} onClose={close} centered title="Новая услуга">
         <form
           onSubmit={form.onSubmit((values) => {
-            createPrompt({
-              title: values.title,
-              service: values.service,
-              model: values.model,
-            });
+            createService({ title: values.title, category: values.category });
             close();
             notifications.show({
-              message: `Промт "${values.title}" создан`,
+              message: `Услуга "${values.title}" создана`,
               color: 'green',
             });
           })}
@@ -57,21 +49,12 @@ export const Create = () => {
             />
 
             <Select
-              label="Услуга"
-              placeholder="Выберите услугу"
-              data={services.map((i) => ({ label: i.title, value: i.id }))}
+              label="Категория"
+              placeholder="Выберите категорию"
+              data={categories.map((i) => ({ label: i.title, value: i.id }))}
               searchable
-              key={form.key('service')}
-              {...form.getInputProps('service')}
-            />
-
-            <Select
-              label="Модель ИИ"
-              placeholder="Выберите модель ИИ"
-              data={models.map((i) => ({ label: i.title, value: i.id }))}
-              searchable
-              key={form.key('model')}
-              {...form.getInputProps('model')}
+              key={form.key('category')}
+              {...form.getInputProps('category')}
             />
 
             <Group ml="auto" mt="lg">
