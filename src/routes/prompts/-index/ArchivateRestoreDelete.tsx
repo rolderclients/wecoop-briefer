@@ -2,7 +2,7 @@ import { Button, Group, type MantineColor, Modal, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { type Icon, IconCancel } from '@tabler/icons-react';
-import { useServices } from './-ServicesProvider';
+import { usePrompts } from './PromptsProvider';
 
 export const ArchivateRestoreDelete = ({
   type,
@@ -15,13 +15,8 @@ export const ArchivateRestoreDelete = ({
   icon: Icon;
   color?: MantineColor;
 }) => {
-  const {
-    services,
-    updateServices,
-    deleteServices,
-    selectedIds,
-    setSelectedIds,
-  } = useServices();
+  const { prompts, updatePrompts, deletePrompts, selectedIds, setSelectedIds } =
+    usePrompts();
   const [opened, { open, close }] = useDisclosure(false);
 
   return (
@@ -58,47 +53,56 @@ export const ArchivateRestoreDelete = ({
             leftSection={<Icon size={16} />}
             rightSection={selectedIds.length}
             onClick={() => {
-              const selected = services.filter((i) =>
+              const selected = prompts.filter((i) =>
                 selectedIds.includes(i.id),
               );
+              const enabledCount = selected.filter((i) => i.enabled).length;
 
               switch (type) {
                 case 'archivate':
                   {
-                    updateServices(
-                      selected.map((i) => ({ id: i.id, archived: true })),
+                    updatePrompts(
+                      selected.map((i) => ({
+                        id: i.id,
+                        archived: true,
+                        enabled: false,
+                      })),
                     );
                     notifications.show({
                       message:
                         selected.length === 1
-                          ? `Услуга архивирована`
-                          : `Услуги архивированы`,
-                      color: 'green',
+                          ? enabledCount
+                            ? `Промт выключен и отпрален в архив`
+                            : `Промт отпрален в архив`
+                          : enabledCount
+                            ? `Промты отпралены в архив, из них выключено ${enabledCount}`
+                            : `Промты отпралены в архив`,
+                      color: enabledCount ? 'orange' : 'green',
                     });
                   }
                   break;
                 case 'restore':
                   {
-                    updateServices(
+                    updatePrompts(
                       selected.map((i) => ({ id: i.id, archived: false })),
                     );
                     notifications.show({
                       message:
                         selected.length === 1
-                          ? `Услуга восстановлена`
-                          : `Услуги восстановлены`,
+                          ? `Промт восстановлен`
+                          : `Промты восстановлены`,
                       color: 'green',
                     });
                   }
                   break;
                 case 'delete':
                   {
-                    deleteServices(selectedIds);
+                    deletePrompts(selectedIds);
                     notifications.show({
                       message:
                         selected.length === 1
-                          ? `Услуга удалена`
-                          : `Услуги удалены`,
+                          ? `Промт удален`
+                          : `Промты удалены`,
                       color: 'green',
                     });
                   }

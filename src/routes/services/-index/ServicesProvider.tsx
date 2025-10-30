@@ -1,5 +1,3 @@
-import { isNotEmpty, type UseFormReturnType, useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
 import {
   useMutation,
   useQueryClient,
@@ -8,20 +6,22 @@ import {
 import { createContext, type ReactNode, useContext, useState } from 'react';
 import {
   type Category,
+  type CategoryWithServices,
   categoriesQueryOptions,
+  categoriesWithServicesQueryOptions,
   createService,
   deleteServices,
   type NewService,
   type Service,
-  servicesQueryOptions,
   type UpdateService,
   updateService,
   updateServices,
 } from '@/api';
-import { Route } from './route';
+import { Route } from '..';
 
 interface ServicesContext {
   categories: Category[];
+  categoriesWithServices: CategoryWithServices[];
   services: Service[];
   createService: (serviceData: NewService) => void;
   updateService: (serviceData: UpdateService) => void;
@@ -31,12 +31,6 @@ interface ServicesContext {
   setSelectedIds: (ids: string[]) => void;
   archived?: boolean;
   setArchived: (archived: boolean) => void;
-  opened: boolean;
-  open: () => void;
-  close: () => void;
-  form: UseFormReturnType<{ id: string; title: string; category: string }>;
-  formType: 'create' | 'edit';
-  setFormType: (type: 'create' | 'edit') => void;
 }
 
 const ServicesContext = createContext<ServicesContext | null>(null);
@@ -48,51 +42,41 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
   const { archived: initialArchived } = Route.useSearch();
   const [archived, setArchived] = useState(initialArchived);
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
-  const { data: services } = useSuspenseQuery(
-    servicesQueryOptions(initialArchived),
+  const { data: categoriesWithServices } = useSuspenseQuery(
+    categoriesWithServicesQueryOptions(initialArchived),
   );
-  const [opened, { open, close }] = useDisclosure(false);
-  const form = useForm({
-    mode: 'uncontrolled',
-    initialValues: {
-      id: '',
-      title: '',
-      category: '',
-    },
-
-    validate: {
-      title: isNotEmpty(),
-      category: isNotEmpty(),
-    },
-  });
-  const [formType, setFormType] = useState<'create' | 'edit'>('create');
 
   const createServiceMutation = useMutation({
     mutationFn: (serviceData: NewService) =>
       createService({ data: { serviceData } }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['services'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] }),
   });
 
   const updateServiceMutation = useMutation({
     mutationFn: (serviceData: UpdateService) =>
       updateService({ data: { serviceData } }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['services'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] }),
   });
 
   const updateServicesMutation = useMutation({
     mutationFn: (servicesData: UpdateService[]) =>
       updateServices({ data: { servicesData } }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['services'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] }),
   });
 
   const deleteServicesMutation = useMutation({
     mutationFn: (ids: string[]) => deleteServices({ data: { ids } }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['services'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] }),
   });
 
   const value = {
     categories,
-    services,
+    categoriesWithServices,
+    services: categoriesWithServices.flatMap((i) => i.services),
     createService: createServiceMutation.mutate,
     updateService: updateServiceMutation.mutate,
     updateServices: updateServicesMutation.mutate,
@@ -101,12 +85,6 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
     setSelectedIds,
     archived,
     setArchived,
-    opened,
-    open,
-    close,
-    form,
-    formType,
-    setFormType,
   };
 
   return (

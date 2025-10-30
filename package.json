@@ -1,6 +1,6 @@
 {
   "name": "wecoop-briefer",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,21 +10,30 @@
     "start": "bun server.ts"
   },
   "dependencies": {
-    "@mantine/core": "^8.3.5",
-    "@mantine/form": "^8.3.5",
-    "@mantine/hooks": "^8.3.5",
-    "@mantine/notifications": "^8.3.5",
+    "@mantine/core": "^8.3.6",
+    "@mantine/form": "^8.3.6",
+    "@mantine/hooks": "^8.3.6",
+    "@mantine/notifications": "^8.3.6",
+    "@mantine/tiptap": "^8.3.6",
     "@rolder/streamdown": "^1.3.0-1",
     "@rolder/ui-kit-react": "^3.0.0-6",
     "@tabler/icons-react": "^3.35.0",
     "@tanstack/react-query": "^5.90.5",
-    "@tanstack/react-router": "^1.133.28",
-    "@tanstack/react-router-ssr-query": "^1.133.28",
-    "@tanstack/react-start": "^1.133.29",
+    "@tanstack/react-router": "^1.133.36",
+    "@tanstack/react-router-ssr-query": "^1.133.36",
+    "@tanstack/react-start": "^1.134.0",
+    "@tiptap/extension-highlight": "^3.9.1",
+    "@tiptap/extension-link": "^3.9.1",
+    "@tiptap/extension-task-item": "^3.9.1",
+    "@tiptap/extension-task-list": "^3.9.1",
+    "@tiptap/extension-text-align": "^3.9.1",
+    "@tiptap/pm": "^3.9.1",
+    "@tiptap/react": "^3.9.1",
+    "@tiptap/starter-kit": "^3.9.1",
     "@vitejs/plugin-react": "^5.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "surrealdb": "^1.3.2"
+    "surrealdb": "^2.0.0-alpha.10"
   },
   "devDependencies": {
     "@types/react": "^19.2.2",
@@ -36,7 +45,7 @@
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
     "clsx": "^2.1.1",
-    "@biomejs/biome": "2.3.0",
+    "@biomejs/biome": "2.3.2",
     "@types/bun": "^1.3.1"
   }
 }

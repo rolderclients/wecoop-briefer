@@ -1,7 +1,12 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { getDB } from '../db';
-import type { NewService, Service, UpdateService } from '../types';
+import type {
+  CategoryWithServices,
+  NewService,
+  Service,
+  UpdateService,
+} from '../types';
 import { fromDTO, fromDTOs, toDTO, toDTOs } from '../utils';
 
 const getServices = createServerFn({ method: 'GET' })
@@ -9,14 +14,16 @@ const getServices = createServerFn({ method: 'GET' })
   .handler(async ({ data: { archived = false } }) => {
     const db = await getDB();
 
-    const result = await db.query<[Service[]]>(
-      'SELECT *, category.title as categoryTitle FROM service WHERE archived = $archived ORDER BY categoryTitle, title;',
-      {
-        archived,
-      },
-    );
+    const [result] = await db
+      .query(
+        `SELECT * FROM service WHERE archived == $archived ORDER BY title NUMERIC;`,
+        {
+          archived,
+        },
+      )
+      .collect<[Service[]]>();
 
-    return toDTOs(result[0]);
+    return toDTOs(result);
   });
 
 export const servicesQueryOptions = (archived?: boolean) =>
@@ -25,17 +32,54 @@ export const servicesQueryOptions = (archived?: boolean) =>
     queryFn: () => getServices({ data: { archived } }),
   });
 
+const getCategoriesWithServices = createServerFn({ method: 'GET' })
+  .inputValidator((data: { archived?: boolean }) => data)
+  .handler(async ({ data: { archived = false } }) => {
+    const db = await getDB();
+
+    const [result] = await db
+      .query(
+        `SELECT
+            id,
+            title,
+            (
+                SELECT *
+                FROM id.services
+                WHERE archived == $archived
+                ORDER BY title NUMERIC
+            ) AS services
+        FROM category
+        WHERE count(services[WHERE archived == $archived]) > 0
+        ORDER BY title NUMERIC;`,
+        {
+          archived,
+        },
+      )
+      .collect<[CategoryWithServices[]]>();
+
+    return toDTOs(result);
+  });
+
+export const categoriesWithServicesQueryOptions = (archived?: boolean) =>
+  queryOptions<CategoryWithServices[]>({
+    queryKey: ['categoriesWithServices', archived],
+    queryFn: () => getCategoriesWithServices({ data: { archived } }),
+  });
+
 export const createService = createServerFn({ method: 'POST' })
   .inputValidator((data: { serviceData: NewService }) => data)
   .handler(async ({ data: { serviceData } }) => {
     const db = await getDB();
 
-    const i = fromDTO(serviceData);
-    const result = await db.query<Service[]>('CREATE service CONTENT $i', {
-      i,
-    });
+    const data = await fromDTO(serviceData);
 
-    return toDTO(result[0]);
+    const [result] = await db
+      .query('CREATE service CONTENT $data', {
+        data,
+      })
+      .collect<[Service]>();
+
+    return toDTO(result);
   });
 
 export const updateService = createServerFn({ method: 'POST' })
@@ -43,11 +87,12 @@ export const updateService = createServerFn({ method: 'POST' })
   .handler(async ({ data: { serviceData } }) => {
     const db = await getDB();
 
-    const i = fromDTO(serviceData);
+    const item = await fromDTO(serviceData);
+    const [result] = await db
+      .query('UPDATE $item.id MERGE $item', { item })
+      .collect<[Service]>();
 
-    const result = await db.query<Service[]>('UPDATE $i.id MERGE $i', { i });
-
-    return toDTO(result[0]);
+    return toDTO(result);
   });
 
 export const updateServices = createServerFn({ method: 'POST' })
@@ -55,15 +100,16 @@ export const updateServices = createServerFn({ method: 'POST' })
   .handler(async ({ data: { servicesData } }) => {
     const db = await getDB();
 
-    const items = fromDTO(servicesData);
-
-    const result = await db.query<[undefined, Service[]]>(
-      `FOR $item IN $items { UPDATE $item.id MERGE $item };
+    const items = await fromDTOs(servicesData);
+    const [, result] = await db
+      .query(
+        `FOR $item IN $items { UPDATE $item.id MERGE $item };
   RETURN $items.id.*;`,
-      { items },
-    );
+        { items },
+      )
+      .collect<[undefined, [Service]]>();
 
-    return toDTOs(result[1]);
+    return toDTOs(result);
   });
 
 export const deleteServices = createServerFn({ method: 'POST' })
@@ -71,7 +117,6 @@ export const deleteServices = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const db = await getDB();
 
-    const ids = fromDTOs(data.ids);
-
+    const ids = await fromDTOs(data.ids);
     await db.query('FOR $id IN $ids { DELETE $id };', { ids });
   });
