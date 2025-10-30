@@ -1,4 +1,4 @@
-import { Accordion, Grid, Group, Space, Stack, Text } from '@mantine/core';
+import { Accordion, Grid, Space, Stack, Text } from '@mantine/core';
 import { isNotEmpty, useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { Edit } from './Edit';
