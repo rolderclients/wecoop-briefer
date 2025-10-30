@@ -1,13 +1,12 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
-import { getDB } from '../db';
+import { fromDTO, fromDTOs, getDB } from '../db';
 import type {
   NewPrompt,
   Prompt,
   ServiceWithPrompts,
   UpdatePrompt,
 } from '../types';
-import { fromDTO, fromDTOs, toDTO, toDTOs } from '../utils';
 
 const getServicesWithPrompts = createServerFn({ method: 'GET' })
   .inputValidator((data: { archived?: boolean }) => data)
@@ -32,9 +31,10 @@ const getServicesWithPrompts = createServerFn({ method: 'GET' })
           archived,
         },
       )
+      .json()
       .collect<[ServiceWithPrompts[]]>();
 
-    return toDTOs(result);
+    return result;
   });
 
 export const servicesWithPromptsQueryOptions = (archived?: boolean) =>
@@ -51,9 +51,10 @@ export const getPrompt = createServerFn({ method: 'POST' })
     const id = await fromDTO(promptId);
     const [result] = await db
       .query('SELECT *, model.{ id, name, title } FROM ONLY $id', { id })
+      .json()
       .collect<[Prompt]>();
 
-    return toDTO(result);
+    return result;
   });
 
 export const promptQueryOptions = (promptId: string) =>
@@ -68,12 +69,7 @@ export const createPrompt = createServerFn({ method: 'POST' })
     const db = await getDB();
 
     const data = await fromDTO(promptData);
-
-    const [result] = await db
-      .query('CREATE prompt CONTENT $data', { data })
-      .collect<[Prompt]>();
-
-    return toDTO(result);
+    await db.query('CREATE prompt CONTENT $data', { data });
   });
 
 export const updatePrompt = createServerFn({ method: 'POST' })
@@ -82,12 +78,7 @@ export const updatePrompt = createServerFn({ method: 'POST' })
     const db = await getDB();
 
     const item = await fromDTO(promptData);
-
-    const [result] = await db
-      .query('UPDATE $item.id MERGE $item', { item })
-      .collect<[Prompt]>();
-
-    return toDTO(result);
+    await db.query('UPDATE $item.id MERGE $item', { item });
   });
 
 export const updatePrompts = createServerFn({ method: 'POST' })
@@ -96,15 +87,9 @@ export const updatePrompts = createServerFn({ method: 'POST' })
     const db = await getDB();
 
     const items = await fromDTOs(promptsData);
-    const [, result] = await db
-      .query(
-        `FOR $item IN $items { UPDATE $item.id MERGE $item };
-  RETURN $items.id.*;`,
-        { items },
-      )
-      .collect<[undefined, Prompt[]]>();
-
-    return toDTOs(result);
+    await db.query(`FOR $item IN $items { UPDATE $item.id MERGE $item };`, {
+      items,
+    });
   });
 
 export const deletePrompts = createServerFn({ method: 'POST' })

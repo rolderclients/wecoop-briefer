@@ -38,6 +38,7 @@ const ServicePaper = ({
   const { selectedIds, setSelectedIds, archived } = useServices();
 
   const handleEditClick = () => {
+    console.log(service);
     const values = {
       id: service.id,
       title: service.title,

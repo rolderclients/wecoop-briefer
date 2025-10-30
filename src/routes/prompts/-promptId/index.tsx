@@ -7,9 +7,8 @@ import {
 } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import { promptQueryOptions, type UpdatePrompt, updatePrompt } from '@/api';
-import { Page } from '@/components';
+import { Editor, Page } from '@/components';
 import { Route } from '../$promptId';
-import { Editor } from './Editor';
 
 export const PromptPage = () => {
   const { promptId } = useParams({ from: Route.fullPath });
@@ -33,9 +32,10 @@ export const PromptPage = () => {
         <Title>{prompt.title}</Title>
 
         <Editor
-          prompt={prompt}
+          content={prompt.content}
           onChange={debouncedUpdate}
           saving={status === 'pending'}
+          editable={!prompt.archived}
         />
       </Stack>
     </Page>

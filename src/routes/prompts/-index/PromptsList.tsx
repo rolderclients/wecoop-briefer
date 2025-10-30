@@ -94,7 +94,7 @@ const PromptPaper = ({
       reloadDocument={true}
       className={classes.routerLink}
     >
-      <Paper ref={ref} radius="md" withBorder className={classes.promptPaper}>
+      <Paper ref={ref} radius="md" withBorder className={classes.hoverPaper}>
         <Grid px="md" py="xs" align="center">
           <Grid.Col span="content">
             <Checkbox

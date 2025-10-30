@@ -10,13 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TasksIndexRouteImport } from './routes/tasks/index'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as PromptsIndexRouteImport } from './routes/prompts/index'
+import { Route as TasksTaskIdRouteImport } from './routes/tasks/$taskId'
 import { Route as PromptsPromptIdRouteImport } from './routes/prompts/$promptId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TasksIndexRoute = TasksIndexRouteImport.update({
+  id: '/tasks/',
+  path: '/tasks/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesIndexRoute = ServicesIndexRouteImport.update({
@@ -29,6 +36,11 @@ const PromptsIndexRoute = PromptsIndexRouteImport.update({
   path: '/prompts/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TasksTaskIdRoute = TasksTaskIdRouteImport.update({
+  id: '/tasks/$taskId',
+  path: '/tasks/$taskId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PromptsPromptIdRoute = PromptsPromptIdRouteImport.update({
   id: '/prompts/$promptId',
   path: '/prompts/$promptId',
@@ -38,35 +50,62 @@ const PromptsPromptIdRoute = PromptsPromptIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/prompts/$promptId': typeof PromptsPromptIdRoute
+  '/tasks/$taskId': typeof TasksTaskIdRoute
   '/prompts': typeof PromptsIndexRoute
   '/services': typeof ServicesIndexRoute
+  '/tasks': typeof TasksIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/prompts/$promptId': typeof PromptsPromptIdRoute
+  '/tasks/$taskId': typeof TasksTaskIdRoute
   '/prompts': typeof PromptsIndexRoute
   '/services': typeof ServicesIndexRoute
+  '/tasks': typeof TasksIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/prompts/$promptId': typeof PromptsPromptIdRoute
+  '/tasks/$taskId': typeof TasksTaskIdRoute
   '/prompts/': typeof PromptsIndexRoute
   '/services/': typeof ServicesIndexRoute
+  '/tasks/': typeof TasksIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/prompts/$promptId' | '/prompts' | '/services'
+  fullPaths:
+    | '/'
+    | '/prompts/$promptId'
+    | '/tasks/$taskId'
+    | '/prompts'
+    | '/services'
+    | '/tasks'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/prompts/$promptId' | '/prompts' | '/services'
-  id: '__root__' | '/' | '/prompts/$promptId' | '/prompts/' | '/services/'
+  to:
+    | '/'
+    | '/prompts/$promptId'
+    | '/tasks/$taskId'
+    | '/prompts'
+    | '/services'
+    | '/tasks'
+  id:
+    | '__root__'
+    | '/'
+    | '/prompts/$promptId'
+    | '/tasks/$taskId'
+    | '/prompts/'
+    | '/services/'
+    | '/tasks/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PromptsPromptIdRoute: typeof PromptsPromptIdRoute
+  TasksTaskIdRoute: typeof TasksTaskIdRoute
   PromptsIndexRoute: typeof PromptsIndexRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
+  TasksIndexRoute: typeof TasksIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -76,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tasks/': {
+      id: '/tasks/'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services/': {
@@ -92,6 +138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromptsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tasks/$taskId': {
+      id: '/tasks/$taskId'
+      path: '/tasks/$taskId'
+      fullPath: '/tasks/$taskId'
+      preLoaderRoute: typeof TasksTaskIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/prompts/$promptId': {
       id: '/prompts/$promptId'
       path: '/prompts/$promptId'
@@ -105,8 +158,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PromptsPromptIdRoute: PromptsPromptIdRoute,
+  TasksTaskIdRoute: TasksTaskIdRoute,
   PromptsIndexRoute: PromptsIndexRoute,
   ServicesIndexRoute: ServicesIndexRoute,
+  TasksIndexRoute: TasksIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
