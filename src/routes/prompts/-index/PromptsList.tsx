@@ -5,7 +5,6 @@ import {
   Chip,
   Grid,
   Paper,
-  Space,
   Text,
 } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
@@ -143,14 +142,14 @@ const PromptPaper = ({
 
           <Grid.Col span="content">
             {archived ? (
-              <Space w={28} />
+              <Box w={28} h={35} />
             ) : (
               <ActionIcon
                 aria-label="Изменить"
                 className={classes.editActionIcon}
                 mod={{ hovered }}
                 onClick={handleEditClick}
-                mt={3.5}
+                mt={4}
               >
                 <IconEdit size={20} />
               </ActionIcon>

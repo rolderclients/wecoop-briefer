@@ -1,12 +1,4 @@
-import {
-  ActionIcon,
-  Checkbox,
-  Grid,
-  Group,
-  Paper,
-  Space,
-  Text,
-} from '@mantine/core';
+import { ActionIcon, Box, Checkbox, Grid, Paper, Text } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
@@ -23,42 +15,27 @@ export const ServicesList = ({
   form: UseFormReturnType<FormService>;
   open: () => void;
 }) => {
-  const { selectedIds, setSelectedIds } = useServices();
-
   return services.map((service) => (
-    <ServicePaper key={service.id} service={service} form={form} open={open}>
-      <Grid.Col span="content">
-        <Checkbox
-          checked={selectedIds.includes(service.id)}
-          onChange={(e) => {
-            setSelectedIds(
-              e.currentTarget.checked
-                ? [...selectedIds, service.id]
-                : selectedIds.filter((id) => id !== service.id),
-            );
-          }}
-        />
-      </Grid.Col>
-      <Grid.Col span="auto">
-        <Text lh={1}>{service.title}</Text>
-      </Grid.Col>
-    </ServicePaper>
+    <ServicePaper
+      key={service.id}
+      service={service}
+      form={form}
+      open={open}
+    ></ServicePaper>
   ));
 };
 
 const ServicePaper = ({
-  children,
   service,
   form,
   open,
 }: {
-  children: React.ReactNode;
   service: Service;
   form: UseFormReturnType<FormService>;
   open: () => void;
 }) => {
   const { hovered, ref } = useHover();
-  const { archived } = useServices();
+  const { selectedIds, setSelectedIds, archived } = useServices();
 
   const handleEditClick = () => {
     const values = {
@@ -74,18 +51,32 @@ const ServicePaper = ({
   return (
     <Paper ref={ref} radius="md" withBorder>
       <Grid px="md" py="xs" align="center">
-        {children}
+        <Grid.Col span="content">
+          <Checkbox
+            checked={selectedIds.includes(service.id)}
+            onChange={(e) => {
+              setSelectedIds(
+                e.currentTarget.checked
+                  ? [...selectedIds, service.id]
+                  : selectedIds.filter((id) => id !== service.id),
+              );
+            }}
+          />
+        </Grid.Col>
+        <Grid.Col span="auto">
+          <Text lh={1}>{service.title}</Text>
+        </Grid.Col>
 
         <Grid.Col span="content">
           {archived ? (
-            <Space w={28} />
+            <Box h={35} />
           ) : (
             <ActionIcon
               aria-label="Изменить"
               className={classes.editActionIcon}
               mod={{ hovered }}
               onClick={handleEditClick}
-              mt={3.5}
+              mt={4}
             >
               <IconEdit size={20} />
             </ActionIcon>
