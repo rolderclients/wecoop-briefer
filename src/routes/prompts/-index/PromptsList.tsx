@@ -11,7 +11,7 @@ import {
 import type { UseFormReturnType } from '@mantine/form';
 import { useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
-import { useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import type { FormPrompt, Prompt } from '@/api';
 import classes from '../../styles.module.css';
@@ -26,7 +26,6 @@ export const PromptsList = ({
   form: UseFormReturnType<FormPrompt>;
   open: () => void;
 }) => {
-  const { selectedIds, setSelectedIds, updatePrompts } = usePrompts();
   const [enabledPromptId, setEnabledPromptId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,10 +43,64 @@ export const PromptsList = ({
       onChange={setEnabledPromptId}
     >
       {prompts.map((prompt) => (
-        <PromptPaper key={prompt.id} prompt={prompt} form={form} open={open}>
+        <PromptPaper
+          key={prompt.id}
+          prompt={prompt}
+          form={form}
+          open={open}
+          enabledPromptId={enabledPromptId}
+          setEnabledPromptId={setEnabledPromptId}
+        />
+      ))}
+    </Chip.Group>
+  );
+};
+
+const PromptPaper = ({
+  prompt,
+  form,
+  open,
+  enabledPromptId,
+  setEnabledPromptId,
+}: {
+  prompt: Prompt;
+  form: UseFormReturnType<FormPrompt>;
+  open: () => void;
+  enabledPromptId: string | null;
+  setEnabledPromptId: React.Dispatch<React.SetStateAction<string | null>>;
+}) => {
+  const { hovered, ref } = useHover();
+  const { prompts, selectedIds, setSelectedIds, archived, updatePrompts } =
+    usePrompts();
+
+  const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    const values = {
+      id: prompt.id,
+      title: prompt.title,
+      service: prompt.service,
+      model: prompt.model.id,
+    };
+    form.setInitialValues(values);
+    form.reset();
+    open();
+  };
+
+  return (
+    <Link
+      to="/prompts/$promptId"
+      params={{ promptId: prompt.id }}
+      preload="intent"
+      reloadDocument={true}
+      className={classes.routerLink}
+    >
+      <Paper ref={ref} radius="md" withBorder className={classes.promptPaper}>
+        <Grid px="md" py="xs" align="center">
           <Grid.Col span="content">
             <Checkbox
               checked={selectedIds.includes(prompt.id)}
+              onClick={(e) => e.stopPropagation()}
               onChange={(e) => {
                 setSelectedIds(
                   e.currentTarget.checked
@@ -57,14 +110,16 @@ export const PromptsList = ({
               }}
             />
           </Grid.Col>
+
           <Grid.Col span="auto">
             <Text lh={1}>{prompt.title}</Text>
           </Grid.Col>
           <Grid.Col span="auto">
             <Text lh={1}>{prompt.model.title}</Text>
           </Grid.Col>
+
           <Grid.Col span="content">
-            <Box w={110}>
+            <Box w={110} onClick={(e) => e.stopPropagation()}>
               <Chip
                 value={prompt.id}
                 disabled={prompt.archived}
@@ -85,84 +140,24 @@ export const PromptsList = ({
               </Chip>
             </Box>
           </Grid.Col>
-        </PromptPaper>
-      ))}
-    </Chip.Group>
-  );
-};
 
-const PromptPaper = ({
-  children,
-  prompt,
-  form,
-  open,
-}: {
-  children: React.ReactNode;
-  prompt: Prompt;
-  form: UseFormReturnType<FormPrompt>;
-  open: () => void;
-}) => {
-  const { hovered, ref } = useHover();
-  const { archived } = usePrompts();
-  const navigate = useNavigate();
-
-  const handlePaperClick = (e: React.MouseEvent) => {
-    // Не переходить если кликнули по чекбоксу или чипу
-    const target = e.target as HTMLElement;
-    if (
-      target.closest('input[type="checkbox"]') ||
-      target.closest('[data-chip]') ||
-      target.closest('button')
-    ) {
-      return;
-    }
-
-    navigate({
-      to: '/prompts/$promptId',
-      params: { promptId: prompt.id },
-      reloadDocument: true,
-    });
-  };
-
-  const handleEditClick = () => {
-    const values = {
-      id: prompt.id,
-      title: prompt.title,
-      service: prompt.service,
-      model: prompt.model.id,
-    };
-    form.setInitialValues(values);
-    form.reset();
-    open();
-  };
-
-  return (
-    <Paper
-      ref={ref}
-      radius="md"
-      withBorder
-      className={classes.promptPaper}
-      onClick={handlePaperClick}
-    >
-      <Grid px="md" py="xs" align="center">
-        {children}
-
-        <Grid.Col span="content">
-          {archived ? (
-            <Space w={28} />
-          ) : (
-            <ActionIcon
-              aria-label="Изменить"
-              className={classes.editActionIcon}
-              mod={{ hovered }}
-              onClick={handleEditClick}
-              mt={3.5}
-            >
-              <IconEdit size={20} />
-            </ActionIcon>
-          )}
-        </Grid.Col>
-      </Grid>
-    </Paper>
+          <Grid.Col span="content">
+            {archived ? (
+              <Space w={28} />
+            ) : (
+              <ActionIcon
+                aria-label="Изменить"
+                className={classes.editActionIcon}
+                mod={{ hovered }}
+                onClick={handleEditClick}
+                mt={3.5}
+              >
+                <IconEdit size={20} />
+              </ActionIcon>
+            )}
+          </Grid.Col>
+        </Grid>
+      </Paper>
+    </Link>
   );
 };

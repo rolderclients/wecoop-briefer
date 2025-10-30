@@ -13,9 +13,7 @@ import { Editor } from './Editor';
 
 export const PromptPage = () => {
   const { promptId } = useParams({ from: Route.fullPath });
-  const { data: prompt, isLoading } = useSuspenseQuery(
-    promptQueryOptions(promptId),
-  );
+  const { data: prompt } = useSuspenseQuery(promptQueryOptions(promptId));
 
   const queryClient = useQueryClient();
   const { mutate, status } = useMutation({
@@ -29,20 +27,16 @@ export const PromptPage = () => {
     500,
   );
 
-  console.log(prompt.title);
-
   return (
     <Page>
       <Stack>
         <Title>{prompt.title}</Title>
 
-        {isLoading ? null : (
-          <Editor
-            prompt={prompt}
-            onChange={debouncedUpdate}
-            saving={status === 'pending'}
-          />
-        )}
+        <Editor
+          prompt={prompt}
+          onChange={debouncedUpdate}
+          saving={status === 'pending'}
+        />
       </Stack>
     </Page>
   );
