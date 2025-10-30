@@ -1,4 +1,4 @@
-import { Accordion, Group, Space, Stack, Text } from '@mantine/core';
+import { Accordion, Grid, Group, Space, Stack, Text } from '@mantine/core';
 import { isNotEmpty, useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { Edit } from './Edit';
@@ -23,13 +23,23 @@ export const Categories = () => {
           key={categoryWithServices.id}
           value={categoryWithServices.title}
         >
-          <Accordion.Control>{categoryWithServices.title}</Accordion.Control>
+          <Accordion.Control>
+            {categoryWithServices.title}{' '}
+            <Text c="dimmed" span>
+              {categoryWithServices.services.length}
+            </Text>
+          </Accordion.Control>
           <Accordion.Panel>
             <Stack>
-              <Group px="md" c="dimmed" wrap="nowrap">
-                <Space w={20} />
-                <Text w="100%">Название</Text>
-              </Group>
+              <Grid px="md" c="dimmed">
+                <Grid.Col span="content">
+                  <Space w={20} />
+                </Grid.Col>
+                <Grid.Col span="auto">Название</Grid.Col>
+                <Grid.Col span="content">
+                  <Space w={28} />
+                </Grid.Col>
+              </Grid>
 
               <ServicesList
                 services={categoryWithServices.services}

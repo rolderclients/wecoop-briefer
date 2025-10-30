@@ -1,13 +1,22 @@
 .editActionIcon {
-  position: absolute;
-  right: 12px;
-  top: 0;
-  bottom: 0;
-  margin: auto 0;
   transition: opacity 0.2s ease-in-out;
   opacity: 0;
   &[data-hovered] {
     opacity: 1;
     transition: opacity 0.2s ease-in-out;
   }
+}
+
+.promptPaper {
+  transition: background-color 0.2s ease-in-out;
+  &:hover {
+    background-color: var(--mantine-color-default-hover);
+    transition: background-color 0.2s ease-in-out;
+    cursor: pointer;
+  }
+}
+
+.routerLink {
+  text-decoration: none;
+  color: inherit;
 }

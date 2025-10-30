@@ -1,4 +1,12 @@
-import { ActionIcon, Checkbox, Group, Paper, Text } from '@mantine/core';
+import {
+  ActionIcon,
+  Checkbox,
+  Grid,
+  Group,
+  Paper,
+  Space,
+  Text,
+} from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
@@ -19,19 +27,21 @@ export const ServicesList = ({
 
   return services.map((service) => (
     <ServicePaper key={service.id} service={service} form={form} open={open}>
-      <Group px="md" wrap="nowrap">
+      <Grid.Col span="content">
         <Checkbox
           checked={selectedIds.includes(service.id)}
-          onChange={(e) =>
+          onChange={(e) => {
             setSelectedIds(
               e.currentTarget.checked
                 ? [...selectedIds, service.id]
                 : selectedIds.filter((id) => id !== service.id),
-            )
-          }
+            );
+          }}
         />
-        <Text>{service.title}</Text>
-      </Group>
+      </Grid.Col>
+      <Grid.Col span="auto">
+        <Text lh={1}>{service.title}</Text>
+      </Grid.Col>
     </ServicePaper>
   ));
 };
@@ -50,29 +60,38 @@ const ServicePaper = ({
   const { hovered, ref } = useHover();
   const { archived } = useServices();
 
-  return (
-    <Paper ref={ref} radius="md" withBorder py="sm" pos="relative">
-      {children}
+  const handleEditClick = () => {
+    const values = {
+      id: service.id,
+      title: service.title,
+      category: service.category,
+    };
+    form.setInitialValues(values);
+    form.reset();
+    open();
+  };
 
-      {!archived && (
-        <ActionIcon
-          aria-label="Изменить"
-          className={classes.editActionIcon}
-          mod={{ hovered }}
-          onClick={() => {
-            const values = {
-              id: service.id,
-              title: service.title,
-              category: service.category,
-            };
-            form.setInitialValues(values);
-            form.reset();
-            open();
-          }}
-        >
-          <IconEdit />
-        </ActionIcon>
-      )}
+  return (
+    <Paper ref={ref} radius="md" withBorder>
+      <Grid px="md" py="xs" align="center">
+        {children}
+
+        <Grid.Col span="content">
+          {archived ? (
+            <Space w={28} />
+          ) : (
+            <ActionIcon
+              aria-label="Изменить"
+              className={classes.editActionIcon}
+              mod={{ hovered }}
+              onClick={handleEditClick}
+              mt={3.5}
+            >
+              <IconEdit size={20} />
+            </ActionIcon>
+          )}
+        </Grid.Col>
+      </Grid>
     </Paper>
   );
 };

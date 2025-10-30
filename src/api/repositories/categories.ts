@@ -8,7 +8,7 @@ const getCategories = createServerFn({ method: 'GET' }).handler(async () => {
   const db = await getDB();
 
   const [result] = await db
-    .query('SELECT * FROM category ORDER BY title;')
+    .query('SELECT * FROM category ORDER BY title NUMERIC;')
     .collect<[Category[]]>();
 
   return toDTOs(result);

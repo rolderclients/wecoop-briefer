@@ -21,7 +21,7 @@ import {
   updatePrompt,
   updatePrompts,
 } from '@/api/repositories';
-import { Route } from '../route';
+import { Route } from '..';
 
 interface PromptsContext {
   services: Service[];

@@ -3,9 +3,9 @@ import {
   categoriesQueryOptions,
   categoriesWithServicesQueryOptions,
 } from '@/api';
-import { ServicesPage } from './-components';
+import { ServicesPage } from './-index';
 
-export const Route = createFileRoute('/services')({
+export const Route = createFileRoute('/services/')({
   loaderDeps: ({ search: { archived } }) => ({ archived }),
   loader: async ({ context, deps: { archived } }) => {
     await context.queryClient.ensureQueryData(categoriesQueryOptions());

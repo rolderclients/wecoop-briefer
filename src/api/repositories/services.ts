@@ -16,7 +16,7 @@ const getServices = createServerFn({ method: 'GET' })
 
     const [result] = await db
       .query(
-        `SELECT * FROM service WHERE archived == $archived ORDER BY title;`,
+        `SELECT * FROM service WHERE archived == $archived ORDER BY title NUMERIC;`,
         {
           archived,
         },
@@ -46,11 +46,11 @@ const getCategoriesWithServices = createServerFn({ method: 'GET' })
                 SELECT *
                 FROM id.services
                 WHERE archived == $archived
-                ORDER BY title
+                ORDER BY title NUMERIC
             ) AS services
         FROM category
         WHERE count(services[WHERE archived == $archived]) > 0
-        ORDER BY title;`,
+        ORDER BY title NUMERIC;`,
         {
           archived,
         },
@@ -71,7 +71,8 @@ export const createService = createServerFn({ method: 'POST' })
   .handler(async ({ data: { serviceData } }) => {
     const db = await getDB();
 
-    const data = fromDTO(serviceData);
+    const data = await fromDTO(serviceData);
+
     const [result] = await db
       .query('CREATE service CONTENT $data', {
         data,
@@ -86,7 +87,7 @@ export const updateService = createServerFn({ method: 'POST' })
   .handler(async ({ data: { serviceData } }) => {
     const db = await getDB();
 
-    const item = fromDTO(serviceData);
+    const item = await fromDTO(serviceData);
     const [result] = await db
       .query('UPDATE $item.id MERGE $item', { item })
       .collect<[Service]>();
@@ -99,7 +100,7 @@ export const updateServices = createServerFn({ method: 'POST' })
   .handler(async ({ data: { servicesData } }) => {
     const db = await getDB();
 
-    const items = fromDTO(servicesData);
+    const items = await fromDTOs(servicesData);
     const [, result] = await db
       .query(
         `FOR $item IN $items { UPDATE $item.id MERGE $item };
@@ -116,6 +117,6 @@ export const deleteServices = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const db = await getDB();
 
-    const ids = fromDTOs(data.ids);
+    const ids = await fromDTOs(data.ids);
     await db.query('FOR $id IN $ids { DELETE $id };', { ids });
   });

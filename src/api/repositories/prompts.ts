@@ -23,11 +23,11 @@ const getServicesWithPrompts = createServerFn({ method: 'GET' })
                 SELECT *, model.{ id, name, title }
                 FROM id.prompts
                 WHERE archived == $archived
-                ORDER BY title
+                ORDER BY title NUMERIC
             ) AS prompts
         FROM service
         WHERE count(prompts[WHERE archived == $archived]) > 0 AND archived == false
-        ORDER BY title;`,
+        ORDER BY title NUMERIC;`,
         {
           archived,
         },
@@ -43,12 +43,32 @@ export const servicesWithPromptsQueryOptions = (archived?: boolean) =>
     queryFn: () => getServicesWithPrompts({ data: { archived } }),
   });
 
+export const getPrompt = createServerFn({ method: 'POST' })
+  .inputValidator((data: { promptId: string }) => data)
+  .handler(async ({ data: { promptId } }) => {
+    const db = await getDB();
+
+    const id = await fromDTO(promptId);
+    const [result] = await db
+      .query('SELECT *, model.{ id, name, title } FROM ONLY $id', { id })
+      .collect<[Prompt]>();
+
+    return toDTO(result);
+  });
+
+export const promptQueryOptions = (promptId: string) =>
+  queryOptions<Prompt>({
+    queryKey: ['prompt'],
+    queryFn: () => getPrompt({ data: { promptId } }),
+  });
+
 export const createPrompt = createServerFn({ method: 'POST' })
   .inputValidator((data: { promptData: NewPrompt }) => data)
   .handler(async ({ data: { promptData } }) => {
     const db = await getDB();
 
-    const data = fromDTO(promptData);
+    const data = await fromDTO(promptData);
+
     const [result] = await db
       .query('CREATE prompt CONTENT $data', { data })
       .collect<[Prompt]>();
@@ -61,7 +81,8 @@ export const updatePrompt = createServerFn({ method: 'POST' })
   .handler(async ({ data: { promptData } }) => {
     const db = await getDB();
 
-    const item = fromDTO(promptData);
+    const item = await fromDTO(promptData);
+
     const [result] = await db
       .query('UPDATE $item.id MERGE $item', { item })
       .collect<[Prompt]>();
@@ -74,7 +95,7 @@ export const updatePrompts = createServerFn({ method: 'POST' })
   .handler(async ({ data: { promptsData } }) => {
     const db = await getDB();
 
-    const items = fromDTO(promptsData);
+    const items = await fromDTOs(promptsData);
     const [, result] = await db
       .query(
         `FOR $item IN $items { UPDATE $item.id MERGE $item };
@@ -91,6 +112,6 @@ export const deletePrompts = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const db = await getDB();
 
-    const ids = fromDTOs(data.ids);
+    const ids = await fromDTOs(data.ids);
     await db.query('FOR $id IN $ids { DELETE $id };', { ids });
   });

@@ -4,9 +4,9 @@ import {
   servicesQueryOptions,
   servicesWithPromptsQueryOptions,
 } from '@/api/repositories';
-import { PromptsPage } from './-components';
+import { PromptsPage } from './-index';
 
-export const Route = createFileRoute('/prompts')({
+export const Route = createFileRoute('/prompts/')({
   loaderDeps: ({ search: { archived } }) => ({ archived }),
   loader: async ({ context, deps: { archived } }) => {
     await context.queryClient.ensureQueryData(servicesQueryOptions());
