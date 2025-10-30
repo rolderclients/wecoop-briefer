@@ -1,4 +1,5 @@
 import { RecordId, StringRecordId } from 'surrealdb';
+import { getTableNames } from './db/utils';
 import type { Item } from './types';
 
 /**
@@ -18,15 +19,17 @@ export const toDTOs = <T extends Item>(records: T[]): T[] => {
 /**
  * Converts DTO back to SurrealDB Record recursively
  */
-export const fromDTO = <T>(dto: T): T => {
-  return convertStringsToRecordIds(dto) as T;
+export const fromDTO = async <T>(dto: T): Promise<T> => {
+  const tableNames = await getTableNames();
+  return convertStringsToRecordIds(dto, tableNames) as T;
 };
 
 /**
  * Converts array of DTOs back to SurrealDB Records recursively
  */
-export const fromDTOs = <T>(dtos: T[]): T[] => {
-  return dtos.map((dto) => fromDTO(dto));
+export const fromDTOs = async <T>(dtos: T[]): Promise<T[]> => {
+  const tableNames = await getTableNames();
+  return dtos.map((dto) => convertStringsToRecordIds(dto, tableNames) as T);
 };
 
 /**
@@ -63,14 +66,17 @@ const convertRecordIds = (obj: unknown): unknown => {
 /**
  * Recursively converts string IDs back to RecordId instances
  */
-const convertStringsToRecordIds = (obj: unknown): unknown => {
+const convertStringsToRecordIds = (
+  obj: unknown,
+  tableNames: string[],
+): unknown => {
   if (obj === null || obj === undefined) {
     return obj;
   }
 
   // If it's an array, recursively process each element
   if (Array.isArray(obj)) {
-    return obj.map((item) => convertStringsToRecordIds(item));
+    return obj.map((item) => convertStringsToRecordIds(item, tableNames));
   }
 
   // If it's an object, recursively process each property
@@ -78,17 +84,29 @@ const convertStringsToRecordIds = (obj: unknown): unknown => {
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(obj)) {
       // Convert id fields and fields ending with Id back to RecordId
-      if (typeof value === 'string' && value.includes(':')) {
-        result[key] = new StringRecordId(value);
+      if (typeof value === 'string') {
+        // Check if the string contains any table name prefix
+        const matchingTable = tableNames.find((table) =>
+          value.includes(`${table}:`),
+        );
+        if (matchingTable) {
+          result[key] = new StringRecordId(value);
+        } else {
+          result[key] = convertStringsToRecordIds(value, tableNames);
+        }
       } else {
-        result[key] = convertStringsToRecordIds(value);
+        result[key] = convertStringsToRecordIds(value, tableNames);
       }
     }
     return result;
   }
 
-  if (typeof obj === 'string' && obj.includes(':')) {
-    return new StringRecordId(obj);
+  if (typeof obj === 'string') {
+    // Check if the string contains any table name prefix
+    const matchingTable = tableNames.find((table) => obj.includes(`${table}:`));
+    if (matchingTable) {
+      return new StringRecordId(obj);
+    }
   }
 
   // For primitive types, return as is

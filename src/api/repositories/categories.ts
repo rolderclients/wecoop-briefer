@@ -7,11 +7,11 @@ import { toDTOs } from '../utils';
 const getCategories = createServerFn({ method: 'GET' }).handler(async () => {
   const db = await getDB();
 
-  const result = await db.query<[Category[]]>(
-    'SELECT * FROM category ORDER BY title;',
-  );
+  const [result] = await db
+    .query('SELECT * FROM category ORDER BY title NUMERIC;')
+    .collect<[Category[]]>();
 
-  return toDTOs(result[0]);
+  return toDTOs(result);
 });
 
 export const categoriesQueryOptions = () =>

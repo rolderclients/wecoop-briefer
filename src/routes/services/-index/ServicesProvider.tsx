@@ -6,20 +6,22 @@ import {
 import { createContext, type ReactNode, useContext, useState } from 'react';
 import {
   type Category,
+  type CategoryWithServices,
   categoriesQueryOptions,
+  categoriesWithServicesQueryOptions,
   createService,
   deleteServices,
   type NewService,
   type Service,
-  servicesQueryOptions,
   type UpdateService,
   updateService,
   updateServices,
 } from '@/api';
-import { Route } from './route';
+import { Route } from '..';
 
 interface ServicesContext {
   categories: Category[];
+  categoriesWithServices: CategoryWithServices[];
   services: Service[];
   createService: (serviceData: NewService) => void;
   updateService: (serviceData: UpdateService) => void;
@@ -40,36 +42,41 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
   const { archived: initialArchived } = Route.useSearch();
   const [archived, setArchived] = useState(initialArchived);
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
-  const { data: services } = useSuspenseQuery(
-    servicesQueryOptions(initialArchived),
+  const { data: categoriesWithServices } = useSuspenseQuery(
+    categoriesWithServicesQueryOptions(initialArchived),
   );
 
   const createServiceMutation = useMutation({
     mutationFn: (serviceData: NewService) =>
       createService({ data: { serviceData } }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['services'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] }),
   });
 
   const updateServiceMutation = useMutation({
     mutationFn: (serviceData: UpdateService) =>
       updateService({ data: { serviceData } }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['services'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] }),
   });
 
   const updateServicesMutation = useMutation({
     mutationFn: (servicesData: UpdateService[]) =>
       updateServices({ data: { servicesData } }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['services'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] }),
   });
 
   const deleteServicesMutation = useMutation({
     mutationFn: (ids: string[]) => deleteServices({ data: { ids } }),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['services'] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] }),
   });
 
   const value = {
     categories,
-    services,
+    categoriesWithServices,
+    services: categoriesWithServices.flatMap((i) => i.services),
     createService: createServiceMutation.mutate,
     updateService: updateServiceMutation.mutate,
     updateServices: updateServicesMutation.mutate,

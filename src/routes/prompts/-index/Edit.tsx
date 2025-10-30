@@ -2,18 +2,20 @@ import { Button, Group, Modal, Select, Stack, TextInput } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconCancel, IconPlus } from '@tabler/icons-react';
-import { useServices } from './-ServicesProvider';
+import type { FormPrompt } from '@/api';
+import { usePrompts } from './PromptsProvider';
 
 export const Edit = ({
   form,
   opened,
   close,
 }: {
-  form: UseFormReturnType<{ id: string; title: string; category: string }>;
+  form: UseFormReturnType<FormPrompt>;
   opened: boolean;
   close: () => void;
 }) => {
-  const { categories, updateService } = useServices();
+  const { services, servicesWithPrompts, prompts, models, updatePrompt } =
+    usePrompts();
 
   return (
     <Modal
@@ -24,11 +26,21 @@ export const Edit = ({
     >
       <form
         onSubmit={form.onSubmit((values) => {
-          updateService(values);
+          const prompt = prompts.find((p) => p.id === values.id);
+          const serviceChanged = values.service !== prompt?.service;
+          const willDisabled = servicesWithPrompts
+            .find((i) => i.id === values.service)
+            ?.prompts.some((p) => p.enabled);
+          let enabled = prompt?.enabled;
+
+          if (enabled && serviceChanged && willDisabled) enabled = false;
+
+          updatePrompt({ ...values, enabled });
+
           close();
           notifications.show({
-            message: `Услуга "${values.title}" обновлена`,
-            color: 'green',
+            message: `Промт "${values.title}" обновлен${willDisabled ? ' и выключен' : ''}`,
+            color: willDisabled ? 'orange' : 'green',
           });
         })}
       >
@@ -41,12 +53,21 @@ export const Edit = ({
           />
 
           <Select
-            label="Категория"
-            placeholder="Выберите категорию"
-            data={categories.map((i) => ({ label: i.title, value: i.id }))}
+            label="Услуга"
+            placeholder="Выберите услугу"
+            data={services.map((i) => ({ label: i.title, value: i.id }))}
             searchable
-            key={form.key('category')}
-            {...form.getInputProps('category')}
+            key={form.key('service')}
+            {...form.getInputProps('service')}
+          />
+
+          <Select
+            label="Модель ИИ"
+            placeholder="Выберите модель ИИ"
+            data={models.map((i) => ({ label: i.title, value: i.id }))}
+            searchable
+            key={form.key('model')}
+            {...form.getInputProps('model')}
           />
 
           <Group ml="auto" mt="lg">
