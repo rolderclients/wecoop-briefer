@@ -80,6 +80,7 @@ export interface ScrollAreaOptions extends SpringAnimation {
   initial?: Animation | boolean;
   targetScrollTop?: GetTargetScrollTop;
   autoScrollOnInitialRender?: boolean;
+  autoScroll?: boolean;
 }
 
 export type ScrollToOptions =
@@ -127,7 +128,8 @@ export type ScrollTo = (
 
 export type StopScroll = () => void;
 
-const SCROLL_OFFSET_PX = 70;
+const SCROLL_OFFSET_PX = 1;
+const SCROLL_TOP_OFFSET_PX = 70;
 const SIXTY_FPS_INTERVAL_MS = 1000 / 60;
 const RETAIN_ANIMATION_DURATION_MS = 350;
 
@@ -212,7 +214,9 @@ export const useScrollArea = (
         }
 
         return (
-          scrollRef.current.scrollHeight - 0.6 - scrollRef.current.clientHeight
+          scrollRef.current.scrollHeight -
+          SCROLL_OFFSET_PX -
+          scrollRef.current.clientHeight
         );
       },
       get calculatedTargetScrollTop() {
@@ -259,7 +263,7 @@ export const useScrollArea = (
       },
 
       get isNearTop() {
-        return this.scrollTop <= SCROLL_OFFSET_PX;
+        return this.scrollTop <= SCROLL_TOP_OFFSET_PX;
       },
 
       get isAboveCenter() {
@@ -404,9 +408,12 @@ export const useScrollArea = (
         setIsAtBottom(true);
       }
 
-      // Special handling for preserveScrollPosition
-      if (scrollOptions.preserveScrollPosition && !state.isAtBottom) {
-        return false;
+      // Special handling for preserveScrollPosition with autoScroll check
+      if (scrollOptions.preserveScrollPosition) {
+        const shouldAutoScroll = optionsRef.current.autoScroll !== false;
+        if (!shouldAutoScroll && !state.isAtBottom) {
+          return false;
+        }
       }
 
       return scrollToPosition(state.calculatedTargetScrollTop, scrollOptions);
@@ -580,7 +587,7 @@ export const useScrollArea = (
         if (difference >= 0) {
           /**
            * If it's a positive resize, scroll to the bottom when
-           * we're already at the bottom.
+           * we're already at the bottom or when autoScroll is enabled.
            */
           const animation = mergeAnimations(
             optionsRef.current,
@@ -589,10 +596,13 @@ export const useScrollArea = (
               : optionsRef.current.initial,
           );
 
+          const shouldAutoScroll = optionsRef.current.autoScroll !== false;
+          const shouldPreservePosition = !shouldAutoScroll;
+
           scrollToBottom({
             animation,
             wait: true,
-            preserveScrollPosition: true,
+            preserveScrollPosition: shouldPreservePosition,
             duration:
               animation === 'instant'
                 ? undefined

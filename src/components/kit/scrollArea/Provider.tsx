@@ -26,10 +26,12 @@ export const ScrollAreaProvider = ({
   children,
   height,
   autoScrollOnInitialRender = false,
+  autoScroll = true,
 }: {
   children: ReactNode;
   height?: MantineStyleProps['h'];
   autoScrollOnInitialRender?: boolean;
+  autoScroll?: boolean;
 }) => {
   const {
     scrollRef,
@@ -44,6 +46,7 @@ export const ScrollAreaProvider = ({
     scrollToTop,
   } = useScrollAreaHook({
     autoScrollOnInitialRender,
+    autoScroll,
   });
 
   const value = {
