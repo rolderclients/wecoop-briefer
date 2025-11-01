@@ -7,7 +7,11 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { useStickToBottom } from './useStickToBottom';
+import {
+  type ScrollToBottom,
+  type ScrollToTop,
+  useStickToBottom,
+} from './useStickToBottom';
 
 interface ScrollAreaContext {
   height?: MantineStyleProps['h'];
@@ -15,6 +19,8 @@ interface ScrollAreaContext {
   contentRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   at?: 'top' | 'bottom';
   setAt: (at: 'top' | 'bottom') => void;
+  scrollToBottom: ScrollToBottom;
+  scrollToTop: ScrollToTop;
 }
 
 const ScrollAreaContext = createContext<ScrollAreaContext | null>(null);
@@ -30,9 +36,10 @@ export const ScrollAreaProvider = ({
 }) => {
   // undefined - не показывать кнопку
   const [at, setAt] = useState<'top' | 'bottom'>();
-  const { scrollRef, contentRef, isNearBottom } = useStickToBottom({
-    autoScrollOnInitialRender,
-  });
+  const { scrollRef, contentRef, isNearBottom, scrollToBottom, scrollToTop } =
+    useStickToBottom({
+      autoScrollOnInitialRender,
+    });
 
   // at bottom при автоскролле
   useEffect(() => {
@@ -59,6 +66,8 @@ export const ScrollAreaProvider = ({
     contentRef,
     at,
     setAt,
+    scrollToBottom,
+    scrollToTop,
   };
 
   return (

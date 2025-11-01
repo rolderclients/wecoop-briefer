@@ -122,6 +122,7 @@ export type ScrollToBottomOptions =
 export type ScrollToBottom = (
   scrollOptions?: ScrollToBottomOptions,
 ) => Promise<boolean> | boolean;
+export type ScrollToTop = () => void;
 export type StopScroll = () => void;
 
 const STICK_TO_BOTTOM_OFFSET_PX = 70;
@@ -206,7 +207,7 @@ export const useStickToBottom = (
         }
 
         return (
-          scrollRef.current.scrollHeight - 1 - scrollRef.current.clientHeight
+          scrollRef.current.scrollHeight - 0.6 - scrollRef.current.clientHeight
         );
       },
       get calculatedTargetScrollTop() {
@@ -399,6 +400,14 @@ export const useStickToBottom = (
     },
     [setIsAtBottom, isSelecting, state],
   );
+
+  const scrollToTop = useCallback((): void => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    setEscapedFromLock(true);
+    setIsAtBottom(false);
+  }, [setEscapedFromLock, setIsAtBottom]);
 
   const stopScroll = useCallback((): void => {
     setEscapedFromLock(true);
@@ -612,6 +621,7 @@ export const useStickToBottom = (
     contentRef: mergedContentRef,
     scrollRef: mergedScrollRef,
     scrollToBottom,
+    scrollToTop,
     stopScroll,
     isAtBottom: isAtBottom || isNearBottom,
     isNearBottom,
@@ -624,6 +634,7 @@ export interface StickToBottomInstance {
   contentRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   scrollRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   scrollToBottom: ScrollToBottom;
+  scrollToTop: ScrollToTop;
   stopScroll: StopScroll;
   isAtBottom: boolean;
   isNearBottom: boolean;

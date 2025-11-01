@@ -41,16 +41,11 @@ const Content = ({ children, ...props }: ContentProps) => {
 };
 
 const ScrollButton = (props: ActionIconProps) => {
-  const { scrollRef, at } = useScrollArea();
+  const { at, scrollToBottom, scrollToTop } = useScrollArea();
 
-  const scrollToBottom = () =>
-    scrollRef?.current?.scrollTo({
-      top: scrollRef?.current?.scrollHeight,
-      behavior: 'smooth',
-    });
+  const handleScrollToBottom = () => scrollToBottom({ animation: 'smooth' });
 
-  const scrollToTop = () =>
-    scrollRef?.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleScrollToTop = () => scrollToTop();
 
   return at ? (
     <ActionIcon
@@ -58,7 +53,7 @@ const ScrollButton = (props: ActionIconProps) => {
       bottom={16}
       right={16}
       variant="light"
-      onClick={at === 'top' ? scrollToBottom : scrollToTop}
+      onClick={at === 'top' ? handleScrollToBottom : handleScrollToTop}
       {...props}
     >
       {at === 'top' ? (
