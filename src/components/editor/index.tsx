@@ -2,22 +2,26 @@ import { Loader } from '@mantine/core';
 import { getTaskListExtension, Link, RichTextEditor } from '@mantine/tiptap';
 import { IconCheck } from '@tabler/icons-react';
 import Highlight from '@tiptap/extension-highlight';
+import { TableKit } from '@tiptap/extension-table';
 import TaskItem from '@tiptap/extension-task-item';
 import TipTapTaskList from '@tiptap/extension-task-list';
 import TextAlign from '@tiptap/extension-text-align';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import classes from './editor.module.css';
 
 export const Editor = ({
   content,
   onChange,
   saving,
   editable,
+  height,
 }: {
   content?: string;
   onChange?: (value: string) => void;
   saving?: boolean;
   editable?: boolean;
+  height?: string;
 }) => {
   const editor = useEditor({
     shouldRerenderOnTransaction: true,
@@ -34,14 +38,23 @@ export const Editor = ({
           class: 'test-item',
         },
       }),
+      TableKit,
     ],
     content,
     onUpdate: ({ editor }) => onChange?.(editor.getHTML()),
-    editable,
+    editable: !!editable,
   });
 
+  if (!editor) {
+    return null;
+  }
+
   return (
-    <RichTextEditor editor={editor} variant="default">
+    <RichTextEditor
+      editor={editor}
+      className={classes.editor}
+      style={{ '--editor-height': height }}
+    >
       {editable && (
         <RichTextEditor.Toolbar sticky stickyOffset="64px">
           <RichTextEditor.ControlsGroup>

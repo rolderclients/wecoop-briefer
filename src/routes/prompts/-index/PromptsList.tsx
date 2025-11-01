@@ -111,10 +111,10 @@ const PromptPaper = ({
           </Grid.Col>
 
           <Grid.Col span="auto">
-            <Text lh={1}>{prompt.title}</Text>
+            <Text inline>{prompt.title}</Text>
           </Grid.Col>
           <Grid.Col span="auto">
-            <Text lh={1}>{prompt.model.title}</Text>
+            <Text inline>{prompt.model.title}</Text>
           </Grid.Col>
 
           <Grid.Col span="content">

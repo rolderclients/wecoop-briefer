@@ -7,20 +7,8 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  plugins: [
-    tsConfigPaths(),
-    tanstackStart(),
-    viteReact(),
-    {
-      name: 'markdown-loader',
-      transform(code, id) {
-        if (id.endsWith('.md')) {
-          return `export default ${JSON.stringify(code.trim())};`;
-        }
-      },
-    },
-  ],
+  plugins: [tsConfigPaths(), tanstackStart(), viteReact()],
   ssr: {
-    noExternal: ['streamdown'],
+    noExternal: ['@rolder/streamdown', '@rolder/ui-kit-react'],
   },
 });

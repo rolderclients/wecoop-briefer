@@ -65,7 +65,7 @@ const ServicePaper = ({
           />
         </Grid.Col>
         <Grid.Col span="auto">
-          <Text lh={1}>{service.title}</Text>
+          <Text inline>{service.title}</Text>
         </Grid.Col>
 
         <Grid.Col span="content">
