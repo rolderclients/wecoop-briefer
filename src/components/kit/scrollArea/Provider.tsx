@@ -2,6 +2,7 @@ import type { MantineStyleProps } from '@mantine/core';
 import type { RefCallback, RefObject } from 'react';
 import { createContext, type ReactNode, useContext } from 'react';
 import {
+  type Animation,
   type ScrollTo,
   useScrollArea as useScrollAreaHook,
 } from './useScrollArea';
@@ -27,11 +28,13 @@ export const ScrollAreaProvider = ({
   height,
   autoScrollOnInitialRender = false,
   autoScroll = false,
+  scrollAnimation = 'smooth',
 }: {
   children: ReactNode;
   height?: MantineStyleProps['h'];
   autoScrollOnInitialRender?: boolean;
   autoScroll?: boolean;
+  scrollAnimation?: Animation;
 }) => {
   const {
     scrollRef,
@@ -53,8 +56,10 @@ export const ScrollAreaProvider = ({
     height,
     scrollRef,
     contentRef,
-    scrollToBottom,
-    scrollToTop,
+    scrollToBottom: (options = {}) =>
+      scrollToBottom({ animation: scrollAnimation, ...options }),
+    scrollToTop: (options = {}) =>
+      scrollToTop({ animation: scrollAnimation, ...options }),
     hasScrollableContent,
     isNearBottom,
     isAtBottom,

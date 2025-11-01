@@ -13,17 +13,20 @@ interface RootProps extends BoxProps {
   children?: React.ReactNode;
   autoScrollOnInitialRender?: boolean;
   autoScroll?: boolean;
+  scrollAnimation?: 'smooth' | 'instant';
 }
 const Root = ({
   h,
   autoScrollOnInitialRender,
   autoScroll,
+  scrollAnimation,
   ...props
 }: RootProps) => (
   <ScrollAreaProvider
     height={h}
     autoScrollOnInitialRender={autoScrollOnInitialRender}
     autoScroll={autoScroll}
+    scrollAnimation={scrollAnimation}
   >
     <Box pos="relative" {...props} />
   </ScrollAreaProvider>

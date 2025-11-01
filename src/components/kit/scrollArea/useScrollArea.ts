@@ -81,6 +81,7 @@ export interface ScrollAreaOptions extends SpringAnimation {
   targetScrollTop?: GetTargetScrollTop;
   autoScrollOnInitialRender?: boolean;
   autoScroll?: boolean;
+  scrollAnimation?: Animation;
 }
 
 export type ScrollToOptions =
@@ -590,14 +591,15 @@ export const useScrollArea = (
            * If it's a positive resize, scroll to the bottom when
            * we're already at the bottom or when autoScroll is enabled.
            */
-          const animation = mergeAnimations(
-            optionsRef.current,
-            previousHeight
-              ? optionsRef.current.resize
-              : optionsRef.current.initial,
-          );
+          const animation = previousHeight
+            ? 'instant' // Auto-scroll on content change - instant
+            : optionsRef.current.autoScrollOnInitialRender
+              ? optionsRef.current.scrollAnimation || 'smooth' // Initial render with autoScrollOnInitialRender - use scrollAnimation
+              : 'instant'; // Initial render without autoScrollOnInitialRender - but this shouldn't happen
 
-          const shouldAutoScroll = optionsRef.current.autoScroll === true;
+          const shouldAutoScroll = previousHeight
+            ? optionsRef.current.autoScroll === true // Content change - use autoScroll
+            : optionsRef.current.autoScrollOnInitialRender === true; // Initial render - use autoScrollOnInitialRender
           const shouldPreservePosition = !shouldAutoScroll;
 
           scrollToBottom({
