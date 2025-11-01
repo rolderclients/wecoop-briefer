@@ -35,7 +35,7 @@ export const BriefPage = () => {
           <Grid.Col span={4}>
             <Stack>
               <Conversation>
-                <ScrollArea h="calc(100vh - 240px)">
+                <ScrollArea h="calc(100vh - 240px)" autoScrollOnInitialRender>
                   <ScrollArea.Content>
                     {!messages.length && <Conversation.EmptyState />}
 

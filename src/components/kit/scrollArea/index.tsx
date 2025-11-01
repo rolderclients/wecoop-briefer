@@ -38,8 +38,8 @@ const ScrollButton = (props: ActionIconProps) => {
   const { hasScrollableContent, isAboveCenter, scrollToBottom, scrollToTop } =
     useScrollAreaContext();
 
-  const handleScrollToBottom = () => scrollToBottom({ animation: 'smooth' });
-  const handleScrollToTop = () => scrollToTop({ animation: 'smooth' });
+  const handleScrollToBottom = () => scrollToBottom();
+  const handleScrollToTop = () => scrollToTop();
 
   // Не показывать кнопку если нет скроллируемого контента
   if (!hasScrollableContent) {
