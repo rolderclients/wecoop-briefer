@@ -11,7 +11,7 @@ import {
   useProps,
   useStyles,
 } from '@mantine/core';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import classes from './ScrollArea.module.css';
 import { ScrollAreaCorner } from './ScrollAreaCorner/ScrollAreaCorner';
 import { ScrollAreaRoot } from './ScrollAreaRoot/ScrollAreaRoot';
@@ -75,8 +75,11 @@ export interface ScrollAreaProps
   /** Defines `overscroll-behavior` of the viewport */
   overscrollBehavior?: React.CSSProperties['overscrollBehavior'];
 
-  onBottomThreshold?: number;
-  onTopThreshold?: number;
+  bottomThreshold?: number;
+  topThreshold?: number;
+
+  /** Auto-scroll to bottom when content changes, but only when user is already at the bottom */
+  autoScroll?: boolean;
 }
 
 export interface ScrollAreaAutosizeProps extends ScrollAreaProps {
@@ -105,6 +108,7 @@ const defaultProps = {
   scrollHideDelay: 1000,
   type: 'hover',
   scrollbars: 'xy',
+  autoScroll: false,
 } satisfies Partial<ScrollAreaProps>;
 
 const varsResolver = createVarsResolver<ScrollAreaFactory>(
@@ -136,18 +140,18 @@ export const ScrollArea = factory<ScrollAreaFactory>((_props, ref) => {
     scrollbars,
     onBottomReached,
     onTopReached,
-    onBottomThreshold = 0.6,
-    onTopThreshold = 0,
+    bottomThreshold = 0.6,
+    topThreshold = 0,
+    autoScroll,
     // overscrollBehavior,
     attributes,
     ...others
   } = props;
 
-  const onBottomThresholdNegative = onBottomThreshold * -1;
-
   const [scrollbarHovered, setScrollbarHovered] = useState(false);
   const [verticalThumbVisible, setVerticalThumbVisible] = useState(false);
   const [horizontalThumbVisible, setHorizontalThumbVisible] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(true);
 
   const getStyles = useStyles<ScrollAreaFactory>({
     name: 'ScrollArea',
@@ -165,6 +169,37 @@ export const ScrollArea = factory<ScrollAreaFactory>((_props, ref) => {
 
   const localViewportRef = useRef<HTMLDivElement>(null);
   const combinedViewportRef = useMergeRefs([viewportRef, localViewportRef]);
+
+  // Auto-scroll functionality
+  const scrollToBottom = useCallback(() => {
+    if (localViewportRef.current) {
+      localViewportRef.current.scrollTo({
+        top: localViewportRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, []);
+
+  // Watch for content changes to trigger auto-scroll
+  useEffect(() => {
+    if (!autoScroll || !localViewportRef.current) return;
+
+    const viewport = localViewportRef.current;
+
+    const observer = new MutationObserver(() => {
+      if (isAtBottom) {
+        // Small delay to ensure content is rendered
+        setTimeout(scrollToBottom, 300);
+      }
+    });
+
+    observer.observe(viewport, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => observer.disconnect();
+  }, [autoScroll, isAtBottom, scrollToBottom]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <>
   useEffect(() => {
@@ -225,14 +260,19 @@ export const ScrollArea = factory<ScrollAreaFactory>((_props, ref) => {
           });
           const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
 
+          // Track if user is at bottom for auto-scroll
+          const isNearBottom =
+            scrollTop >= scrollHeight - clientHeight - bottomThreshold;
+          setIsAtBottom(isNearBottom);
+
           // threshold of -0.6 is required for some browsers that use sub-pixel rendering
           if (
             scrollTop - (scrollHeight - clientHeight) >=
-            onBottomThresholdNegative
+            bottomThreshold * -1
           ) {
             onBottomReached?.();
           }
-          if (scrollTop <= onTopThreshold) {
+          if (scrollTop <= topThreshold) {
             onTopReached?.();
           }
         }}
@@ -308,8 +348,9 @@ export const ScrollAreaAutosize = factory<ScrollAreaAutosizeFactory>(
       vars,
       onBottomReached,
       onTopReached,
-      onBottomThreshold = 0.6,
-      onTopThreshold = 0,
+      bottomThreshold = 0.6,
+      topThreshold = 0,
+      autoScroll,
       onOverflowChange,
       ...others
     } = useProps(
@@ -397,8 +438,9 @@ export const ScrollAreaAutosize = factory<ScrollAreaAutosizeFactory>(
             scrollbars={scrollbars}
             onBottomReached={onBottomReached}
             onTopReached={onTopReached}
-            onBottomThreshold={onBottomThreshold}
-            onTopThreshold={onTopThreshold}
+            bottomThreshold={bottomThreshold}
+            topThreshold={topThreshold}
+            autoScroll={autoScroll}
             data-autosize="true"
           >
             {children}

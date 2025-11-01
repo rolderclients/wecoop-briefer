@@ -1,4 +1,6 @@
 import {
+  ActionIcon,
+  type ActionIconProps,
   type MantineStyleProps,
   Paper,
   type PaperProps,
@@ -6,15 +8,9 @@ import {
   type StackProps,
   Title,
 } from '@mantine/core';
-import { useElementSize, useInViewport } from '@mantine/hooks';
-import {
-  type ComponentProps,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import { ScrollArea } from '../scrollArea/mantine';
+import { IconArrowDown, IconArrowUp } from '@tabler/icons-react';
+import type { ComponentProps } from 'react';
+import { ScrollArea } from '../scrollArea';
 import { ConversationProvider, useConversation } from './Provider';
 
 interface RootProps extends PaperProps {
@@ -24,42 +20,26 @@ interface RootProps extends PaperProps {
 
 const Root = ({ height, ...props }: RootProps) => (
   <ConversationProvider height={height}>
-    <Paper withBorder radius="md" {...props}></Paper>
+    <Paper pos="relative" withBorder radius="md" {...props}></Paper>
   </ConversationProvider>
 );
 type ContentProps = Omit<ComponentProps<typeof ScrollArea>, 'height'>;
 
 const Content = ({ children, ...props }: ContentProps) => {
-  const { height } = useConversation();
-  const { ref, height: viewportHeight } = useElementSize();
-  const { ref: botoomRef, inViewport } = useInViewport();
-  const [scrolling, setScrolling] = useState(false);
-
-  const scrollToBottom = useCallback(() => {
-    ref.current?.scrollTo({
-      top: ref.current?.scrollHeight,
-      behavior: 'smooth',
-    });
-  }, [ref]);
-
-  useEffect(() => {
-    if (!inViewport) {
-      scrollToBottom();
-      console.log('scrollToBottom');
-    }
-  }, [inViewport, scrollToBottom]);
+  const { height, viewport, setAt } = useConversation();
 
   return (
     <ScrollArea
       h={height}
-      onTopThreshold={24}
-      onBottomThreshold={24}
-      onTopReached={() => console.log('top')}
-      onBottomReached={() => console.log('bottom')}
+      topThreshold={24}
+      bottomThreshold={24}
+      autoScroll
+      onTopReached={() => setAt?.('top')}
+      onBottomReached={() => setAt?.('bottom')}
+      viewportRef={viewport}
       {...props}
     >
       {children}
-      <div ref={botoomRef} />
     </ScrollArea>
   );
 };
@@ -77,81 +57,38 @@ const EmptyState = ({ children, ...props }: EmptyStateProps) =>
     </Stack>
   );
 
-export const Conversation = Object.assign(Root, { Content, EmptyState });
+const ScrollButton = (props: ActionIconProps) => {
+  const { viewport, at } = useConversation();
 
-// export type ConversationContentProps = ComponentProps<
-//   typeof StickToBottom.Content
-// >;
+  const scrollToBottom = () =>
+    viewport?.current?.scrollTo({
+      top: viewport?.current?.scrollHeight,
+      behavior: 'smooth',
+    });
 
-// export const ConversationContent = ({
-//   className,
-//   ...props
-// }: ConversationContentProps) => (
-//   <StickToBottom.Content className={cn('p-4', className)} {...props} />
-// );
+  const scrollToTop = () =>
+    viewport?.current?.scrollTo({ top: 0, behavior: 'smooth' });
 
-// export type ConversationEmptyStateProps = ComponentProps<'div'> & {
-//   title?: string;
-//   description?: string;
-//   icon?: React.ReactNode;
-// };
+  return at ? (
+    <ActionIcon
+      pos="absolute"
+      bottom={16}
+      right={16}
+      variant="light"
+      onClick={at === 'top' ? scrollToBottom : scrollToTop}
+      {...props}
+    >
+      {at === 'top' ? (
+        <IconArrowDown strokeWidth={1.5} />
+      ) : (
+        <IconArrowUp strokeWidth={1.5} />
+      )}
+    </ActionIcon>
+  ) : null;
+};
 
-// export const ConversationEmptyState = ({
-//   className,
-//   title = 'No messages yet',
-//   description = 'Start a conversation to see messages here',
-//   icon,
-//   children,
-//   ...props
-// }: ConversationEmptyStateProps) => (
-//   <div
-//     className={cn(
-//       'flex size-full flex-col items-center justify-center gap-3 p-8 text-center',
-//       className,
-//     )}
-//     {...props}
-//   >
-//     {children ?? (
-//       <>
-//         {icon && <div className="text-muted-foreground">{icon}</div>}
-//         <div className="space-y-1">
-//           <h3 className="font-medium text-sm">{title}</h3>
-//           {description && (
-//             <p className="text-muted-foreground text-sm">{description}</p>
-//           )}
-//         </div>
-//       </>
-//     )}
-//   </div>
-// );
-
-// export type ConversationScrollButtonProps = ComponentProps<typeof Button>;
-
-// export const ConversationScrollButton = ({
-//   className,
-//   ...props
-// }: ConversationScrollButtonProps) => {
-//   const { isAtBottom, scrollToBottom } = useStickToBottomContext();
-
-//   const handleScrollToBottom = useCallback(() => {
-//     scrollToBottom();
-//   }, [scrollToBottom]);
-
-//   return (
-//     !isAtBottom && (
-//       <Button
-//         className={cn(
-//           'absolute bottom-4 left-[50%] translate-x-[-50%] rounded-full',
-//           className,
-//         )}
-//         onClick={handleScrollToBottom}
-//         size="icon"
-//         type="button"
-//         variant="outline"
-//         {...props}
-//       >
-//         <ArrowDownIcon className="size-4" />
-//       </Button>
-//     )
-//   );
-// };
+export const Conversation = Object.assign(Root, {
+  Content,
+  EmptyState,
+  ScrollButton,
+});

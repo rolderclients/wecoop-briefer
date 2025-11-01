@@ -1,13 +1,5 @@
 import { useChat } from '@ai-sdk/react';
-import {
-  Grid,
-  Group,
-  Paper,
-  ScrollArea,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Grid, Group, Stack, Text, Title } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -54,6 +46,8 @@ export const BriefPage = () => {
                     ))}
                   </Stack>
                 </Conversation.Content>
+
+                <Conversation.ScrollButton />
 
                 {/*</ScrollArea>*/}
               </Conversation>
