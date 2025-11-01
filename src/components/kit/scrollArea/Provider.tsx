@@ -36,29 +36,28 @@ export const ScrollAreaProvider = ({
 }) => {
   // undefined - не показывать кнопку
   const [at, setAt] = useState<'top' | 'bottom'>();
-  const { scrollRef, contentRef, isNearBottom, scrollToBottom, scrollToTop } =
-    useStickToBottom({
-      autoScrollOnInitialRender,
-    });
-
-  // at bottom при автоскролле
-  useEffect(() => {
-    const scrollHeight = scrollRef.current?.clientHeight;
-    const contentHeight = contentRef.current?.clientHeight;
-
-    if (
-      isNearBottom &&
-      scrollHeight &&
-      contentHeight &&
-      scrollHeight < contentHeight
-    ) {
-      setAt('bottom');
-    }
-  }, [
+  const {
+    scrollRef,
+    contentRef,
     isNearBottom,
-    scrollRef.current?.clientHeight,
-    contentRef.current?.clientHeight,
-  ]);
+    isAtBottom,
+    hasScrollableContent,
+    scrollToBottom,
+    scrollToTop,
+  } = useStickToBottom({
+    autoScrollOnInitialRender,
+  });
+
+  // Определение позиции кнопки на основе состояний хука
+  useEffect(() => {
+    if (!hasScrollableContent) {
+      setAt(undefined);
+    } else if (isNearBottom || isAtBottom) {
+      setAt('bottom');
+    } else {
+      setAt('top');
+    }
+  }, [hasScrollableContent, isNearBottom, isAtBottom]);
 
   const value = {
     height,

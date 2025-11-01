@@ -25,16 +25,10 @@ const Root = ({ h, autoScrollOnInitialRender, ...props }: RootProps) => (
 type ContentProps = Omit<ComponentProps<typeof MantinScrollArea>, 'height'>;
 
 const Content = ({ children, ...props }: ContentProps) => {
-  const { height, scrollRef, contentRef, setAt } = useScrollArea();
+  const { height, scrollRef, contentRef } = useScrollArea();
 
   return (
-    <MantinScrollArea
-      h={height}
-      onTopReached={() => setAt?.('top')}
-      onBottomReached={() => setAt?.('bottom')}
-      viewportRef={scrollRef}
-      {...props}
-    >
+    <MantinScrollArea h={height} viewportRef={scrollRef} {...props}>
       <div ref={contentRef}>{children}</div>
     </MantinScrollArea>
   );

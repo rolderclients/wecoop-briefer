@@ -153,6 +153,7 @@ export const useStickToBottom = (
       : false,
   );
   const [isNearBottom, setIsNearBottom] = useState(false);
+  const [hasScrollableContent, setHasScrollableContent] = useState(false);
 
   const optionsRef = useRef<StickToBottomOptions>({});
   optionsRef.current = options;
@@ -552,6 +553,13 @@ export const useStickToBottom = (
 
         setIsNearBottom(state.isNearBottom);
 
+        // Check if content is scrollable
+        if (scrollRef.current && contentRef.current) {
+          const isScrollable =
+            scrollRef.current.scrollHeight > scrollRef.current.clientHeight;
+          setHasScrollableContent(isScrollable);
+        }
+
         if (difference >= 0) {
           /**
            * If it's a positive resize, scroll to the bottom when
@@ -626,6 +634,7 @@ export const useStickToBottom = (
     isAtBottom: isAtBottom || isNearBottom,
     isNearBottom,
     escapedFromLock,
+    hasScrollableContent,
     state,
   };
 };
@@ -639,6 +648,7 @@ export interface StickToBottomInstance {
   isAtBottom: boolean;
   isNearBottom: boolean;
   escapedFromLock: boolean;
+  hasScrollableContent: boolean;
   state: StickToBottomState;
 }
 
