@@ -7,8 +7,7 @@ import {
 } from '@mantine/core';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons-react';
 import type { ComponentProps } from 'react';
-import { ScrollAreaProvider, useScrollArea } from './Provider';
-import { useStickToBottom } from './useStickToBottom';
+import { ScrollAreaProvider, useScrollAreaContext } from './Provider';
 
 interface RootProps extends BoxProps {
   children?: React.ReactNode;
@@ -26,7 +25,7 @@ const Root = ({ h, autoScrollOnInitialRender, ...props }: RootProps) => (
 type ContentProps = Omit<ComponentProps<typeof MantinScrollArea>, 'height'>;
 
 const Content = ({ children, ...props }: ContentProps) => {
-  const { height, scrollRef, contentRef } = useScrollArea();
+  const { height, scrollRef, contentRef } = useScrollAreaContext();
 
   return (
     <MantinScrollArea h={height} viewportRef={scrollRef} {...props}>
@@ -37,7 +36,7 @@ const Content = ({ children, ...props }: ContentProps) => {
 
 const ScrollButton = (props: ActionIconProps) => {
   const { hasScrollableContent, isAboveCenter, scrollToBottom, scrollToTop } =
-    useScrollArea();
+    useScrollAreaContext();
 
   const handleScrollToBottom = () => scrollToBottom({ animation: 'smooth' });
   const handleScrollToTop = () => scrollToTop({ animation: 'smooth' });
@@ -72,6 +71,5 @@ export const ScrollArea = Object.assign(Root, {
   Content,
   ScrollButton,
   Provider: ScrollAreaProvider,
-  useScrollArea,
-  useStickToBottom,
+  useScrollArea: useScrollAreaContext,
 });

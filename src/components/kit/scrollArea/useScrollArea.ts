@@ -145,9 +145,9 @@ globalThis.document?.addEventListener('click', () => {
   mouseDown = false;
 });
 
-export const useStickToBottom = (
+export const useScrollArea = (
   options: StickToBottomOptions = {},
-): StickToBottomInstance => {
+): ScrollAreaInstance => {
   const [escapedFromLock, updateEscapedFromLock] = useState(false);
   const [isAtBottom, updateIsAtBottom] = useState(
     options.autoScrollOnInitialRender === true
@@ -658,7 +658,7 @@ export const useStickToBottom = (
   };
 };
 
-export interface StickToBottomInstance {
+export interface ScrollAreaInstance {
   contentRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   scrollRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   scrollToBottom: ScrollToBottom;

@@ -1,7 +1,10 @@
 import type { MantineStyleProps } from '@mantine/core';
 import type { RefCallback, RefObject } from 'react';
 import { createContext, type ReactNode, useContext } from 'react';
-import { type ScrollToBottom, useStickToBottom } from './useStickToBottom';
+import {
+  type ScrollToBottom,
+  useScrollArea as useScrollAreaHook,
+} from './useScrollArea';
 
 interface ScrollAreaContext {
   height?: MantineStyleProps['h'];
@@ -39,7 +42,7 @@ export const ScrollAreaProvider = ({
     hasScrollableContent,
     scrollToBottom,
     scrollToTop,
-  } = useStickToBottom({
+  } = useScrollAreaHook({
     autoScrollOnInitialRender,
   });
 
@@ -64,7 +67,7 @@ export const ScrollAreaProvider = ({
   );
 };
 
-export const useScrollArea = () => {
+export const useScrollAreaContext = () => {
   const context = useContext(ScrollAreaContext);
   if (!context) {
     throw new Error('useScrollArea must be used within ScrollAreaProvider');
