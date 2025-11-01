@@ -26,7 +26,7 @@ export const ScrollAreaProvider = ({
   children,
   height,
   autoScrollOnInitialRender = false,
-  autoScroll = true,
+  autoScroll = false,
 }: {
   children: ReactNode;
   height?: MantineStyleProps['h'];

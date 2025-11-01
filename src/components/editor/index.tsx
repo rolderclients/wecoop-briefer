@@ -116,7 +116,7 @@ export const Editor = ({
         </RichTextEditor.Toolbar>
       )}
 
-      <ScrollArea h={height} autoScroll={false} autoScrollOnInitialRender>
+      <ScrollArea h={height} autoScroll={true} autoScrollOnInitialRender>
         <ScrollArea.Content>
           <RichTextEditor.Content />
         </ScrollArea.Content>

@@ -128,7 +128,8 @@ export type ScrollTo = (
 
 export type StopScroll = () => void;
 
-const SCROLL_OFFSET_PX = 1;
+const SCROLL_OFFSET_PX = 0.6;
+const SCROLL_NEAR_BOTTOM_PX = 70;
 const SCROLL_TOP_OFFSET_PX = 70;
 const SIXTY_FPS_INTERVAL_MS = 1000 / 60;
 const RETAIN_ANIMATION_DURATION_MS = 350;
@@ -152,9 +153,7 @@ export const useScrollArea = (
 ): ScrollAreaInstance => {
   const [escapedFromLock, updateEscapedFromLock] = useState(false);
   const [isAtBottom, updateIsAtBottom] = useState(
-    options.autoScrollOnInitialRender === true
-      ? options.initial !== false
-      : false,
+    options.autoScrollOnInitialRender === true,
   );
   const [isNearBottom, setIsNearBottom] = useState(false);
   const [isNearTop, setIsNearTop] = useState(true);
@@ -213,11 +212,21 @@ export const useScrollArea = (
           return 0;
         }
 
-        return (
+        const targetScrollTop = Math.max(
+          0,
           scrollRef.current.scrollHeight -
-          SCROLL_OFFSET_PX -
-          scrollRef.current.clientHeight
+            SCROLL_OFFSET_PX -
+            scrollRef.current.clientHeight,
         );
+
+        console.log('[ScrollArea] targetScrollTop calc:', {
+          scrollHeight: scrollRef.current.scrollHeight,
+          clientHeight: scrollRef.current.clientHeight,
+          offset: SCROLL_OFFSET_PX,
+          targetScrollTop,
+        });
+
+        return targetScrollTop;
       },
       get calculatedTargetScrollTop() {
         if (!scrollRef.current || !contentRef.current) {
@@ -259,7 +268,7 @@ export const useScrollArea = (
       },
 
       get isNearBottom() {
-        return this.scrollDifference <= SCROLL_OFFSET_PX;
+        return this.scrollDifference <= SCROLL_NEAR_BOTTOM_PX;
       },
 
       get isNearTop() {
@@ -294,7 +303,11 @@ export const useScrollArea = (
   );
 
   const scrollToPosition = useCallback(
-    (targetPosition: number, scrollOptions: ScrollToOptions = {}) => {
+    (
+      targetPosition: number,
+      scrollOptions: ScrollToOptions = {},
+      direction: 'up' | 'down' = 'down',
+    ) => {
       if (typeof scrollOptions === 'string') {
         scrollOptions = { animation: scrollOptions };
       }
@@ -307,6 +320,7 @@ export const useScrollArea = (
       const { ignoreEscapes = false } = scrollOptions;
 
       let durationElapsed: number;
+      let startTarget = targetPosition; // Fix target at animation start
 
       if (scrollOptions.duration instanceof Promise) {
         scrollOptions.duration.finally(() => {
@@ -318,6 +332,11 @@ export const useScrollArea = (
 
       const next = async (): Promise<boolean> => {
         const promise = new Promise(requestAnimationFrame).then(() => {
+          if (direction === 'down' && !state.isAtBottom) {
+            state.animation = undefined;
+            return false;
+          }
+
           const { scrollTop } = state;
           const tick = performance.now();
           const tickDelta =
@@ -336,8 +355,11 @@ export const useScrollArea = (
             return next();
           }
 
-          const targetDifference = targetPosition - scrollTop;
-          const shouldContinue = Math.abs(targetDifference) > 1;
+          const shouldContinue =
+            direction === 'down'
+              ? scrollTop <
+                Math.min(startTarget, state.calculatedTargetScrollTop)
+              : scrollTop > targetPosition;
 
           if (shouldContinue) {
             if (state.animation?.behavior === behavior) {
@@ -346,6 +368,7 @@ export const useScrollArea = (
                 return next();
               }
 
+              const targetDifference = targetPosition - scrollTop;
               state.velocity =
                 (behavior.damping * state.velocity +
                   behavior.stiffness * targetDifference) /
@@ -362,15 +385,39 @@ export const useScrollArea = (
           }
 
           if (durationElapsed > Date.now()) {
+            startTarget = state.calculatedTargetScrollTop;
             return next();
           }
 
           state.animation = undefined;
 
-          // Ensure we're at exact target position
-          state.scrollTop = targetPosition;
+          /**
+           * If we're still below the target, then queue
+           * up another scroll to the bottom with the last
+           * requested animation.
+           */
+          if (
+            direction === 'down' &&
+            state.scrollTop < state.calculatedTargetScrollTop
+          ) {
+            return scrollToPosition(state.calculatedTargetScrollTop, {
+              animation: mergeAnimations(
+                optionsRef.current,
+                optionsRef.current.resize,
+              ),
+              ignoreEscapes,
+              duration: Math.max(0, durationElapsed - Date.now()) || undefined,
+            });
+          }
 
-          return true;
+          console.log('[ScrollArea] Animation completed:', {
+            finalScrollTop: state.scrollTop,
+            targetPosition,
+            actualScrollTop: scrollRef.current?.scrollTop,
+            difference: targetPosition - (scrollRef.current?.scrollTop || 0),
+          });
+
+          return state.isAtBottom;
         });
 
         return promise.then((completed) => {
@@ -408,24 +455,32 @@ export const useScrollArea = (
         setIsAtBottom(true);
       }
 
-      // Special handling for preserveScrollPosition with autoScroll check
-      if (scrollOptions.preserveScrollPosition) {
-        const shouldAutoScroll = optionsRef.current.autoScroll !== false;
-        if (!shouldAutoScroll && !state.isAtBottom) {
-          return false;
-        }
+      // Special handling for preserveScrollPosition
+      if (scrollOptions.preserveScrollPosition && !state.isAtBottom) {
+        console.log('[ScrollArea] scrollToBottom skipped - not at bottom');
+        return false;
       }
 
-      return scrollToPosition(state.calculatedTargetScrollTop, scrollOptions);
+      const targetPosition = state.calculatedTargetScrollTop;
+
+      console.log('[ScrollArea] scrollToBottom started:', {
+        targetPosition,
+        currentScrollTop: state.scrollTop,
+        difference: targetPosition - state.scrollTop,
+        preserveScrollPosition: scrollOptions.preserveScrollPosition,
+      });
+
+      return scrollToPosition(targetPosition, scrollOptions, 'down');
     },
     [setIsAtBottom, state, scrollToPosition],
   );
 
   const scrollToTop = useCallback<ScrollTo>(
     (scrollOptions = {}) => {
+      console.log('[ScrollArea] scrollToTop called');
       setEscapedFromLock(true);
       setIsAtBottom(false);
-      return scrollToPosition(0, scrollOptions);
+      return scrollToPosition(0, scrollOptions, 'up');
     },
     [setEscapedFromLock, setIsAtBottom, scrollToPosition],
   );
@@ -596,8 +651,17 @@ export const useScrollArea = (
               : optionsRef.current.initial,
           );
 
-          const shouldAutoScroll = optionsRef.current.autoScroll !== false;
+          const shouldAutoScroll = optionsRef.current.autoScroll === true;
           const shouldPreservePosition = !shouldAutoScroll;
+
+          console.log('[ScrollArea] ResizeObserver - content added:', {
+            difference,
+            shouldAutoScroll,
+            shouldPreservePosition,
+            isAtBottom: state.isAtBottom,
+            scrollTop: state.scrollTop,
+            targetScrollTop: state.calculatedTargetScrollTop,
+          });
 
           scrollToBottom({
             animation,
