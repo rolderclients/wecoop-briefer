@@ -1,7 +1,31 @@
-import { AppShell, type AppShellMainProps } from '@mantine/core';
+import {
+  ActionIcon,
+  Affix,
+  AppShell,
+  type AppShellMainProps,
+  Transition,
+} from '@mantine/core';
+import { useWindowScroll } from '@mantine/hooks';
+import { IconArrowUp } from '@tabler/icons-react';
 
-export const Page = (props: AppShellMainProps) => {
-  const { children, ...rest } = props;
+export const Page = ({ children, ...props }: AppShellMainProps) => {
+  const [scroll, scrollTo] = useWindowScroll();
 
-  return <AppShell.Main {...rest}>{children}</AppShell.Main>;
+  return (
+    <AppShell.Main {...props}>
+      {children}
+      <Affix position={{ bottom: 18, right: 18 }}>
+        <Transition transition="slide-up" mounted={scroll.y > 0}>
+          {(transitionStyles) => (
+            <ActionIcon
+              style={transitionStyles}
+              onClick={() => scrollTo({ y: 0 })}
+            >
+              <IconArrowUp strokeWidth={1.5} />
+            </ActionIcon>
+          )}
+        </Transition>
+      </Affix>
+    </AppShell.Main>
+  );
 };
