@@ -6,7 +6,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { useStickToBottom } from 'use-stick-to-bottom';
+import { useStickToBottom } from './useStickToBottom';
 
 interface ScrollAreaContext {
   height?: MantineStyleProps['h'];
@@ -23,13 +23,32 @@ const ScrollAreaContext = createContext<ScrollAreaContext | null>(null);
 export const ScrollAreaProvider = ({
   children,
   height,
+  autoScrollOnInitialRender = false,
 }: {
   children: ReactNode;
   height?: MantineStyleProps['h'];
+  autoScrollOnInitialRender?: boolean;
 }) => {
   // undefined - не показывать кнопку
   const [at, setAt] = useState<'top' | 'bottom'>();
-  const { scrollRef, contentRef, isNearBottom } = useStickToBottom();
+  const { scrollRef, contentRef, isNearBottom, stopScroll } = useStickToBottom({
+    autoScrollOnInitialRender,
+  });
+
+  // useEffect(() => {
+  // stopScroll();
+
+  // if (contentRef.caller)
+  // Small timeout so stopScroll fires after auto-scroll begins
+  // setTimeout(() => {
+  //   // Stop scroll from useStickToBottom hook
+  //   stopScroll();
+  //   // Reset scroll position to top
+  //   if (scrollRef.current) {
+  //     scrollRef.current.scrollTop = 0;
+  //   }
+  // }, 5);
+  // }, [stopScroll, contentRef]);
 
   // at bottom при автоскролле
   useEffect(() => {

@@ -11,9 +11,13 @@ import { ScrollAreaProvider, useScrollArea } from './Provider';
 
 interface RootProps extends BoxProps {
   children?: React.ReactNode;
+  autoScrollOnInitialRender?: boolean;
 }
-const Root = ({ h, ...props }: RootProps) => (
-  <ScrollAreaProvider height={h}>
+const Root = ({ h, autoScrollOnInitialRender, ...props }: RootProps) => (
+  <ScrollAreaProvider
+    height={h}
+    autoScrollOnInitialRender={autoScrollOnInitialRender}
+  >
     <Box pos="relative" {...props} />
   </ScrollAreaProvider>
 );
