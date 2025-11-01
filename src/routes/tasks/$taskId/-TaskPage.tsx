@@ -90,6 +90,7 @@ export const TaskPage = () => {
                   <ScrollArea.Content>
                     <Box
                       px="md"
+                      py="sm"
                       // biome-ignore lint/security/noDangerouslySetInnerHtml: <>
                       dangerouslySetInnerHTML={{
                         __html: task.brief?.content || '',

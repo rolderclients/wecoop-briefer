@@ -75,7 +75,7 @@ export const BriefPage = () => {
             <AIEditor
               content={task.brief?.content}
               messages={messages}
-              editable={!task.archived}
+              editable={!task.archived || status !== 'ready'}
               height="calc(100vh - 240px)"
             />
           </Grid.Col>
