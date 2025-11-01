@@ -34,8 +34,6 @@ export const BriefPage = () => {
         <Grid gutter="xl">
           <Grid.Col span={4}>
             <Stack>
-              {/*<Paper withBorder radius="md">*/}
-              {/*<ScrollArea h="calc(100vh - 222px)" px="sm" py="xs">*/}
               <Conversation height="calc(100vh - 240px)">
                 <Conversation.Content>
                   {!messages.length && <Conversation.EmptyState />}
@@ -48,10 +46,7 @@ export const BriefPage = () => {
                 </Conversation.Content>
 
                 <Conversation.ScrollButton />
-
-                {/*</ScrollArea>*/}
               </Conversation>
-              {/*</Paper>*/}
 
               <form
                 onSubmit={(e) => {

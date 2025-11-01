@@ -4,13 +4,13 @@ import {
   type MantineStyleProps,
   Paper,
   type PaperProps,
+  ScrollArea,
   Stack,
   type StackProps,
   Title,
 } from '@mantine/core';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons-react';
 import type { ComponentProps } from 'react';
-import { ScrollArea } from '../scrollArea';
 import { ConversationProvider, useConversation } from './Provider';
 
 interface RootProps extends PaperProps {
@@ -26,20 +26,20 @@ const Root = ({ height, ...props }: RootProps) => (
 type ContentProps = Omit<ComponentProps<typeof ScrollArea>, 'height'>;
 
 const Content = ({ children, ...props }: ContentProps) => {
-  const { height, viewport, setAt } = useConversation();
+  const { height, scrollRef, contentRef, setAt } = useConversation();
 
   return (
     <ScrollArea
       h={height}
-      topThreshold={24}
-      bottomThreshold={24}
-      autoScroll
+      // topThreshold={24}
+      // bottomThreshold={24}
+      // autoScroll
       onTopReached={() => setAt?.('top')}
       onBottomReached={() => setAt?.('bottom')}
-      viewportRef={viewport}
+      viewportRef={scrollRef}
       {...props}
     >
-      {children}
+      <div ref={contentRef}>{children}</div>
     </ScrollArea>
   );
 };
@@ -58,16 +58,16 @@ const EmptyState = ({ children, ...props }: EmptyStateProps) =>
   );
 
 const ScrollButton = (props: ActionIconProps) => {
-  const { viewport, at } = useConversation();
+  const { scrollRef, at } = useConversation();
 
   const scrollToBottom = () =>
-    viewport?.current?.scrollTo({
-      top: viewport?.current?.scrollHeight,
+    scrollRef?.current?.scrollTo({
+      top: scrollRef?.current?.scrollHeight,
       behavior: 'smooth',
     });
 
   const scrollToTop = () =>
-    viewport?.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollRef?.current?.scrollTo({ top: 0, behavior: 'smooth' });
 
   return at ? (
     <ActionIcon

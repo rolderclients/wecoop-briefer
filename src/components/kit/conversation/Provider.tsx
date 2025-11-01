@@ -3,13 +3,17 @@ import {
   createContext,
   type ReactNode,
   useContext,
-  useRef,
+  useEffect,
   useState,
 } from 'react';
+import { useStickToBottom } from 'use-stick-to-bottom';
 
 interface ConversationContext {
   height?: MantineStyleProps['h'];
-  viewport?: React.RefObject<HTMLDivElement | null>;
+  scrollRef?: React.RefObject<HTMLElement | null> &
+    React.RefCallback<HTMLElement>;
+  contentRef?: React.RefObject<HTMLElement | null> &
+    React.RefCallback<HTMLElement>;
   at?: 'top' | 'bottom';
   setAt?: (at: 'top' | 'bottom') => void;
 }
@@ -20,12 +24,33 @@ export const ConversationProvider = ({
   children,
   height,
 }: ConversationContext & { children: ReactNode }) => {
-  const viewport = useRef<HTMLDivElement>(null);
+  // undefined - не показывать кнопку
   const [at, setAt] = useState<'top' | 'bottom'>();
+  const { scrollRef, contentRef, isNearBottom } = useStickToBottom();
+
+  // at bottom при автоскролле
+  useEffect(() => {
+    const scrollHeight = scrollRef.current?.clientHeight;
+    const contentHeight = contentRef.current?.clientHeight;
+
+    if (
+      isNearBottom &&
+      scrollHeight &&
+      contentHeight &&
+      scrollHeight < contentHeight
+    ) {
+      setAt('bottom');
+    }
+  }, [
+    isNearBottom,
+    scrollRef.current?.clientHeight,
+    contentRef.current?.clientHeight,
+  ]);
 
   const value = {
     height,
-    viewport,
+    scrollRef,
+    contentRef,
     at,
     setAt,
   };
