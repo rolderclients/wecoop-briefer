@@ -2,7 +2,7 @@ import type { MantineStyleProps } from '@mantine/core';
 import type { RefCallback, RefObject } from 'react';
 import { createContext, type ReactNode, useContext } from 'react';
 import {
-  type ScrollToBottom,
+  type ScrollTo,
   useScrollArea as useScrollAreaHook,
 } from './useScrollArea';
 
@@ -10,8 +10,8 @@ interface ScrollAreaContext {
   height?: MantineStyleProps['h'];
   scrollRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   contentRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
-  scrollToBottom: ScrollToBottom;
-  scrollToTop: ScrollToBottom;
+  scrollToBottom: ScrollTo;
+  scrollToTop: ScrollTo;
   hasScrollableContent: boolean;
   isNearBottom: boolean;
   isAtBottom: boolean;

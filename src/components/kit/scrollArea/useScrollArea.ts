@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 
-export interface StickToBottomState {
+export interface ScrollAreaState {
   scrollTop: number;
   lastScrollTop?: number;
   ignoreScrollToTop?: number;
@@ -75,14 +75,14 @@ export type GetTargetScrollTop = (
   context: ScrollElements,
 ) => number;
 
-export interface StickToBottomOptions extends SpringAnimation {
+export interface ScrollAreaOptions extends SpringAnimation {
   resize?: Animation;
   initial?: Animation | boolean;
   targetScrollTop?: GetTargetScrollTop;
   autoScrollOnInitialRender?: boolean;
 }
 
-export type ScrollToBottomOptions =
+export type ScrollToOptions =
   | ScrollBehavior
   | {
       animation?: Animation;
@@ -121,13 +121,13 @@ export type ScrollToBottomOptions =
       duration?: number | Promise<void>;
     };
 
-export type ScrollToBottom = (
-  scrollOptions?: ScrollToBottomOptions,
+export type ScrollTo = (
+  scrollOptions?: ScrollToOptions,
 ) => Promise<boolean> | boolean;
 
 export type StopScroll = () => void;
 
-const STICK_TO_BOTTOM_OFFSET_PX = 70;
+const SCROLL_OFFSET_PX = 70;
 const SIXTY_FPS_INTERVAL_MS = 1000 / 60;
 const RETAIN_ANIMATION_DURATION_MS = 350;
 
@@ -146,7 +146,7 @@ globalThis.document?.addEventListener('click', () => {
 });
 
 export const useScrollArea = (
-  options: StickToBottomOptions = {},
+  options: ScrollAreaOptions = {},
 ): ScrollAreaInstance => {
   const [escapedFromLock, updateEscapedFromLock] = useState(false);
   const [isAtBottom, updateIsAtBottom] = useState(
@@ -159,7 +159,7 @@ export const useScrollArea = (
   const [isAboveCenter, setIsAboveCenter] = useState(true);
   const [hasScrollableContent, setHasScrollableContent] = useState(false);
 
-  const optionsRef = useRef<StickToBottomOptions>({});
+  const optionsRef = useRef<ScrollAreaOptions>({});
   optionsRef.current = options;
 
   const scrollRef = useRef<HTMLElement | null>(null);
@@ -183,7 +183,7 @@ export const useScrollArea = (
   }, []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: not needed
-  const state = useMemo<StickToBottomState>(() => {
+  const state = useMemo<ScrollAreaState>(() => {
     let lastCalculation:
       | { targetScrollTop: number; calculatedScrollTop: number }
       | undefined;
@@ -255,11 +255,11 @@ export const useScrollArea = (
       },
 
       get isNearBottom() {
-        return this.scrollDifference <= STICK_TO_BOTTOM_OFFSET_PX;
+        return this.scrollDifference <= SCROLL_OFFSET_PX;
       },
 
       get isNearTop() {
-        return this.scrollTop <= STICK_TO_BOTTOM_OFFSET_PX;
+        return this.scrollTop <= SCROLL_OFFSET_PX;
       },
 
       get isAboveCenter() {
@@ -290,7 +290,7 @@ export const useScrollArea = (
   );
 
   const scrollToPosition = useCallback(
-    (targetPosition: number, scrollOptions: ScrollToBottomOptions = {}) => {
+    (targetPosition: number, scrollOptions: ScrollToOptions = {}) => {
       if (typeof scrollOptions === 'string') {
         scrollOptions = { animation: scrollOptions };
       }
@@ -394,7 +394,7 @@ export const useScrollArea = (
     [isSelecting, state],
   );
 
-  const scrollToBottom = useCallback<ScrollToBottom>(
+  const scrollToBottom = useCallback<ScrollTo>(
     (scrollOptions = {}) => {
       if (typeof scrollOptions === 'string') {
         scrollOptions = { animation: scrollOptions };
@@ -414,7 +414,7 @@ export const useScrollArea = (
     [setIsAtBottom, state, scrollToPosition],
   );
 
-  const scrollToTop = useCallback<ScrollToBottom>(
+  const scrollToTop = useCallback<ScrollTo>(
     (scrollOptions = {}) => {
       setEscapedFromLock(true);
       setIsAtBottom(false);
@@ -661,8 +661,8 @@ export const useScrollArea = (
 export interface ScrollAreaInstance {
   contentRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   scrollRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
-  scrollToBottom: ScrollToBottom;
-  scrollToTop: ScrollToBottom;
+  scrollToBottom: ScrollTo;
+  scrollToTop: ScrollTo;
   stopScroll: StopScroll;
   isAtBottom: boolean;
   isNearBottom: boolean;
@@ -670,7 +670,7 @@ export interface ScrollAreaInstance {
   isAboveCenter: boolean;
   escapedFromLock: boolean;
   hasScrollableContent: boolean;
-  state: StickToBottomState;
+  state: ScrollAreaState;
 }
 
 const animationCache = new Map<string, Readonly<Required<SpringAnimation>>>();
