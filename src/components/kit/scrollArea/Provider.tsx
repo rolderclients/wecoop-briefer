@@ -1,12 +1,6 @@
 import type { MantineStyleProps } from '@mantine/core';
 import type { RefCallback, RefObject } from 'react';
-import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { createContext, type ReactNode, useContext } from 'react';
 import {
   type ScrollToBottom,
   type ScrollToTop,
@@ -17,10 +11,11 @@ interface ScrollAreaContext {
   height?: MantineStyleProps['h'];
   scrollRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   contentRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
-  at?: 'top' | 'bottom';
-  setAt: (at: 'top' | 'bottom') => void;
   scrollToBottom: ScrollToBottom;
   scrollToTop: ScrollToTop;
+  hasScrollableContent: boolean;
+  isNearBottom: boolean;
+  isAtBottom: boolean;
 }
 
 const ScrollAreaContext = createContext<ScrollAreaContext | null>(null);
@@ -34,8 +29,6 @@ export const ScrollAreaProvider = ({
   height?: MantineStyleProps['h'];
   autoScrollOnInitialRender?: boolean;
 }) => {
-  // undefined - не показывать кнопку
-  const [at, setAt] = useState<'top' | 'bottom'>();
   const {
     scrollRef,
     contentRef,
@@ -48,25 +41,15 @@ export const ScrollAreaProvider = ({
     autoScrollOnInitialRender,
   });
 
-  // Определение позиции кнопки на основе состояний хука
-  useEffect(() => {
-    if (!hasScrollableContent) {
-      setAt(undefined);
-    } else if (isNearBottom || isAtBottom) {
-      setAt('bottom');
-    } else {
-      setAt('top');
-    }
-  }, [hasScrollableContent, isNearBottom, isAtBottom]);
-
   const value = {
     height,
     scrollRef,
     contentRef,
-    at,
-    setAt,
     scrollToBottom,
     scrollToTop,
+    hasScrollableContent,
+    isNearBottom,
+    isAtBottom,
   };
 
   return (
