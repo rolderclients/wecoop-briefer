@@ -1,12 +1,12 @@
 import { AppShell, ScrollArea, Stack } from '@mantine/core';
-import { IconAi, IconList, IconMessage } from '@tabler/icons-react';
+import { IconAi, IconChecklist, IconList } from '@tabler/icons-react';
 import { useLocation } from '@tanstack/react-router';
 import { NavbarLink, type NavbarLinkProps } from './NavbarLink';
 
 const menu: NavbarLinkProps[] = [
   { label: 'Услуги', icon: IconList, pathname: '/services' },
   { label: 'Промты', icon: IconAi, pathname: '/prompts' },
-  { label: 'Ассистент', icon: IconMessage, pathname: '/assistant' },
+  { label: 'Задачи', icon: IconChecklist, pathname: '/tasks' },
 ];
 
 export const Navbar = () => {

@@ -1,25 +1,36 @@
-import { Loader } from '@mantine/core';
+import { Center, Loader } from '@mantine/core';
 import { getTaskListExtension, Link, RichTextEditor } from '@mantine/tiptap';
 import { IconCheck } from '@tabler/icons-react';
 import Highlight from '@tiptap/extension-highlight';
+import { TableKit } from '@tiptap/extension-table';
 import TaskItem from '@tiptap/extension-task-item';
 import TipTapTaskList from '@tiptap/extension-task-list';
 import TextAlign from '@tiptap/extension-text-align';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import type { Prompt } from '@/api';
+import { useEffect } from 'react';
+import { ScrollArea } from '../kit';
+import classes from './editor.module.css';
+
+export { AIEditor } from './AIEditor';
+
+export interface EditorProps {
+  content?: string;
+  onChange?: (value: string) => void;
+  saving?: boolean;
+  editable?: boolean;
+  height?: string;
+}
 
 export const Editor = ({
-  prompt,
+  content,
   onChange,
   saving,
-}: {
-  prompt: Prompt;
-  onChange: (value: string) => void;
-  saving: boolean;
-}) => {
+  editable,
+  height,
+}: EditorProps) => {
   const editor = useEditor({
-    shouldRerenderOnTransaction: true,
+    shouldRerenderOnTransaction: false,
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({ link: false }),
@@ -33,15 +44,20 @@ export const Editor = ({
           class: 'test-item',
         },
       }),
+      TableKit,
     ],
-    content: prompt.content,
-    onUpdate: ({ editor }) => onChange(editor.getHTML()),
-    editable: !prompt.archived,
+    content: content,
+    onUpdate: ({ editor }) => onChange?.(editor.getHTML()),
+    editable: !!editable,
   });
 
-  return (
-    <RichTextEditor editor={editor} variant="default">
-      {prompt.archived ? null : (
+  useEffect(() => {
+    editor?.commands.setContent(content || '');
+  }, [content, editor]);
+
+  return editor ? (
+    <RichTextEditor editor={editor} className={classes.editor}>
+      {editable && (
         <RichTextEditor.Toolbar sticky stickyOffset="64px">
           <RichTextEditor.ControlsGroup>
             <RichTextEditor.Bold />
@@ -100,7 +116,17 @@ export const Editor = ({
         </RichTextEditor.Toolbar>
       )}
 
-      <RichTextEditor.Content />
+      <ScrollArea h={height}>
+        <ScrollArea.Content>
+          <RichTextEditor.Content />
+        </ScrollArea.Content>
+
+        <ScrollArea.ScrollButton />
+      </ScrollArea>
     </RichTextEditor>
+  ) : (
+    <Center mt="xl">
+      <Loader size="lg" />
+    </Center>
   );
 };

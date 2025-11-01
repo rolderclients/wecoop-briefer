@@ -14,7 +14,6 @@ export interface Category extends Item {
 export interface Service extends Item {
   title: string;
   category: string;
-  // categoryTitle: string;
   archived: boolean;
 }
 
@@ -77,3 +76,23 @@ export interface UpdatePrompt {
 export type FormPrompt = Required<
   Pick<UpdatePrompt, 'id' | 'title' | 'service' | 'model'>
 >;
+
+export interface Brief extends Item {
+  content: string;
+}
+
+export interface Task extends Item {
+  title: string;
+  content?: string;
+  brief?: string;
+  company: {
+    title?: string;
+    info?: string;
+  };
+  service: Pick<Service, 'id' | 'title'>;
+  archived: boolean;
+}
+
+export interface TaskWithBrief extends Omit<Task, 'brief'> {
+  brief?: Brief;
+}

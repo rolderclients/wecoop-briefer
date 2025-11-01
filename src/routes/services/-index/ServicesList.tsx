@@ -38,6 +38,7 @@ const ServicePaper = ({
   const { selectedIds, setSelectedIds, archived } = useServices();
 
   const handleEditClick = () => {
+    console.log(service);
     const values = {
       id: service.id,
       title: service.title,
@@ -64,7 +65,7 @@ const ServicePaper = ({
           />
         </Grid.Col>
         <Grid.Col span="auto">
-          <Text lh={1}>{service.title}</Text>
+          <Text inline>{service.title}</Text>
         </Grid.Col>
 
         <Grid.Col span="content">

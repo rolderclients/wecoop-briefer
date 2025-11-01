@@ -14,16 +14,16 @@ export const App = () => (
   <html lang="ru" {...mantineHtmlProps}>
     <head>
       <HeadContent />
-      <ColorSchemeScript defaultColorScheme="light" />
+      <ColorSchemeScript defaultColorScheme="auto" />
     </head>
     <body>
-      <MantineProvider defaultColorScheme="light">
+      <MantineProvider defaultColorScheme="auto">
         <Notifications />
         <AppShell
           header={{ height: 64 }}
           navbar={{
             width: 160,
-            breakpoint: 'sm',
+            breakpoint: 'xs',
           }}
           padding="xl"
         >
