@@ -8,22 +8,25 @@ import {
 } from 'react';
 import { useStickToBottom } from 'use-stick-to-bottom';
 
-interface ConversationContext {
+interface ScrollAreaContext {
   height?: MantineStyleProps['h'];
-  scrollRef?: React.RefObject<HTMLElement | null> &
+  scrollRef: React.RefObject<HTMLElement | null> &
     React.RefCallback<HTMLElement>;
-  contentRef?: React.RefObject<HTMLElement | null> &
+  contentRef: React.RefObject<HTMLElement | null> &
     React.RefCallback<HTMLElement>;
   at?: 'top' | 'bottom';
-  setAt?: (at: 'top' | 'bottom') => void;
+  setAt: (at: 'top' | 'bottom') => void;
 }
 
-const ConversationContext = createContext<ConversationContext | null>(null);
+const ScrollAreaContext = createContext<ScrollAreaContext | null>(null);
 
-export const ConversationProvider = ({
+export const ScrollAreaProvider = ({
   children,
   height,
-}: ConversationContext & { children: ReactNode }) => {
+}: {
+  children: ReactNode;
+  height?: MantineStyleProps['h'];
+}) => {
   // undefined - не показывать кнопку
   const [at, setAt] = useState<'top' | 'bottom'>();
   const { scrollRef, contentRef, isNearBottom } = useStickToBottom();
@@ -56,16 +59,16 @@ export const ConversationProvider = ({
   };
 
   return (
-    <ConversationContext.Provider value={value}>
+    <ScrollAreaContext.Provider value={value}>
       {children}
-    </ConversationContext.Provider>
+    </ScrollAreaContext.Provider>
   );
 };
 
-export const useConversation = () => {
-  const context = useContext(ConversationContext);
+export const useScrollArea = () => {
+  const context = useContext(ScrollAreaContext);
   if (!context) {
-    throw new Error('useConversation must be used within ConversationProvider');
+    throw new Error('useScrollArea must be used within ScrollAreaProvider');
   }
   return context;
 };

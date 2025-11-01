@@ -3,13 +3,12 @@ import type { AgentUIMessage } from '@/routes/api/chat';
 import { ChatMessageContent } from './Content';
 
 export const ChatMessage = ({ message }: { message: AgentUIMessage }) => {
+  const textParts = message.parts?.filter((i) => i.type === 'text');
+  const lastPart = textParts?.[textParts.length - 1];
+
   return (
     <Message from={message.role}>
-      {message.parts
-        .filter((part) => part.type === 'text')
-        .map((part, i) => (
-          <ChatMessageContent part={part} key={`${message.id}-${i}`} />
-        ))}
+      <ChatMessageContent part={lastPart} />
     </Message>
   );
 };

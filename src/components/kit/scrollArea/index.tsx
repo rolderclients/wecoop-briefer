@@ -1,64 +1,43 @@
 import {
   ActionIcon,
   type ActionIconProps,
-  type MantineStyleProps,
-  Paper,
-  type PaperProps,
-  ScrollArea,
-  Stack,
-  type StackProps,
-  Title,
+  Box,
+  type BoxProps,
+  ScrollArea as MantinScrollArea,
 } from '@mantine/core';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons-react';
 import type { ComponentProps } from 'react';
-import { ConversationProvider, useConversation } from './Provider';
+import { ScrollAreaProvider, useScrollArea } from './Provider';
 
-interface RootProps extends PaperProps {
-  height?: MantineStyleProps['h'];
+interface RootProps extends BoxProps {
   children?: React.ReactNode;
 }
-
-const Root = ({ height, ...props }: RootProps) => (
-  <ConversationProvider height={height}>
-    <Paper pos="relative" withBorder radius="md" {...props}></Paper>
-  </ConversationProvider>
+const Root = ({ h, ...props }: RootProps) => (
+  <ScrollAreaProvider height={h}>
+    <Box pos="relative" {...props} />
+  </ScrollAreaProvider>
 );
-type ContentProps = Omit<ComponentProps<typeof ScrollArea>, 'height'>;
+
+type ContentProps = Omit<ComponentProps<typeof MantinScrollArea>, 'height'>;
 
 const Content = ({ children, ...props }: ContentProps) => {
-  const { height, scrollRef, contentRef, setAt } = useConversation();
+  const { height, scrollRef, contentRef, setAt } = useScrollArea();
 
   return (
-    <ScrollArea
+    <MantinScrollArea
       h={height}
-      // topThreshold={24}
-      // bottomThreshold={24}
-      // autoScroll
       onTopReached={() => setAt?.('top')}
       onBottomReached={() => setAt?.('bottom')}
       viewportRef={scrollRef}
       {...props}
     >
       <div ref={contentRef}>{children}</div>
-    </ScrollArea>
+    </MantinScrollArea>
   );
 };
 
-interface EmptyStateProps extends StackProps {
-  children?: React.ReactNode;
-}
-
-const EmptyState = ({ children, ...props }: EmptyStateProps) =>
-  children || (
-    <Stack align="center" mt="xl" {...props}>
-      <Title order={4} c="dimmed">
-        Нет сообщений
-      </Title>
-    </Stack>
-  );
-
 const ScrollButton = (props: ActionIconProps) => {
-  const { scrollRef, at } = useConversation();
+  const { scrollRef, at } = useScrollArea();
 
   const scrollToBottom = () =>
     scrollRef?.current?.scrollTo({
@@ -87,8 +66,8 @@ const ScrollButton = (props: ActionIconProps) => {
   ) : null;
 };
 
-export const Conversation = Object.assign(Root, {
+export const ScrollArea = Object.assign(Root, {
   Content,
-  EmptyState,
   ScrollButton,
+  Provider: ScrollAreaProvider,
 });

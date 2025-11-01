@@ -11,6 +11,7 @@
     background-color: var(--mantine-primary-color-light);
   }
   &[data-from="assistant"] {
+    margin-right: auto;
     background-color: var(--mantine-color-orange-light);
   }
   &[data-from="system"] {

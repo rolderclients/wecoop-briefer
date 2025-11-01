@@ -8,7 +8,19 @@ import TipTapTaskList from '@tiptap/extension-task-list';
 import TextAlign from '@tiptap/extension-text-align';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { useEffect } from 'react';
+import { ScrollArea } from '../kit';
 import classes from './editor.module.css';
+
+export { AIEditor } from './AIEditor';
+
+export interface EditorProps {
+  content?: string;
+  onChange?: (value: string) => void;
+  saving?: boolean;
+  editable?: boolean;
+  height?: string;
+}
 
 export const Editor = ({
   content,
@@ -16,15 +28,9 @@ export const Editor = ({
   saving,
   editable,
   height,
-}: {
-  content?: string;
-  onChange?: (value: string) => void;
-  saving?: boolean;
-  editable?: boolean;
-  height?: string;
-}) => {
+}: EditorProps) => {
   const editor = useEditor({
-    shouldRerenderOnTransaction: true,
+    shouldRerenderOnTransaction: false,
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({ link: false }),
@@ -40,17 +46,17 @@ export const Editor = ({
       }),
       TableKit,
     ],
-    content,
+    content: content,
     onUpdate: ({ editor }) => onChange?.(editor.getHTML()),
     editable: !!editable,
   });
 
+  useEffect(() => {
+    editor?.commands.setContent(content || '');
+  }, [content, editor]);
+
   return editor ? (
-    <RichTextEditor
-      editor={editor}
-      className={classes.editor}
-      style={{ '--editor-height': height }}
-    >
+    <RichTextEditor editor={editor} className={classes.editor}>
       {editable && (
         <RichTextEditor.Toolbar sticky stickyOffset="64px">
           <RichTextEditor.ControlsGroup>
@@ -110,11 +116,17 @@ export const Editor = ({
         </RichTextEditor.Toolbar>
       )}
 
-      <RichTextEditor.Content />
+      <ScrollArea h={height}>
+        <ScrollArea.Content>
+          <RichTextEditor.Content />
+        </ScrollArea.Content>
+
+        <ScrollArea.ScrollButton />
+      </ScrollArea>
     </RichTextEditor>
   ) : (
     <Center mt="xl">
-      <Loader size="xl" />
+      <Loader size="lg" />
     </Center>
   );
 };

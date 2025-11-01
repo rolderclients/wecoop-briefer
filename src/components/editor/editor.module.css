@@ -9,8 +9,6 @@
 
   & :global(.mantine-RichTextEditor-content) {
     border-radius: var(--mantine-radius-md);
-    overflow: auto;
-    height: var(--editor-height);
   }
   & :global(.mantine-RichTextEditor-toolbar) {
     border-color: var(--editor-border-color);

@@ -16,7 +16,7 @@ const providerOptions = {
 };
 
 const schema = object({
-  document: string().describe('Документ в формате Markdown'),
+  document: string().describe('Документ в формате HTML'),
   chat: string().describe('Сообщения в чат для пользователя'),
 });
 

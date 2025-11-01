@@ -4,7 +4,6 @@ import {
   Grid,
   Group,
   Paper,
-  ScrollArea,
   Stack,
   Text,
   Title,
@@ -13,7 +12,8 @@ import { IconEdit } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { taskWithBriefQueryOptions } from '@/api';
-import { Editor, Page } from '@/components';
+import { Page } from '@/components';
+import { ScrollArea } from '@/components/kit';
 import { Route } from '.';
 
 export const TaskPage = () => {
@@ -42,20 +42,23 @@ export const TaskPage = () => {
               <Title order={3}>Задание</Title>
               <Paper withBorder radius="md">
                 <ScrollArea h="calc(100vh - 240px)">
-                  <Stack px="md" py="sm">
-                    <Box style={{ whiteSpace: 'pre-wrap' }}>
-                      <Text c="dimmed">Компания</Text>
-                      <Text>{task.company.title}</Text>
-                    </Box>
-                    <Box style={{ whiteSpace: 'pre-wrap' }}>
-                      <Text c="dimmed">О компании</Text>
-                      <Text>{task.company.info}</Text>
-                    </Box>
-                    <Box style={{ whiteSpace: 'pre-wrap' }}>
-                      <Text c="dimmed">Описание</Text>
-                      <Text>{task.content}</Text>
-                    </Box>
-                  </Stack>
+                  <ScrollArea.Content>
+                    <Stack px="md" py="sm">
+                      <Box style={{ whiteSpace: 'pre-wrap' }}>
+                        <Text c="dimmed">Компания</Text>
+                        <Text>{task.company.title}</Text>
+                      </Box>
+                      <Box style={{ whiteSpace: 'pre-wrap' }}>
+                        <Text c="dimmed">О компании</Text>
+                        <Text>{task.company.info}</Text>
+                      </Box>
+                      <Box style={{ whiteSpace: 'pre-wrap' }}>
+                        <Text c="dimmed">Описание</Text>
+                        <Text>{task.content}</Text>
+                      </Box>
+                    </Stack>
+                  </ScrollArea.Content>
+                  <ScrollArea.ScrollButton />
                 </ScrollArea>
               </Paper>
             </Stack>
@@ -82,10 +85,20 @@ export const TaskPage = () => {
                 </Link>
               </Group>
 
-              <Editor
-                content={task.brief?.content}
-                height="calc(100vh - 240px)"
-              />
+              <Paper withBorder radius="md">
+                <ScrollArea h="calc(100vh - 240px)">
+                  <ScrollArea.Content>
+                    <Box
+                      px="md"
+                      // biome-ignore lint/security/noDangerouslySetInnerHtml: <>
+                      dangerouslySetInnerHTML={{
+                        __html: task.brief?.content || '',
+                      }}
+                    />
+                  </ScrollArea.Content>
+                  <ScrollArea.ScrollButton />
+                </ScrollArea>
+              </Paper>
             </Stack>
           </Grid.Col>
         </Grid>

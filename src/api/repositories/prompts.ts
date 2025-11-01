@@ -1,5 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
+import sanitizeHtml from 'sanitize-html';
 import { fromDTO, fromDTOs, getDB } from '../db';
 import type {
   NewPrompt,
@@ -77,6 +78,8 @@ export const updatePrompt = createServerFn({ method: 'POST' })
   .handler(async ({ data: { promptData } }) => {
     const db = await getDB();
 
+    if (promptData.content)
+      promptData.content = sanitizeHtml(promptData.content);
     const item = await fromDTO(promptData);
     await db.query('UPDATE $item.id MERGE $item', { item });
   });
