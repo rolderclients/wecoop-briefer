@@ -1,9 +1,9 @@
 import { ActionIcon, type ActionIconProps } from '@mantine/core';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons-react';
+import type { RefCallback, RefObject } from 'react';
 
 export interface ScrollButtonProps extends ActionIconProps {
-  scrollRef?: React.RefObject<HTMLElement | null> &
-    React.RefCallback<HTMLElement>;
+  scrollRef?: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   at?: 'top' | 'bottom';
 }
 

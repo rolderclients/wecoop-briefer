@@ -1,7 +1,7 @@
+import { useMergedRef } from '@mantine/hooks';
 import {
-  type DependencyList,
-  type MutableRefObject,
   type RefCallback,
+  type RefObject,
   useCallback,
   useMemo,
   useRef,
@@ -153,8 +153,11 @@ export const useStickToBottom = (
   );
   const [isNearBottom, setIsNearBottom] = useState(false);
 
-  const optionsRef = useRef<StickToBottomOptions>(null!);
+  const optionsRef = useRef<StickToBottomOptions>({});
   optionsRef.current = options;
+
+  const scrollRef = useRef<HTMLElement | null>(null);
+  const contentRef = useRef<HTMLElement | null>(null);
 
   const isSelecting = useCallback(() => {
     if (!mouseDown) {
@@ -171,16 +174,6 @@ export const useStickToBottom = (
       range.commonAncestorContainer.contains(scrollRef.current) ||
       scrollRef.current?.contains(range.commonAncestorContainer)
     );
-  }, []);
-
-  const setIsAtBottom = useCallback((isAtBottom: boolean) => {
-    state.isAtBottom = isAtBottom;
-    updateIsAtBottom(isAtBottom);
-  }, []);
-
-  const setEscapedFromLock = useCallback((escapedFromLock: boolean) => {
-    state.escapedFromLock = escapedFromLock;
-    updateEscapedFromLock(escapedFromLock);
   }, []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: not needed
@@ -260,6 +253,22 @@ export const useStickToBottom = (
       },
     };
   }, []);
+
+  const setIsAtBottom = useCallback(
+    (isAtBottom: boolean) => {
+      state.isAtBottom = isAtBottom;
+      updateIsAtBottom(isAtBottom);
+    },
+    [state],
+  );
+
+  const setEscapedFromLock = useCallback(
+    (escapedFromLock: boolean) => {
+      state.escapedFromLock = escapedFromLock;
+      updateEscapedFromLock(escapedFromLock);
+    },
+    [state],
+  );
 
   const scrollToBottom = useCallback<ScrollToBottom>(
     (scrollOptions = {}) => {
@@ -485,6 +494,7 @@ export const useStickToBottom = (
       if (
         element === scrollRef.current &&
         deltaY < 0 &&
+        scrollRef.current &&
         scrollRef.current.scrollHeight > scrollRef.current.clientHeight &&
         !state.animation?.ignoreEscapes
       ) {
@@ -495,93 +505,112 @@ export const useStickToBottom = (
     [setEscapedFromLock, setIsAtBottom, state],
   );
 
-  const scrollRef = useRefCallback((scroll) => {
-    scrollRef.current?.removeEventListener('scroll', handleScroll);
-    scrollRef.current?.removeEventListener('wheel', handleWheel);
-    scroll?.addEventListener('scroll', handleScroll, { passive: true });
-    scroll?.addEventListener('wheel', handleWheel, { passive: true });
-  }, []);
+  const handleScrollRef = useCallback(
+    (scroll: HTMLElement | null) => {
+      scrollRef.current?.removeEventListener('scroll', handleScroll);
+      scrollRef.current?.removeEventListener('wheel', handleWheel);
+      scrollRef.current = scroll;
+      scroll?.addEventListener('scroll', handleScroll, { passive: true });
+      scroll?.addEventListener('wheel', handleWheel, { passive: true });
+    },
+    [handleScroll, handleWheel],
+  );
 
-  const contentRef = useRefCallback((content) => {
-    state.resizeObserver?.disconnect();
+  const handleContentRef = useCallback(
+    (content: HTMLElement | null) => {
+      state.resizeObserver?.disconnect();
+      contentRef.current = content;
 
-    if (!content) {
-      return;
-    }
-
-    let previousHeight: number | undefined;
-
-    state.resizeObserver = new ResizeObserver(([entry]) => {
-      const { height } = entry.contentRect;
-      const difference = height - (previousHeight ?? height);
-
-      state.resizeDifference = difference;
-
-      /**
-       * Sometimes the browser can overscroll past the target,
-       * so check for this and adjust appropriately.
-       */
-      if (state.scrollTop > state.targetScrollTop) {
-        state.scrollTop = state.targetScrollTop;
+      if (!content) {
+        return;
       }
 
-      setIsNearBottom(state.isNearBottom);
+      let previousHeight: number | undefined;
 
-      if (difference >= 0) {
-        /**
-         * If it's a positive resize, scroll to the bottom when
-         * we're already at the bottom.
-         */
-        const animation = mergeAnimations(
-          optionsRef.current,
-          previousHeight
-            ? optionsRef.current.resize
-            : optionsRef.current.initial,
-        );
+      state.resizeObserver = new ResizeObserver(([entry]) => {
+        const { height } = entry.contentRect;
+        const difference = height - (previousHeight ?? height);
 
-        scrollToBottom({
-          animation,
-          wait: true,
-          preserveScrollPosition: true,
-          duration:
-            animation === 'instant' ? undefined : RETAIN_ANIMATION_DURATION_MS,
-        });
-      } else {
+        state.resizeDifference = difference;
+
         /**
-         * Else if it's a negative resize, check if we're near the bottom
-         * if we are want to un-escape from the lock, because the resize
-         * could have caused the container to be at the bottom.
+         * Sometimes the browser can overscroll past the target,
+         * so check for this and adjust appropriately.
          */
-        if (state.isNearBottom) {
-          setEscapedFromLock(false);
-          setIsAtBottom(true);
+        if (state.scrollTop > state.targetScrollTop) {
+          state.scrollTop = state.targetScrollTop;
         }
-      }
 
-      previousHeight = height;
+        setIsNearBottom(state.isNearBottom);
 
-      /**
-       * Reset the resize difference after the scroll event
-       * has fired. Requires a rAF to wait for the scroll event,
-       * and a setTimeout to wait for the other timeout we have in
-       * resizeObserver in case the scroll event happens after the
-       * resize event.
-       */
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          if (state.resizeDifference === difference) {
-            state.resizeDifference = 0;
+        if (difference >= 0) {
+          /**
+           * If it's a positive resize, scroll to the bottom when
+           * we're already at the bottom.
+           */
+          const animation = mergeAnimations(
+            optionsRef.current,
+            previousHeight
+              ? optionsRef.current.resize
+              : optionsRef.current.initial,
+          );
+
+          scrollToBottom({
+            animation,
+            wait: true,
+            preserveScrollPosition: true,
+            duration:
+              animation === 'instant'
+                ? undefined
+                : RETAIN_ANIMATION_DURATION_MS,
+          });
+        } else {
+          /**
+           * Else if it's a negative resize, check if we're near the bottom
+           * if we are want to un-escape from the lock, because the resize
+           * could have caused the container to be at the bottom.
+           */
+          if (state.isNearBottom) {
+            setEscapedFromLock(false);
+            setIsAtBottom(true);
           }
-        }, 1);
-      });
-    });
+        }
 
-    state.resizeObserver?.observe(content);
-  }, []);
+        previousHeight = height;
+
+        /**
+         * Reset the resize difference after the scroll event
+         * has fired. Requires a rAF to wait for the scroll event,
+         * and a setTimeout to wait for the other timeout we have in
+         * resizeObserver in case the scroll event happens after the
+         * resize event.
+         */
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            if (state.resizeDifference === difference) {
+              state.resizeDifference = 0;
+            }
+          }, 1);
+        });
+      });
+
+      state.resizeObserver?.observe(content);
+    },
+    [state, scrollToBottom, setEscapedFromLock, setIsAtBottom],
+  );
+
+  const mergedScrollRef = useMergedRef(
+    scrollRef,
+    handleScrollRef,
+  ) as RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
+  const mergedContentRef = useMergedRef(
+    contentRef,
+    handleContentRef,
+  ) as RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
 
   return {
-    contentRef,
-    scrollRef,
+    contentRef: mergedContentRef,
+    scrollRef: mergedScrollRef,
     scrollToBottom,
     stopScroll,
     isAtBottom: isAtBottom || isNearBottom,
@@ -592,30 +621,14 @@ export const useStickToBottom = (
 };
 
 export interface StickToBottomInstance {
-  contentRef: React.MutableRefObject<HTMLElement | null> &
-    React.RefCallback<HTMLElement>;
-  scrollRef: React.MutableRefObject<HTMLElement | null> &
-    React.RefCallback<HTMLElement>;
+  contentRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
+  scrollRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   scrollToBottom: ScrollToBottom;
   stopScroll: StopScroll;
   isAtBottom: boolean;
   isNearBottom: boolean;
   escapedFromLock: boolean;
   state: StickToBottomState;
-}
-
-function useRefCallback<T extends (ref: HTMLElement | null) => any>(
-  callback: T,
-  deps: DependencyList,
-) {
-  // biome-ignore lint/correctness/useExhaustiveDependencies: not needed
-  const result = useCallback((ref: HTMLElement | null) => {
-    result.current = ref;
-    return callback(ref);
-  }, deps) as any as MutableRefObject<HTMLElement | null> &
-    RefCallback<HTMLElement>;
-
-  return result;
 }
 
 const animationCache = new Map<string, Readonly<Required<SpringAnimation>>>();
@@ -647,5 +660,7 @@ function mergeAnimations(...animations: (Animation | boolean | undefined)[]) {
     animationCache.set(key, Object.freeze(result));
   }
 
-  return instant ? 'instant' : animationCache.get(key)!;
+  return instant
+    ? 'instant'
+    : (animationCache.get(key) as Required<SpringAnimation>);
 }

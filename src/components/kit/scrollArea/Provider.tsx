@@ -1,4 +1,5 @@
 import type { MantineStyleProps } from '@mantine/core';
+import type { RefCallback, RefObject } from 'react';
 import {
   createContext,
   type ReactNode,
@@ -10,10 +11,8 @@ import { useStickToBottom } from './useStickToBottom';
 
 interface ScrollAreaContext {
   height?: MantineStyleProps['h'];
-  scrollRef: React.RefObject<HTMLElement | null> &
-    React.RefCallback<HTMLElement>;
-  contentRef: React.RefObject<HTMLElement | null> &
-    React.RefCallback<HTMLElement>;
+  scrollRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
+  contentRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   at?: 'top' | 'bottom';
   setAt: (at: 'top' | 'bottom') => void;
 }
@@ -31,24 +30,9 @@ export const ScrollAreaProvider = ({
 }) => {
   // undefined - не показывать кнопку
   const [at, setAt] = useState<'top' | 'bottom'>();
-  const { scrollRef, contentRef, isNearBottom, stopScroll } = useStickToBottom({
+  const { scrollRef, contentRef, isNearBottom } = useStickToBottom({
     autoScrollOnInitialRender,
   });
-
-  // useEffect(() => {
-  // stopScroll();
-
-  // if (contentRef.caller)
-  // Small timeout so stopScroll fires after auto-scroll begins
-  // setTimeout(() => {
-  //   // Stop scroll from useStickToBottom hook
-  //   stopScroll();
-  //   // Reset scroll position to top
-  //   if (scrollRef.current) {
-  //     scrollRef.current.scrollTop = 0;
-  //   }
-  // }, 5);
-  // }, [stopScroll, contentRef]);
 
   // at bottom при автоскролле
   useEffect(() => {
