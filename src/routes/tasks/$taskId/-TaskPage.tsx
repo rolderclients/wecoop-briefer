@@ -12,7 +12,7 @@ import { IconEdit } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { taskWithBriefQueryOptions } from '@/api';
-import { Page } from '@/components';
+import { Editor, Page } from '@/components';
 import { ScrollArea } from '@/components/kit';
 import { Route } from '.';
 
@@ -85,21 +85,11 @@ export const TaskPage = () => {
                 </Link>
               </Group>
 
-              <Paper withBorder radius="md">
-                <ScrollArea h="calc(100vh - 240px)">
-                  <ScrollArea.Content>
-                    <Box
-                      px="md"
-                      py="sm"
-                      // biome-ignore lint/security/noDangerouslySetInnerHtml: <>
-                      dangerouslySetInnerHTML={{
-                        __html: task.brief?.content || '',
-                      }}
-                    />
-                  </ScrollArea.Content>
-                  <ScrollArea.ScrollButton />
-                </ScrollArea>
-              </Paper>
+              <Editor
+                height="calc(100vh - 240px)"
+                content={task.brief?.content}
+                editable={false}
+              />
             </Stack>
           </Grid.Col>
         </Grid>
