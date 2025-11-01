@@ -29,6 +29,8 @@ export interface StickToBottomState {
   escapedFromLock: boolean;
   isAtBottom: boolean;
   isNearBottom: boolean;
+  isNearTop: boolean;
+  isAboveCenter: boolean;
 
   resizeObserver?: ResizeObserver;
 }
@@ -122,7 +124,7 @@ export type ScrollToBottomOptions =
 export type ScrollToBottom = (
   scrollOptions?: ScrollToBottomOptions,
 ) => Promise<boolean> | boolean;
-export type ScrollToTop = () => void;
+
 export type StopScroll = () => void;
 
 const STICK_TO_BOTTOM_OFFSET_PX = 70;
@@ -153,6 +155,8 @@ export const useStickToBottom = (
       : false,
   );
   const [isNearBottom, setIsNearBottom] = useState(false);
+  const [isNearTop, setIsNearTop] = useState(true);
+  const [isAboveCenter, setIsAboveCenter] = useState(true);
   const [hasScrollableContent, setHasScrollableContent] = useState(false);
 
   const optionsRef = useRef<StickToBottomOptions>({});
@@ -253,6 +257,19 @@ export const useStickToBottom = (
       get isNearBottom() {
         return this.scrollDifference <= STICK_TO_BOTTOM_OFFSET_PX;
       },
+
+      get isNearTop() {
+        return this.scrollTop <= STICK_TO_BOTTOM_OFFSET_PX;
+      },
+
+      get isAboveCenter() {
+        if (!scrollRef.current || !contentRef.current) {
+          return true;
+        }
+        const centerPosition =
+          (scrollRef.current.scrollHeight - scrollRef.current.clientHeight) / 2;
+        return this.scrollTop < centerPosition;
+      },
     };
   }, []);
 
@@ -272,14 +289,10 @@ export const useStickToBottom = (
     [state],
   );
 
-  const scrollToBottom = useCallback<ScrollToBottom>(
-    (scrollOptions = {}) => {
+  const scrollToPosition = useCallback(
+    (targetPosition: number, scrollOptions: ScrollToBottomOptions = {}) => {
       if (typeof scrollOptions === 'string') {
         scrollOptions = { animation: scrollOptions };
-      }
-
-      if (!scrollOptions.preserveScrollPosition) {
-        setIsAtBottom(true);
       }
 
       const waitElapsed = Date.now() + (Number(scrollOptions.wait) || 0);
@@ -290,7 +303,6 @@ export const useStickToBottom = (
       const { ignoreEscapes = false } = scrollOptions;
 
       let durationElapsed: number;
-      let startTarget = state.calculatedTargetScrollTop;
 
       if (scrollOptions.duration instanceof Promise) {
         scrollOptions.duration.finally(() => {
@@ -302,12 +314,6 @@ export const useStickToBottom = (
 
       const next = async (): Promise<boolean> => {
         const promise = new Promise(requestAnimationFrame).then(() => {
-          if (!state.isAtBottom) {
-            state.animation = undefined;
-
-            return false;
-          }
-
           const { scrollTop } = state;
           const tick = performance.now();
           const tickDelta =
@@ -326,18 +332,19 @@ export const useStickToBottom = (
             return next();
           }
 
-          if (
-            scrollTop < Math.min(startTarget, state.calculatedTargetScrollTop)
-          ) {
+          const targetDifference = targetPosition - scrollTop;
+          const shouldContinue = Math.abs(targetDifference) > 1;
+
+          if (shouldContinue) {
             if (state.animation?.behavior === behavior) {
               if (behavior === 'instant') {
-                state.scrollTop = state.calculatedTargetScrollTop;
+                state.scrollTop = targetPosition;
                 return next();
               }
 
               state.velocity =
                 (behavior.damping * state.velocity +
-                  behavior.stiffness * state.scrollDifference) /
+                  behavior.stiffness * targetDifference) /
                 behavior.mass;
               state.accumulated += state.velocity * tickDelta;
               state.scrollTop += state.accumulated;
@@ -351,33 +358,18 @@ export const useStickToBottom = (
           }
 
           if (durationElapsed > Date.now()) {
-            startTarget = state.calculatedTargetScrollTop;
-
             return next();
           }
 
           state.animation = undefined;
 
-          /**
-           * If we're still below the target, then queue
-           * up another scroll to the bottom with the last
-           * requested animatino.
-           */
-          if (state.scrollTop < state.calculatedTargetScrollTop) {
-            return scrollToBottom({
-              animation: mergeAnimations(
-                optionsRef.current,
-                optionsRef.current.resize,
-              ),
-              ignoreEscapes,
-              duration: Math.max(0, durationElapsed - Date.now()) || undefined,
-            });
-          }
+          // Ensure we're at exact target position
+          state.scrollTop = targetPosition;
 
-          return state.isAtBottom;
+          return true;
         });
 
-        return promise.then((isAtBottom) => {
+        return promise.then((completed) => {
           requestAnimationFrame(() => {
             if (!state.animation) {
               state.lastTick = undefined;
@@ -385,7 +377,7 @@ export const useStickToBottom = (
             }
           });
 
-          return isAtBottom;
+          return completed;
         });
       };
 
@@ -399,16 +391,37 @@ export const useStickToBottom = (
 
       return next();
     },
-    [setIsAtBottom, isSelecting, state],
+    [isSelecting, state],
   );
 
-  const scrollToTop = useCallback((): void => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    setEscapedFromLock(true);
-    setIsAtBottom(false);
-  }, [setEscapedFromLock, setIsAtBottom]);
+  const scrollToBottom = useCallback<ScrollToBottom>(
+    (scrollOptions = {}) => {
+      if (typeof scrollOptions === 'string') {
+        scrollOptions = { animation: scrollOptions };
+      }
+
+      if (!scrollOptions.preserveScrollPosition) {
+        setIsAtBottom(true);
+      }
+
+      // Special handling for preserveScrollPosition
+      if (scrollOptions.preserveScrollPosition && !state.isAtBottom) {
+        return false;
+      }
+
+      return scrollToPosition(state.calculatedTargetScrollTop, scrollOptions);
+    },
+    [setIsAtBottom, state, scrollToPosition],
+  );
+
+  const scrollToTop = useCallback<ScrollToBottom>(
+    (scrollOptions = {}) => {
+      setEscapedFromLock(true);
+      setIsAtBottom(false);
+      return scrollToPosition(0, scrollOptions);
+    },
+    [setEscapedFromLock, setIsAtBottom, scrollToPosition],
+  );
 
   const stopScroll = useCallback((): void => {
     setEscapedFromLock(true);
@@ -437,6 +450,8 @@ export const useStickToBottom = (
       }
 
       setIsNearBottom(state.isNearBottom);
+      setIsNearTop(state.isNearTop);
+      setIsAboveCenter(state.isAboveCenter);
 
       /**
        * Scroll events may come before a ResizeObserver event,
@@ -552,6 +567,8 @@ export const useStickToBottom = (
         }
 
         setIsNearBottom(state.isNearBottom);
+        setIsNearTop(state.isNearTop);
+        setIsAboveCenter(state.isAboveCenter);
 
         // Check if content is scrollable
         if (scrollRef.current && contentRef.current) {
@@ -633,6 +650,8 @@ export const useStickToBottom = (
     stopScroll,
     isAtBottom: isAtBottom || isNearBottom,
     isNearBottom,
+    isNearTop,
+    isAboveCenter,
     escapedFromLock,
     hasScrollableContent,
     state,
@@ -643,10 +662,12 @@ export interface StickToBottomInstance {
   contentRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   scrollRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   scrollToBottom: ScrollToBottom;
-  scrollToTop: ScrollToTop;
+  scrollToTop: ScrollToBottom;
   stopScroll: StopScroll;
   isAtBottom: boolean;
   isNearBottom: boolean;
+  isNearTop: boolean;
+  isAboveCenter: boolean;
   escapedFromLock: boolean;
   hasScrollableContent: boolean;
   state: StickToBottomState;

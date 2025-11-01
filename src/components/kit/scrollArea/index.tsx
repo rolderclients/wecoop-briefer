@@ -8,6 +8,7 @@ import {
 import { IconArrowDown, IconArrowUp } from '@tabler/icons-react';
 import type { ComponentProps } from 'react';
 import { ScrollAreaProvider, useScrollArea } from './Provider';
+import { useStickToBottom } from './useStickToBottom';
 
 interface RootProps extends BoxProps {
   children?: React.ReactNode;
@@ -35,24 +36,19 @@ const Content = ({ children, ...props }: ContentProps) => {
 };
 
 const ScrollButton = (props: ActionIconProps) => {
-  const {
-    hasScrollableContent,
-    isNearBottom,
-    isAtBottom,
-    scrollToBottom,
-    scrollToTop,
-  } = useScrollArea();
+  const { hasScrollableContent, isAboveCenter, scrollToBottom, scrollToTop } =
+    useScrollArea();
 
   const handleScrollToBottom = () => scrollToBottom({ animation: 'smooth' });
-  const handleScrollToTop = () => scrollToTop();
+  const handleScrollToTop = () => scrollToTop({ animation: 'smooth' });
 
   // Не показывать кнопку если нет скроллируемого контента
   if (!hasScrollableContent) {
     return null;
   }
 
-  // Если мы внизу - показать кнопку вверх, иначе - вниз
-  const isAtBottomPosition = isNearBottom || isAtBottom;
+  // Менять направление при достижении центра
+  const showUpButton = !isAboveCenter;
 
   return (
     <ActionIcon
@@ -60,10 +56,10 @@ const ScrollButton = (props: ActionIconProps) => {
       bottom={16}
       right={16}
       variant="light"
-      onClick={isAtBottomPosition ? handleScrollToTop : handleScrollToBottom}
+      onClick={showUpButton ? handleScrollToTop : handleScrollToBottom}
       {...props}
     >
-      {isAtBottomPosition ? (
+      {showUpButton ? (
         <IconArrowUp strokeWidth={1.5} />
       ) : (
         <IconArrowDown strokeWidth={1.5} />
@@ -76,4 +72,6 @@ export const ScrollArea = Object.assign(Root, {
   Content,
   ScrollButton,
   Provider: ScrollAreaProvider,
+  useScrollArea,
+  useStickToBottom,
 });

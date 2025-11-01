@@ -1,21 +1,20 @@
 import type { MantineStyleProps } from '@mantine/core';
 import type { RefCallback, RefObject } from 'react';
 import { createContext, type ReactNode, useContext } from 'react';
-import {
-  type ScrollToBottom,
-  type ScrollToTop,
-  useStickToBottom,
-} from './useStickToBottom';
+import { type ScrollToBottom, useStickToBottom } from './useStickToBottom';
 
 interface ScrollAreaContext {
   height?: MantineStyleProps['h'];
   scrollRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   contentRef: RefObject<HTMLElement | null> & RefCallback<HTMLElement>;
   scrollToBottom: ScrollToBottom;
-  scrollToTop: ScrollToTop;
+  scrollToTop: ScrollToBottom;
   hasScrollableContent: boolean;
   isNearBottom: boolean;
   isAtBottom: boolean;
+  isNearTop: boolean;
+  isAboveCenter: boolean;
+  escapedFromLock: boolean;
 }
 
 const ScrollAreaContext = createContext<ScrollAreaContext | null>(null);
@@ -34,6 +33,9 @@ export const ScrollAreaProvider = ({
     contentRef,
     isNearBottom,
     isAtBottom,
+    isNearTop,
+    isAboveCenter,
+    escapedFromLock,
     hasScrollableContent,
     scrollToBottom,
     scrollToTop,
@@ -50,6 +52,9 @@ export const ScrollAreaProvider = ({
     hasScrollableContent,
     isNearBottom,
     isAtBottom,
+    isNearTop,
+    isAboveCenter,
+    escapedFromLock,
   };
 
   return (
