@@ -1,4 +1,4 @@
-import { Loader } from '@mantine/core';
+import { Center, Loader } from '@mantine/core';
 import { getTaskListExtension, Link, RichTextEditor } from '@mantine/tiptap';
 import { IconCheck } from '@tabler/icons-react';
 import Highlight from '@tiptap/extension-highlight';
@@ -45,11 +45,7 @@ export const Editor = ({
     editable: !!editable,
   });
 
-  if (!editor) {
-    return null;
-  }
-
-  return (
+  return editor ? (
     <RichTextEditor
       editor={editor}
       className={classes.editor}
@@ -116,5 +112,9 @@ export const Editor = ({
 
       <RichTextEditor.Content />
     </RichTextEditor>
+  ) : (
+    <Center mt="xl">
+      <Loader size="xl" />
+    </Center>
   );
 };
