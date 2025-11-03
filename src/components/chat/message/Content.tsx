@@ -9,6 +9,11 @@ export const ChatMessageContent = ({ part }: { part: TextUIPart }) => {
   return chatMessage ? (
     <Response>{chatMessage}</Response>
   ) : (
-    <Loader size={28} my={-2} type="dots" color="orange.1" />
+    <Loader
+      size={28}
+      my={-2}
+      type="dots"
+      color="light-dark(var(--mantine-color-orange-8), var(--mantine-color-orange-1))"
+    />
   );
 };

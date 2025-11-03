@@ -1,0 +1,64 @@
+.root {
+  @mixin light {
+    &[data-variant="default"] {
+      --prompt-input-bd: var(--mantine-color-gray-4);
+      --prompt-input-bg: var(--mantine-color-white);
+      --prompt-input-bd-focus: var(--mantine-primary-color-filled);
+    }
+
+    &[data-variant="filled"] {
+      --prompt-input-bd: transparent;
+      --prompt-input-bg: var(--mantine-color-gray-1);
+      --prompt-input-bd-focus: var(--mantine-primary-color-filled);
+    }
+
+    &[data-variant="unstyled"] {
+      --prompt-input-bd: transparent;
+      --prompt-input-bg: transparent;
+      --prompt-input-bd-focus: transparent;
+    }
+  }
+
+  @mixin dark {
+    &[data-variant="default"] {
+      --prompt-input-bd: var(--mantine-color-dark-4);
+      --prompt-input-bg: var(--mantine-color-dark-6);
+      --prompt-input-bd-focus: var(--mantine-primary-color-filled);
+    }
+
+    &[data-variant="filled"] {
+      --prompt-input-bd: transparent;
+      --prompt-input-bg: var(--mantine-color-dark-5);
+      --prompt-input-bd-focus: var(--mantine-primary-color-filled);
+    }
+
+    &[data-variant="unstyled"] {
+      --prompt-input-bd: transparent;
+      --prompt-input-bg: transparent;
+      --prompt-input-bd-focus: transparent;
+    }
+  }
+
+  --input-radius: var(--mantine-radius-default);
+
+  border: rem(1px) solid var(--prompt-input-bd);
+  background-color: var(--prompt-input-bg);
+  border-radius: var(--input-radius);
+
+  padding-left: var(--input-padding-left);
+  padding-right: var(--input-padding-right);
+  padding-top: var(--input-padding-y, 0rem);
+  padding-bottom: var(--input-padding-y, 0rem);
+}
+
+.textArea {
+  & :global(.mantine-Textarea-input) {
+    scrollbar-width: thin;
+    border-color: transparent;
+
+    &:focus {
+      outline: none;
+      border-color: transparent;
+    }
+  }
+}

@@ -2,10 +2,9 @@ import { useChat } from '@ai-sdk/react';
 import { Grid, Group, Stack, Text, Title } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
-import { useState } from 'react';
 import { taskWithBriefQueryOptions } from '@/api';
 import { AIEditor, ChatMessage, Page } from '@/components';
-import { Conversation, ScrollArea } from '@/components/kit';
+import { Conversation, PromptInput } from '@/components/kit';
 import type { AgentUIMessage } from '@/routes/api/chat';
 import { Route } from '.';
 
@@ -13,7 +12,6 @@ export const BriefPage = () => {
   const { taskId } = useParams({ from: Route.id });
   const { data: task } = useSuspenseQuery(taskWithBriefQueryOptions(taskId));
   const { messages, sendMessage, status } = useChat<AgentUIMessage>();
-  const [input, setInput] = useState('');
 
   return (
     <Page>
@@ -34,40 +32,27 @@ export const BriefPage = () => {
         <Grid gutter="xl">
           <Grid.Col span={4}>
             <Stack>
-              <Conversation>
-                <ScrollArea h="calc(100vh - 240px)" autoScroll>
-                  <ScrollArea.Content>
-                    {!messages.length && <Conversation.EmptyState />}
+              <Conversation height="calc(100vh - 646px)">
+                {!messages.length && <Conversation.EmptyState />}
 
-                    <Stack gap="sm" p="md">
-                      {messages.map((message) => (
-                        <ChatMessage key={message.id} message={message} />
-                      ))}
-                    </Stack>
-                  </ScrollArea.Content>
-                  <ScrollArea.ScrollButton />
-                </ScrollArea>
+                <Stack gap="sm" p="md">
+                  {messages.map((message) => (
+                    <ChatMessage key={message.id} message={message} />
+                  ))}
+                </Stack>
               </Conversation>
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (input.trim()) {
-                    sendMessage({ text: input });
-                    setInput('');
-                  }
+              <PromptInput
+                radius="md"
+                onSubmit={(v) => {
+                  console.log(v);
                 }}
               >
-                <input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  disabled={status !== 'ready'}
-                  placeholder="Say something..."
-                />
-                <button type="submit" disabled={status !== 'ready'}>
-                  Submit
-                </button>
-              </form>
+                <PromptInput.Input />
+                <PromptInput.Toolbar>
+                  <PromptInput.SendButton />
+                </PromptInput.Toolbar>
+              </PromptInput>
             </Stack>
           </Grid.Col>
 
@@ -76,7 +61,7 @@ export const BriefPage = () => {
               content={task.brief?.content}
               messages={messages}
               editable={!task.archived || status !== 'ready'}
-              height="calc(100vh - 240px)"
+              height="calc(100vh - 237px)"
             />
           </Grid.Col>
         </Grid>

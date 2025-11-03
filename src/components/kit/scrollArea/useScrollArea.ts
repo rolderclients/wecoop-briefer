@@ -129,7 +129,7 @@ export type ScrollTo = (
 
 export type StopScroll = () => void;
 
-const SCROLL_OFFSET_PX = 1;
+const SCROLL_OFFSET_PX = 0.6;
 const SCROLL_NEAR_BOTTOM_PX = 70;
 const SCROLL_TOP_OFFSET_PX = 70;
 const SIXTY_FPS_INTERVAL_MS = 1000 / 60;
@@ -203,7 +203,7 @@ export const useScrollArea = (
       },
       set scrollTop(scrollTop: number) {
         if (scrollRef.current) {
-          scrollRef.current.scrollTop = scrollTop;
+          scrollRef.current.scrollTo({ top: scrollTop });
           state.ignoreScrollToTop = scrollRef.current.scrollTop;
         }
       },

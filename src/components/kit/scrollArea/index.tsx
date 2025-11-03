@@ -9,6 +9,9 @@ import { IconArrowDown, IconArrowUp } from '@tabler/icons-react';
 import type { ComponentProps } from 'react';
 import { ScrollAreaProvider, useScrollAreaContext } from './Provider';
 
+const useScrollArea = useScrollAreaContext;
+export { useScrollArea };
+
 interface RootProps extends BoxProps {
   children?: React.ReactNode;
   autoScrollOnInitialRender?: boolean;
@@ -81,5 +84,4 @@ export const ScrollArea = Object.assign(Root, {
   Content,
   ScrollButton,
   Provider: ScrollAreaProvider,
-  useScrollArea: useScrollAreaContext,
 });
