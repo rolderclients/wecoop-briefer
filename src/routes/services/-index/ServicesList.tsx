@@ -7,83 +7,82 @@ import classes from '../../styles.module.css';
 import { useServices } from './ServicesProvider';
 
 export const ServicesList = ({
-  services,
-  form,
-  open,
+	services,
+	form,
+	open,
 }: {
-  services: Service[];
-  form: UseFormReturnType<FormService>;
-  open: () => void;
+	services: Service[];
+	form: UseFormReturnType<FormService>;
+	open: () => void;
 }) => {
-  return services.map((service) => (
-    <ServicePaper
-      key={service.id}
-      service={service}
-      form={form}
-      open={open}
-    ></ServicePaper>
-  ));
+	return services.map((service) => (
+		<ServicePaper
+			key={service.id}
+			service={service}
+			form={form}
+			open={open}
+		></ServicePaper>
+	));
 };
 
 const ServicePaper = ({
-  service,
-  form,
-  open,
+	service,
+	form,
+	open,
 }: {
-  service: Service;
-  form: UseFormReturnType<FormService>;
-  open: () => void;
+	service: Service;
+	form: UseFormReturnType<FormService>;
+	open: () => void;
 }) => {
-  const { hovered, ref } = useHover();
-  const { selectedIds, setSelectedIds, archived } = useServices();
+	const { hovered, ref } = useHover();
+	const { selectedIds, setSelectedIds, archived } = useServices();
 
-  const handleEditClick = () => {
-    console.log(service);
-    const values = {
-      id: service.id,
-      title: service.title,
-      category: service.category,
-    };
-    form.setInitialValues(values);
-    form.reset();
-    open();
-  };
+	const handleEditClick = () => {
+		const values = {
+			id: service.id,
+			title: service.title,
+			category: service.category,
+		};
+		form.setInitialValues(values);
+		form.reset();
+		open();
+	};
 
-  return (
-    <Paper ref={ref} radius="md" withBorder>
-      <Grid px="md" py="xs" align="center">
-        <Grid.Col span="content">
-          <Checkbox
-            checked={selectedIds.includes(service.id)}
-            onChange={(e) => {
-              setSelectedIds(
-                e.currentTarget.checked
-                  ? [...selectedIds, service.id]
-                  : selectedIds.filter((id) => id !== service.id),
-              );
-            }}
-          />
-        </Grid.Col>
-        <Grid.Col span="auto">
-          <Text inline>{service.title}</Text>
-        </Grid.Col>
+	return (
+		<Paper ref={ref} radius="md" withBorder>
+			<Grid px="md" py="xs" align="center">
+				<Grid.Col span="content">
+					<Checkbox
+						checked={selectedIds.includes(service.id)}
+						onChange={(e) => {
+							setSelectedIds(
+								e.currentTarget.checked
+									? [...selectedIds, service.id]
+									: selectedIds.filter((id) => id !== service.id),
+							);
+						}}
+					/>
+				</Grid.Col>
+				<Grid.Col span="auto">
+					<Text inline>{service.title}</Text>
+				</Grid.Col>
 
-        <Grid.Col span="content">
-          {archived ? (
-            <Box h={35} />
-          ) : (
-            <ActionIcon
-              aria-label="Изменить"
-              className={classes.editActionIcon}
-              mod={{ hovered }}
-              onClick={handleEditClick}
-              mt={4}
-            >
-              <IconEdit size={20} />
-            </ActionIcon>
-          )}
-        </Grid.Col>
-      </Grid>
-    </Paper>
-  );
+				<Grid.Col span="content">
+					{archived ? (
+						<Box h={35} />
+					) : (
+						<ActionIcon
+							aria-label="Изменить"
+							className={classes.editActionIcon}
+							mod={{ hovered }}
+							onClick={handleEditClick}
+							mt={4}
+						>
+							<IconEdit size={20} />
+						</ActionIcon>
+					)}
+				</Grid.Col>
+			</Grid>
+		</Paper>
+	);
 };

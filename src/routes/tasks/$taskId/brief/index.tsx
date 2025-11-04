@@ -4,18 +4,18 @@ import { taskWithBriefQueryOptions } from '@/api';
 import { BriefPage } from './-BriefPage';
 
 export const Route = createFileRoute('/tasks/$taskId/brief/')({
-  loader: async ({ context, params: { taskId } }) => {
-    await context.queryClient.ensureQueryData(
-      taskWithBriefQueryOptions(taskId),
-    );
-  },
-  component: BriefPage,
-  head: () => ({
-    links: [
-      {
-        rel: 'stylesheet',
-        href: tiptapCss,
-      },
-    ],
-  }),
+	loader: async ({ context, params: { taskId } }) => {
+		await context.queryClient.ensureQueryData(
+			taskWithBriefQueryOptions(taskId),
+		);
+	},
+	component: BriefPage,
+	head: () => ({
+		links: [
+			{
+				rel: 'stylesheet',
+				href: tiptapCss,
+			},
+		],
+	}),
 });

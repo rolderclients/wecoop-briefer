@@ -6,52 +6,52 @@ import { ServicesList } from './ServicesList';
 import { useServices } from './ServicesProvider';
 
 export const Categories = () => {
-  const { categoriesWithServices, setSelectedIds } = useServices();
+	const { categoriesWithServices, setSelectedIds } = useServices();
 
-  const form = useForm({
-    mode: 'uncontrolled',
-    initialValues: { id: '', title: '', category: '' },
-    validate: { title: isNotEmpty(), category: isNotEmpty() },
-  });
+	const form = useForm({
+		mode: 'uncontrolled',
+		initialValues: { id: '', title: '', category: '' },
+		validate: { title: isNotEmpty(), category: isNotEmpty() },
+	});
 
-  const [opened, { open, close }] = useDisclosure(false);
+	const [opened, { open, close }] = useDisclosure(false);
 
-  return (
-    <Accordion onChange={() => setSelectedIds([])}>
-      {categoriesWithServices.map((categoryWithServices) => (
-        <Accordion.Item
-          key={categoryWithServices.id}
-          value={categoryWithServices.title}
-        >
-          <Accordion.Control>
-            {categoryWithServices.title}{' '}
-            <Text c="dimmed" span>
-              {categoryWithServices.services.length}
-            </Text>
-          </Accordion.Control>
-          <Accordion.Panel>
-            <Stack>
-              <Grid px="md" c="dimmed">
-                <Grid.Col span="content">
-                  <Space w={20} />
-                </Grid.Col>
-                <Grid.Col span="auto">Название</Grid.Col>
-                <Grid.Col span="content">
-                  <Space w={28} />
-                </Grid.Col>
-              </Grid>
+	return (
+		<Accordion onChange={() => setSelectedIds([])}>
+			{categoriesWithServices.map((categoryWithServices) => (
+				<Accordion.Item
+					key={categoryWithServices.id}
+					value={categoryWithServices.title}
+				>
+					<Accordion.Control>
+						{categoryWithServices.title}{' '}
+						<Text c="dimmed" span>
+							{categoryWithServices.services.length}
+						</Text>
+					</Accordion.Control>
+					<Accordion.Panel>
+						<Stack>
+							<Grid px="md" c="dimmed">
+								<Grid.Col span="content">
+									<Space w={20} />
+								</Grid.Col>
+								<Grid.Col span="auto">Название</Grid.Col>
+								<Grid.Col span="content">
+									<Space w={28} />
+								</Grid.Col>
+							</Grid>
 
-              <ServicesList
-                services={categoryWithServices.services}
-                form={form}
-                open={open}
-              />
-            </Stack>
-          </Accordion.Panel>
-        </Accordion.Item>
-      ))}
+							<ServicesList
+								services={categoryWithServices.services}
+								form={form}
+								open={open}
+							/>
+						</Stack>
+					</Accordion.Panel>
+				</Accordion.Item>
+			))}
 
-      <Edit form={form} opened={opened} close={close} />
-    </Accordion>
-  );
+			<Edit form={form} opened={opened} close={close} />
+		</Accordion>
+	);
 };

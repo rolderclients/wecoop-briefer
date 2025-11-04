@@ -7,51 +7,51 @@ import { Create } from './Create';
 import { usePrompts } from './PromptsProvider';
 
 export const Panel = () => {
-  const navigate = useNavigate({ from: Route.fullPath });
+	const navigate = useNavigate({ from: Route.fullPath });
 
-  const { setSelectedIds, archived, setArchived } = usePrompts();
+	const { setSelectedIds, archived, setArchived } = usePrompts();
 
-  return (
-    <Paper radius="md" withBorder py="sm" px="md">
-      <Group wrap="nowrap" justify="space-between">
-        <Group wrap="nowrap">
-          <Switch
-            label="Архив"
-            checked={archived}
-            onChange={(e) => {
-              setArchived(e.currentTarget.checked);
-              navigate({
-                search: () => ({ archived: e.currentTarget.checked }),
-              });
-              setSelectedIds([]);
-            }}
-          />
+	return (
+		<Paper radius="md" withBorder py="sm" px="md">
+			<Group wrap="nowrap" justify="space-between">
+				<Group wrap="nowrap">
+					<Switch
+						label="Архив"
+						checked={archived}
+						onChange={(e) => {
+							setArchived(e.currentTarget.checked);
+							navigate({
+								search: () => ({ archived: e.currentTarget.checked }),
+							});
+							setSelectedIds([]);
+						}}
+					/>
 
-          {archived ? (
-            <Group wrap="nowrap">
-              <ArchivateRestoreDelete
-                type="restore"
-                label="Восстановить"
-                icon={IconRestore}
-              />
-              <ArchivateRestoreDelete
-                type="delete"
-                label="Удалить"
-                icon={IconTrash}
-                color="red"
-              />
-            </Group>
-          ) : (
-            <ArchivateRestoreDelete
-              type="archivate"
-              label="Архивировать"
-              icon={IconArchive}
-            />
-          )}
-        </Group>
+					{archived ? (
+						<Group wrap="nowrap">
+							<ArchivateRestoreDelete
+								type="restore"
+								label="Восстановить"
+								icon={IconRestore}
+							/>
+							<ArchivateRestoreDelete
+								type="delete"
+								label="Удалить"
+								icon={IconTrash}
+								color="red"
+							/>
+						</Group>
+					) : (
+						<ArchivateRestoreDelete
+							type="archivate"
+							label="Архивировать"
+							icon={IconArchive}
+						/>
+					)}
+				</Group>
 
-        <Create />
-      </Group>
-    </Paper>
-  );
+				<Create />
+			</Group>
+		</Paper>
+	);
 };
