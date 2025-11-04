@@ -1,7 +1,0 @@
-.root {
-  & :global(.mantine-ScrollArea-scrollbar) {
-    padding-bottom: calc(var(--conversation-radius) / 2);
-    border-top-right-radius: var(--conversation-radius);
-    border-bottom-right-radius: var(--conversation-radius);
-  }
-}

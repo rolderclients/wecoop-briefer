@@ -1,34 +1,58 @@
-import { AppShell, ScrollArea, Stack } from '@mantine/core';
-import { IconAi, IconChecklist, IconList } from '@tabler/icons-react';
-import { useLocation } from '@tanstack/react-router';
-import { NavbarLink, type NavbarLinkProps } from './NavbarLink';
+import type { Icon } from '@tabler/icons-react';
+import { Link, useLocation } from '@tanstack/react-router';
+import { Text } from '../elements';
+import {
+	Sidebar,
+	SidebarContent,
+	SidebarFooter,
+	SidebarGroup,
+	SidebarGroupContent,
+	SidebarHeader,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+} from '../ui';
 
-const menu: NavbarLinkProps[] = [
-  { label: 'Услуги', icon: IconList, pathname: '/services' },
-  { label: 'Промты', icon: IconAi, pathname: '/prompts' },
-  { label: 'Задачи', icon: IconChecklist, pathname: '/tasks' },
-];
+export interface NavbarLinkProps {
+	label: string;
+	pathname?: string;
+	icon: Icon;
+}
 
-export const Navbar = () => {
-  const pathname = useLocation({
-    select: (location) => location.pathname,
-  });
+export const Navbar = ({ menu }: { menu: NavbarLinkProps[] }) => {
+	const pathname = useLocation({ select: (i) => i.pathname });
 
-  const links = menu.map((i) => (
-    <NavbarLink
-      {...i}
-      defaultOpened={i.childLinks?.some((l) => l.pathname === pathname)}
-      key={i.label}
-    />
-  ));
+	return (
+		<Sidebar>
+			<SidebarHeader className="items-center">
+				<Text variant="h3">Wecoop</Text>
+			</SidebarHeader>
 
-  return (
-    <AppShell.Navbar>
-      <AppShell.Section grow component={ScrollArea} type="never">
-        <Stack py="xl" gap={0}>
-          {links}
-        </Stack>
-      </AppShell.Section>
-    </AppShell.Navbar>
-  );
+			<SidebarContent>
+				<SidebarGroup>
+					<SidebarGroupContent>
+						<SidebarMenu>
+							{menu.map((item) => (
+								<SidebarMenuItem key={item.pathname}>
+									<SidebarMenuButton
+										asChild
+										isActive={item.pathname === pathname}
+									>
+										<Link to={item.pathname}>
+											<item.icon />
+											<span>{item.label}</span>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+							))}
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</SidebarGroup>
+			</SidebarContent>
+
+			<SidebarFooter className="items-center">
+				<Text variant="h6">Пользователь</Text>
+			</SidebarFooter>
+		</Sidebar>
+	);
 };
