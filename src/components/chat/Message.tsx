@@ -1,3 +1,4 @@
+import { Loader } from '@mantine/core';
 import { Message, MessageContent, Response } from '@/components';
 import { useChatMessage } from '@/lib';
 import type { AgentUIMessage } from '@/routes/api/chat';
@@ -10,9 +11,13 @@ export const ChatMessage = ({ message }: { message: AgentUIMessage }) => {
 
 	return (
 		<Message from={message.role} className="py-2">
-			<MessageContent className="group-[.is-user]:bg-default-hover group-[.is-user]:text-default-color group-[.is-assistant]:bg-primary-light group-[.is-assistant]:text-default-color">
-				<Response>{chatMessage}</Response>
-			</MessageContent>
+			{chatMessage ? (
+				<MessageContent className="group-[.is-user]:bg-default-hover group-[.is-user]:text-default-color group-[.is-assistant]:bg-primary-light group-[.is-assistant]:text-default-color">
+					<Response>{chatMessage}</Response>
+				</MessageContent>
+			) : (
+				<Loader size={28} type="dots" />
+			)}
 		</Message>
 	);
 };
