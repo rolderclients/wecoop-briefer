@@ -40,7 +40,7 @@ export const TaskPage = () => {
 					<Stack gap="xs">
 						<Title order={3}>Задание</Title>
 						<Paper withBorder radius="md">
-							<ScrollArea h="calc(100vh - 180px)">
+							<ScrollArea h="calc(100vh - 147px)">
 								<ScrollArea.Content>
 									<Stack px="md" py="sm">
 										<Box style={{ whiteSpace: 'pre-wrap' }}>
@@ -85,7 +85,7 @@ export const TaskPage = () => {
 						</Group>
 
 						<Editor
-							height="calc(100vh - 180px)"
+							height="calc(100vh - 147px)"
 							content={task.brief?.content}
 							editable={false}
 						/>
