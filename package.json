@@ -9,7 +9,7 @@
     "start": "bun server.ts",
     "test": "vitest run",
     "lint": "biome lint",
-    "check": "biome check --write"
+    "check": "biome check --write && tsc --noEmit"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.0-beta.50",
