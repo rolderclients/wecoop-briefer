@@ -32,5 +32,10 @@
 		"formatter": {
 			"quoteStyle": "single"
 		}
+	},
+	"css": {
+		"parser": {
+			"cssModules": true
+		}
 	}
 }

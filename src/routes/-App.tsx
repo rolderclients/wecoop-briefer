@@ -1,20 +1,9 @@
 import { AppShell, ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import {
-	type Icon,
-	IconAi,
-	IconChecklist,
-	IconList,
-} from '@tabler/icons-react';
-import { TanStackDevtools } from '@tanstack/react-devtools';
+import { IconAi, IconChecklist, IconList } from '@tabler/icons-react';
 import { HeadContent, Scripts } from '@tanstack/react-router';
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
-import {
-	Navbar,
-	type NavbarLinkProps,
-	SidebarProvider,
-	ThemeProvider,
-} from '@/components';
+import { Navbar, type NavbarLinkProps } from '@/components';
+import { Page } from './-Page';
 
 const menu: NavbarLinkProps[] = [
 	{ label: 'Услуги', icon: IconList, pathname: '/services' },
@@ -22,7 +11,7 @@ const menu: NavbarLinkProps[] = [
 	{ label: 'Задачи', icon: IconChecklist, pathname: '/tasks' },
 ];
 
-export const App = ({ children }: { children: React.ReactNode }) => (
+export const App = () => (
 	<html lang="ru" suppressHydrationWarning>
 		<head>
 			<HeadContent />
@@ -37,31 +26,23 @@ export const App = ({ children }: { children: React.ReactNode }) => (
 						width: 160,
 						breakpoint: 0,
 					}}
-					padding="xl"
 				>
-					{/*<Navbar />
-					<Outlet />*/}
-				</AppShell>
-
-				{/*<ThemeProvider>*/}
-				<SidebarProvider>
 					<Navbar menu={menu} />
-					<main className="w-full">{children}</main>
-				</SidebarProvider>
-				{/*</ThemeProvider>*/}
+					<Page />
+				</AppShell>
 			</MantineProvider>
 
-			<TanStackDevtools
-				config={{
-					position: 'bottom-right',
-				}}
-				plugins={[
-					{
-						name: 'Tanstack Router',
-						render: <TanStackRouterDevtoolsPanel />,
-					},
-				]}
-			/>
+			{/*<TanStackDevtools
+					config={{
+						position: 'bottom-right',
+					}}
+					plugins={[
+						{
+							name: 'Tanstack Router',
+							render: <TanStackRouterDevtoolsPanel />,
+						},
+					]}
+				/>*/}
 
 			<Scripts />
 		</body>

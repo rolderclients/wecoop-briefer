@@ -1,7 +1,6 @@
+import { Button, Group, Stack, Title } from '@mantine/core';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { Link, rootRouteId, useMatch, useRouter } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { Text } from './elements';
 
 export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
 	const router = useRouter();
@@ -11,18 +10,26 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
 	});
 
 	return (
-		<div className="flex flex-col items-center justify-center h-screen text-center gap-0">
-			<Text variant="h1">Произошла ошибка!</Text>
+		<Stack align="center" justify="center" gap={0} ta="center" h="100vh">
+			<Title textWrap="balance" size={65}>
+				Произошла ошибка!
+			</Title>
 			{error.message && (
-				<Text variant="h6" className="mt-4 text-destructive">
+				<Title
+					order={3}
+					ml={4}
+					textWrap="balance"
+					c="var(--mantine-color-error)"
+				>
 					{error.message}
-				</Text>
+				</Title>
 			)}
 
-			<div className="flex gap-4 mt-12">
+			<Group>
 				<Button
+					mt="xl"
 					size="lg"
-					variant="outline"
+					variant="light"
 					onClick={() => {
 						router.invalidate();
 					}}
@@ -31,25 +38,24 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
 				</Button>
 				{isRoot ? (
 					<Link to="/" preload="intent">
-						<Button size="lg" asChild>
-							<div>На главную</div>
+						<Button mt="xl" component="div" size="lg" radius="md">
+							На главную
 						</Button>
 					</Link>
 				) : (
-					<Link to="/" preload="intent">
-						<Button
-							size="lg"
-							asChild
-							onClick={(e) => {
-								e.preventDefault();
-								window.history.back();
-							}}
-						>
-							<div>Назад</div>
-						</Button>
-					</Link>
+					<Button
+						mt="xl"
+						radius="md"
+						size="lg"
+						onClick={(e) => {
+							e.preventDefault();
+							router.history.back();
+						}}
+					>
+						Назад
+					</Button>
 				)}
-			</div>
-		</div>
+			</Group>
+		</Stack>
 	);
 }

@@ -1,14 +1,14 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 'use client';
 
+import { ActionIcon, type ActionIconProps } from '@mantine/core';
+import { IconArrowBigUp, IconX } from '@tabler/icons-react';
 import type { ChatStatus, FileUIPart } from 'ai';
 import {
 	ImageIcon,
-	Loader2Icon,
 	MicIcon,
 	PaperclipIcon,
 	PlusIcon,
-	SendIcon,
-	SquareIcon,
 	XIcon,
 } from 'lucide-react';
 import { nanoid } from 'nanoid';
@@ -680,7 +680,7 @@ export const PromptInput = ({
 		// Convert blob URLs to data URLs asynchronously
 		Promise.all(
 			files.map(async ({ id, ...item }) => {
-				if (item.url && item.url.startsWith('blob:')) {
+				if (item.url?.startsWith('blob:')) {
 					return {
 						...item,
 						url: await convertBlobUrlToDataUrl(item.url),
@@ -711,7 +711,7 @@ export const PromptInput = ({
 						controller.textInput.clear();
 					}
 				}
-			} catch (error) {
+			} catch (_) {
 				// Don't clear on error - user may want to retry
 			}
 		});
@@ -736,7 +736,9 @@ export const PromptInput = ({
 				onSubmit={handleSubmit}
 				{...props}
 			>
-				<InputGroup>{children}</InputGroup>
+				<InputGroup className="shadow-none has-[[data-slot=input-group-control]:focus-visible]:ring-0">
+					{children}
+				</InputGroup>
 			</form>
 		</>
 	);
@@ -955,41 +957,70 @@ export const PromptInputActionMenuItem = ({
 // Note: Actions that perform side-effects (like opening a file dialog)
 // are provided in opt-in modules (e.g., prompt-input-attachments).
 
-export type PromptInputSubmitProps = ComponentProps<typeof InputGroupButton> & {
+export type PromptInputSubmitProps = ActionIconProps & {
 	status?: ChatStatus;
 };
 
 export const PromptInputSubmit = ({
 	className,
-	variant = 'default',
-	size = 'icon-sm',
+	variant = 'light',
+	size = 'lg',
 	status,
 	children,
 	...props
 }: PromptInputSubmitProps) => {
-	let Icon = <SendIcon className="size-4" />;
+	let Icon = <IconArrowBigUp strokeWidth={1.5} />;
 
-	if (status === 'submitted') {
-		Icon = <Loader2Icon className="size-4 animate-spin" />;
-	} else if (status === 'streaming') {
-		Icon = <SquareIcon className="size-4" />;
-	} else if (status === 'error') {
-		Icon = <XIcon className="size-4" />;
+	if (status === 'error') {
+		Icon = <IconX strokeWidth={1.5} />;
 	}
 
 	return (
-		<InputGroupButton
+		<ActionIcon
 			aria-label="Submit"
-			className={cn(className)}
+			className={className}
 			size={size}
 			type="submit"
 			variant={variant}
+			loading={status === 'submitted'}
 			{...props}
 		>
 			{children ?? Icon}
-		</InputGroupButton>
+		</ActionIcon>
 	);
 };
+
+// export const PromptInputSubmit = ({
+// 	className,
+// 	variant = 'default',
+// 	size = 'icon-sm',
+// 	status,
+// 	children,
+// 	...props
+// }: PromptInputSubmitProps) => {
+// 	let Icon = <SendIcon className="size-4" />;
+
+// 	if (status === 'submitted') {
+// 		Icon = <Loader2Icon className="size-4 animate-spin" />;
+// 	} else if (status === 'streaming') {
+// 		Icon = <SquareIcon className="size-4" />;
+// 	} else if (status === 'error') {
+// 		Icon = <XIcon className="size-4" />;
+// 	}
+
+// 	return (
+// 		<InputGroupButton
+// 			aria-label="Submit"
+// 			className={cn(className)}
+// 			size={size}
+// 			type="submit"
+// 			variant={variant}
+// 			{...props}
+// 		>
+// 			{children ?? Icon}
+// 		</InputGroupButton>
+// 	);
+// };
 
 interface SpeechRecognition extends EventTarget {
 	continuous: boolean;
@@ -1168,7 +1199,7 @@ export const PromptInputModelSelectTrigger = ({
 	<SelectTrigger
 		className={cn(
 			'border-none bg-transparent font-medium text-muted-foreground shadow-none transition-colors',
-			'hover:bg-accent hover:text-foreground [&[aria-expanded="true"]]:bg-accent [&[aria-expanded="true"]]:text-foreground',
+			'hover:bg-accent hover:text-foreground aria-expanded:bg-accent aria-expanded:text-foreground',
 			className,
 		)}
 		{...props}

@@ -1,0 +1,26 @@
+.editor {
+	--editor-border-color: light-dark(
+		var(--mantine-color-gray-3),
+		var(--mantine-color-dark-4)
+	);
+
+	border: rem(1px) solid var(--editor-border-color);
+	border-radius: var(--mantine-radius-md);
+
+	& :global(.mantine-RichTextEditor-content) {
+		border-radius: var(--mantine-radius-md);
+	}
+	& :global(.mantine-RichTextEditor-toolbar) {
+		border-color: var(--editor-border-color);
+		border-top-left-radius: var(--mantine-radius-md);
+		border-top-right-radius: var(--mantine-radius-md);
+	}
+	& :global(.mantine-ScrollArea-viewport) {
+		border-radius: var(--mantine-radius-md);
+		padding-bottom: 2px;
+	}
+	& :global(.mantine-ScrollArea-scrollbar) {
+		padding-bottom: 4px;
+		border-bottom-right-radius: var(--mantine-radius-md);
+	}
+}

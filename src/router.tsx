@@ -2,6 +2,7 @@ import { Button } from '@mantine/core';
 import { Default404Page } from '@rolder/ui-kit-react';
 import { QueryClient } from '@tanstack/react-query';
 import { createRouter, Link } from '@tanstack/react-router';
+import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { DefaultCatchBoundary } from './components/DefaultCatchBoundary';
 import { routeTree } from './routeTree.gen';
 
@@ -17,8 +18,7 @@ export const getRouter = () => {
 		defaultErrorComponent: DefaultCatchBoundary,
 		defaultNotFoundComponent: () => (
 			<Default404Page
-				h="100vh"
-				ml={160}
+				h="100%"
 				gotoHomeComponent={
 					<Link to="/" preload="intent">
 						<Button mt="xl" component="div" size="lg" radius="md">
@@ -28,6 +28,11 @@ export const getRouter = () => {
 				}
 			/>
 		),
+	});
+
+	setupRouterSsrQueryIntegration({
+		router,
+		queryClient,
 	});
 
 	return router;

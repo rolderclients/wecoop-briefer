@@ -6,6 +6,7 @@ export * from './chain-of-thought';
 export * from './code-block';
 export * from './confirmation';
 export * from './connection';
+export * from './conversation';
 export * from './edge';
 export * from './image';
 export * from './inline-citation';
