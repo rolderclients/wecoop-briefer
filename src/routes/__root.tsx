@@ -1,3 +1,4 @@
+import mantineNotificationsCss from '@mantine/notifications/styles.css?url';
 import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext } from '@tanstack/react-router';
 import appCss from '../styles.css?url';
@@ -27,6 +28,10 @@ export const Route = createRootRouteWithContext<{
 			{
 				rel: 'stylesheet',
 				href: appCss,
+			},
+			{
+				rel: 'stylesheet',
+				href: mantineNotificationsCss,
 			},
 		],
 	}),
