@@ -21,6 +21,7 @@ export interface ScrollAreaState {
 		behavior: 'instant' | Required<SpringAnimation>;
 		ignoreEscapes: boolean;
 		promise: Promise<boolean>;
+		targetPosition: number;
 	};
 	lastTick?: number;
 	velocity: number;
@@ -325,7 +326,12 @@ export const useScrollArea = (
 					const tick = performance.now();
 					const tickDelta =
 						(tick - (state.lastTick ?? tick)) / SIXTY_FPS_INTERVAL_MS;
-					state.animation ||= { behavior, promise, ignoreEscapes };
+					state.animation ||= {
+						behavior,
+						promise,
+						ignoreEscapes,
+						targetPosition,
+					};
 
 					if (state.animation.behavior === behavior) {
 						state.lastTick = tick;
@@ -339,7 +345,9 @@ export const useScrollArea = (
 						return next();
 					}
 
-					const targetDifference = targetPosition - scrollTop;
+					const currentTarget =
+						state.animation?.targetPosition ?? targetPosition;
+					const targetDifference = currentTarget - scrollTop;
 					const shouldContinue = Math.abs(targetDifference) > 1;
 
 					if (shouldContinue) {
@@ -371,7 +379,7 @@ export const useScrollArea = (
 					state.animation = undefined;
 
 					// Ensure we're at exact target position
-					state.scrollTop = targetPosition;
+					state.scrollTop = currentTarget;
 
 					return true;
 				});
@@ -388,13 +396,29 @@ export const useScrollArea = (
 				});
 			};
 
+			// Check for interruption BEFORE clearing state
+			if (
+				state.animation &&
+				state.animation.targetPosition !== targetPosition
+			) {
+				// Smoothly decelerate by reducing velocity instead of instant stop
+				state.velocity *= 0.3; // Reduce velocity to 30% for smooth transition
+				state.accumulated *= 0.3;
+
+				// Update target for existing animation
+				state.animation.targetPosition = targetPosition;
+				return state.animation.promise;
+			}
+
 			if (scrollOptions.wait !== true) {
 				state.animation = undefined;
 			}
 
-			if (state.animation?.behavior === behavior) {
-				return state.animation.promise;
-			}
+			// Start new animation only if no existing animation
+			state.animation = undefined;
+			state.velocity = 0;
+			state.accumulated = 0;
+			state.lastTick = undefined;
 
 			return next();
 		},
@@ -491,13 +515,16 @@ export const useScrollArea = (
 					return;
 				}
 
-				if (isScrollingUp) {
-					setEscapedFromLock(true);
-					setIsAtBottom(false);
-				}
+				// Don't interfere with programmatic animations
+				if (!state.animation) {
+					if (isScrollingUp) {
+						setEscapedFromLock(true);
+						setIsAtBottom(false);
+					}
 
-				if (isScrollingDown) {
-					setEscapedFromLock(false);
+					if (isScrollingDown) {
+						setEscapedFromLock(false);
+					}
 				}
 
 				if (!state.escapedFromLock && state.isNearBottom) {
