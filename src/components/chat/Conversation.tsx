@@ -9,6 +9,7 @@ import {
 	PromptInputSubmit,
 	PromptInputTextarea,
 } from '@/components/ai-elements';
+import { ScrollArea } from '../kit';
 import { ChatMessage } from './Message';
 import { useChat } from './Provider';
 
@@ -17,21 +18,27 @@ export const ChatConversation = (props: StackProps) => {
 
 	return (
 		<Stack {...props}>
-			<Paper h="100%" withBorder radius="md">
-				<ConversationComponent>
-					<ConversationContent>
-						{hasMessages ? (
-							messages.map((message) => (
-								<ChatMessage key={message.id} message={message} />
-							))
-						) : (
-							<ConversationEmptyState
-								title="Нет сообщений"
-								description="Начните общение, чтобы увидеть сообщения здесь"
-							/>
-						)}
-					</ConversationContent>
-				</ConversationComponent>
+			<Paper h="calc(100% - 134px)" withBorder radius="md">
+				<ScrollArea>
+					<ScrollArea.Content>
+						<ConversationComponent>
+							<ConversationContent>
+								{hasMessages ? (
+									messages.map((message) => (
+										<ChatMessage key={message.id} message={message} />
+									))
+								) : (
+									<ConversationEmptyState
+										title="Нет сообщений"
+										description="Начните общение, чтобы увидеть сообщения здесь"
+									/>
+								)}
+							</ConversationContent>
+						</ConversationComponent>
+					</ScrollArea.Content>
+
+					<ScrollArea.ScrollButton />
+				</ScrollArea>
 			</Paper>
 
 			<PromptInput

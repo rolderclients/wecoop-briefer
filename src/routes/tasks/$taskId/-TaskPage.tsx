@@ -40,7 +40,7 @@ export const TaskPage = () => {
 					<Stack gap="xs">
 						<Title order={3}>Задание</Title>
 						<Paper withBorder radius="md">
-							<ScrollArea h="calc(100vh - 147px)">
+							<ScrollArea height="calc(100vh - 147px)">
 								<ScrollArea.Content>
 									<Stack px="md" py="sm">
 										<Box style={{ whiteSpace: 'pre-wrap' }}>
@@ -57,6 +57,7 @@ export const TaskPage = () => {
 										</Box>
 									</Stack>
 								</ScrollArea.Content>
+
 								<ScrollArea.ScrollButton />
 							</ScrollArea>
 						</Paper>

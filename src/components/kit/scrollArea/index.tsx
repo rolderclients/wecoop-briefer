@@ -3,6 +3,7 @@ import {
 	type ActionIconProps,
 	Box,
 	type BoxProps,
+	type MantineStyleProps,
 	ScrollArea as MantinScrollArea,
 } from '@mantine/core';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons-react';
@@ -12,26 +13,27 @@ import { ScrollAreaProvider, useScrollAreaContext } from './Provider';
 const useScrollArea = useScrollAreaContext;
 export { useScrollArea };
 
-interface RootProps extends BoxProps {
+interface RootProps extends Omit<BoxProps, 'h'> {
 	children?: React.ReactNode;
 	autoScrollOnInitialRender?: boolean;
 	autoScroll?: boolean;
 	scrollAnimation?: 'smooth' | 'instant';
+	height?: MantineStyleProps['h'];
 }
 const Root = ({
-	h,
+	height = '100%',
 	autoScrollOnInitialRender,
 	autoScroll,
 	scrollAnimation,
 	...props
 }: RootProps) => (
 	<ScrollAreaProvider
-		height={h}
+		height={height}
 		autoScrollOnInitialRender={autoScrollOnInitialRender}
 		autoScroll={autoScroll}
 		scrollAnimation={scrollAnimation}
 	>
-		<Box pos="relative" {...props} />
+		<Box h={height} pos="relative" {...props} />
 	</ScrollAreaProvider>
 );
 
@@ -42,7 +44,9 @@ const Content = ({ children, ...props }: ContentProps) => {
 
 	return (
 		<MantinScrollArea h={height} viewportRef={scrollRef} {...props}>
-			<div ref={contentRef}>{children}</div>
+			<Box h="100%" ref={contentRef}>
+				{children}
+			</Box>
 		</MantinScrollArea>
 	);
 };
