@@ -1,5 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
+import { eq, surql } from 'surrealdb';
 import { fromDTO, getDB } from '../db';
 import type { Task, TaskWithBrief } from '../types';
 
@@ -9,17 +10,12 @@ const getTasks = createServerFn({ method: 'GET' })
 		const db = await getDB();
 
 		const [result] = await db
-			.query(
-				`SELECT
+			.query(surql`SELECT
           *,
           service.{ id, title }
         FROM task
-        WHERE archived == $archived
-        ORDER BY title NUMERIC;`,
-				{
-					archived,
-				},
-			)
+        WHERE ${eq('archived', archived)}
+        ORDER BY title NUMERIC;`)
 			.json()
 			.collect<[Task[]]>();
 
@@ -39,14 +35,11 @@ export const getTask = createServerFn({ method: 'POST' })
 
 		const id = await fromDTO(taskId);
 		const [result] = await db
-			.query(
-				`SELECT
+			.query(surql`SELECT
           *,
           service.{ id, title },
           brief.{ id, content }
-        FROM ONLY $id`,
-				{ id },
-			)
+        FROM ONLY ${id}`)
 			.json()
 			.collect<[TaskWithBrief]>();
 
