@@ -7,6 +7,7 @@ let db: Surreal | null = null;
 export const getDB = createServerOnlyFn(async (): Promise<Surreal> => {
 	if (db?.isConnected) return db;
 
+	// Нужно чтобы был в корне для получения контекста запроса серверной функции
 	const locale = getCookie('locale') || 'ru-RU';
 	const timeZone = getCookie('tz') || 'UTC';
 
