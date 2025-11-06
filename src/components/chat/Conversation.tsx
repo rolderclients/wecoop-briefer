@@ -19,23 +19,23 @@ export const ChatConversation = (props: StackProps) => {
 	return (
 		<Stack {...props}>
 			<Paper h="calc(100% - 134px)" withBorder radius="md">
-				<ScrollArea>
-					<ScrollArea.Content>
-						<ConversationComponent>
-							<ConversationContent>
-								{hasMessages ? (
-									messages.map((message) => (
-										<ChatMessage key={message.id} message={message} />
-									))
-								) : (
-									<ConversationEmptyState
-										title="Нет сообщений"
-										description="Начните общение, чтобы увидеть сообщения здесь"
-									/>
-								)}
-							</ConversationContent>
-						</ConversationComponent>
-					</ScrollArea.Content>
+				<ScrollArea autoScroll>
+					{/*<ScrollArea.Content>*/}
+					<ConversationComponent>
+						<ConversationContent>
+							{hasMessages ? (
+								messages.map((message) => (
+									<ChatMessage key={message.id} message={message} />
+								))
+							) : (
+								<ConversationEmptyState
+									title="Нет сообщений"
+									description="Начните общение, чтобы увидеть сообщения здесь"
+								/>
+							)}
+						</ConversationContent>
+					</ConversationComponent>
+					{/*</ScrollArea.Content>*/}
 
 					<ScrollArea.ScrollButton />
 				</ScrollArea>

@@ -29,11 +29,9 @@ export const App = () => (
 					<Navbar menu={menu} />
 
 					<AppShell.Main>
-						<ScrollArea height="100vh">
-							<ScrollArea.Content px="xl">
-								<Outlet />
-								<ScrollArea.ScrollButton />
-							</ScrollArea.Content>
+						<ScrollArea h="100vh" px="xl">
+							<Outlet />
+							<ScrollArea.ScrollButton />
 						</ScrollArea>
 					</AppShell.Main>
 				</AppShell>
