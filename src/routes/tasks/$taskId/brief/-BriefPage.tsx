@@ -2,7 +2,12 @@ import { Grid, Group, Stack, Text, Title } from '@mantine/core';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import { taskWithBriefQueryOptions } from '@/api';
-import { AIEditor, ChatConversation, ChatProvider } from '@/components';
+import {
+	AIEditor,
+	ChatConversation,
+	ChatProvider,
+	ClientDate,
+} from '@/components';
 import { Route } from '.';
 
 export const BriefPage = () => {
@@ -16,12 +21,11 @@ export const BriefPage = () => {
 					<Title>{task.title}</Title>
 					<Text c="dimmed">
 						Дата создания:{' '}
-						<Text c="var(--mantine-color-text)" span>
-							{new Date(task.time.created).toLocaleDateString('ru-RU', {
-								hour: 'numeric',
-								minute: 'numeric',
-							})}
-						</Text>
+						<ClientDate
+							date={task.time.created}
+							c="var(--mantine-color-text)"
+							span
+						/>
 					</Text>
 				</Group>
 
