@@ -7,13 +7,14 @@ let db: Surreal | null = null;
 export const getDB = createServerOnlyFn(async (): Promise<Surreal> => {
 	if (db?.isConnected) return db;
 
+	// Нужно чтобы был в корне для получения контекста запроса серверной функции
+	const locale = getCookie('locale') || 'ru-RU';
+	const timeZone = getCookie('tz') || 'UTC';
+
 	db = new Surreal({
 		codecOptions: {
 			valueDecodeVisitor(value) {
 				if (value instanceof DateTime) {
-					const locale = getCookie('locale') || 'ru-RU';
-					const timeZone = getCookie('tz') || 'UTC';
-
 					return new Date(value.toDate()).toLocaleDateString(locale, {
 						hour: 'numeric',
 						minute: 'numeric',
