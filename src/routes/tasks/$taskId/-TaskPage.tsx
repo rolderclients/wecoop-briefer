@@ -41,22 +41,21 @@ export const TaskPage = () => {
 						<Title order={3}>Задание</Title>
 						<Paper withBorder radius="md">
 							<ScrollArea h="calc(100vh - 147px)">
-								<ScrollArea.Content>
-									<Stack px="md" py="sm">
-										<Box style={{ whiteSpace: 'pre-wrap' }}>
-											<Text c="dimmed">Компания</Text>
-											<Text>{task.company.title}</Text>
-										</Box>
-										<Box style={{ whiteSpace: 'pre-wrap' }}>
-											<Text c="dimmed">О компании</Text>
-											<Text>{task.company.info}</Text>
-										</Box>
-										<Box style={{ whiteSpace: 'pre-wrap' }}>
-											<Text c="dimmed">Описание</Text>
-											<Text>{task.content}</Text>
-										</Box>
-									</Stack>
-								</ScrollArea.Content>
+								<Stack px="md" py="sm">
+									<Box style={{ whiteSpace: 'pre-wrap' }}>
+										<Text c="dimmed">Компания</Text>
+										<Text>{task.company.title}</Text>
+									</Box>
+									<Box style={{ whiteSpace: 'pre-wrap' }}>
+										<Text c="dimmed">О компании</Text>
+										<Text>{task.company.info}</Text>
+									</Box>
+									<Box style={{ whiteSpace: 'pre-wrap' }}>
+										<Text c="dimmed">Описание</Text>
+										<Text>{task.content}</Text>
+									</Box>
+								</Stack>
+
 								<ScrollArea.ScrollButton />
 							</ScrollArea>
 						</Paper>

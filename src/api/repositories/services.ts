@@ -1,5 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
+import { eq, surql } from 'surrealdb';
 import { fromDTO, fromDTOs, getDB } from '../db';
 import type {
 	CategoryWithServices,
@@ -14,15 +15,10 @@ const getServices = createServerFn({ method: 'GET' })
 		const db = await getDB();
 
 		const [result] = await db
-			.query(
-				`SELECT *
+			.query(surql`SELECT *
         FROM service
-        WHERE archived == $archived
-        ORDER BY title NUMERIC;`,
-				{
-					archived,
-				},
-			)
+        WHERE ${eq('archived', archived)}
+        ORDER BY title NUMERIC;`)
 			.json()
 			.collect<[Service[]]>();
 
@@ -41,23 +37,18 @@ const getCategoriesWithServices = createServerFn({ method: 'GET' })
 		const db = await getDB();
 
 		const [result] = await db
-			.query(
-				`SELECT
+			.query(surql`SELECT
           id,
           title,
           (
             SELECT *
             FROM id.services
-            WHERE archived == $archived
+            WHERE ${eq('archived', archived)}
             ORDER BY title NUMERIC
           ) AS services
         FROM category
-        WHERE count(services[WHERE archived == $archived]) > 0
-        ORDER BY title NUMERIC;`,
-				{
-					archived,
-				},
-			)
+        WHERE count(services[WHERE ${eq('archived', archived)}]) > 0
+        ORDER BY title NUMERIC;`)
 			.json()
 			.collect<[CategoryWithServices[]]>();
 
@@ -76,10 +67,7 @@ export const createService = createServerFn({ method: 'POST' })
 		const db = await getDB();
 
 		const data = await fromDTO(serviceData);
-
-		await db.query(`CREATE service CONTENT $data;`, {
-			data,
-		});
+		await db.query(surql`CREATE service CONTENT ${data};`);
 	});
 
 export const updateService = createServerFn({ method: 'POST' })
@@ -88,7 +76,7 @@ export const updateService = createServerFn({ method: 'POST' })
 		const db = await getDB();
 
 		const item = await fromDTO(serviceData);
-		await db.query(`UPDATE $item.id MERGE $item;`, { item });
+		await db.query(surql`UPDATE ${item.id} MERGE ${item};`);
 	});
 
 export const updateServices = createServerFn({ method: 'POST' })
@@ -97,9 +85,9 @@ export const updateServices = createServerFn({ method: 'POST' })
 		const db = await getDB();
 
 		const items = await fromDTOs(servicesData);
-		await db.query(`FOR $item IN $items { UPDATE $item.id MERGE $item };`, {
-			items,
-		});
+		await db.query(
+			surql`FOR $item IN ${items} { UPDATE $item.id MERGE $item };`,
+		);
 	});
 
 export const deleteServices = createServerFn({ method: 'POST' })
@@ -108,5 +96,5 @@ export const deleteServices = createServerFn({ method: 'POST' })
 		const db = await getDB();
 
 		const ids = await fromDTOs(data.ids);
-		await db.query('FOR $id IN $ids { DELETE $id };', { ids });
+		await db.query(surql`FOR $id IN ${ids} { DELETE $id };`);
 	});

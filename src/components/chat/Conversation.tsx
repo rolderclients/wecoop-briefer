@@ -9,6 +9,7 @@ import {
 	PromptInputSubmit,
 	PromptInputTextarea,
 } from '@/components/ai-elements';
+import { ScrollArea } from '../kit';
 import { ChatMessage } from './Message';
 import { useChat } from './Provider';
 
@@ -17,21 +18,25 @@ export const ChatConversation = (props: StackProps) => {
 
 	return (
 		<Stack {...props}>
-			<Paper h="100%" withBorder radius="md">
-				<ConversationComponent>
-					<ConversationContent>
-						{hasMessages ? (
-							messages.map((message) => (
-								<ChatMessage key={message.id} message={message} />
-							))
-						) : (
-							<ConversationEmptyState
-								title="Нет сообщений"
-								description="Начните общение, чтобы увидеть сообщения здесь"
-							/>
-						)}
-					</ConversationContent>
-				</ConversationComponent>
+			<Paper h="calc(100% - 149px)" withBorder radius="md">
+				<ScrollArea autoScroll scrollToBottomOnInit>
+					<ConversationComponent>
+						<ConversationContent>
+							{hasMessages ? (
+								messages.map((message) => (
+									<ChatMessage key={message.id} message={message} />
+								))
+							) : (
+								<ConversationEmptyState
+									title="Нет сообщений"
+									description="Начните общение, чтобы увидеть сообщения здесь"
+								/>
+							)}
+						</ConversationContent>
+					</ConversationComponent>
+
+					<ScrollArea.ScrollButton />
+				</ScrollArea>
 			</Paper>
 
 			<PromptInput
@@ -41,9 +46,12 @@ export const ChatConversation = (props: StackProps) => {
 				className="relative"
 			>
 				<PromptInputBody>
-					<PromptInputTextarea placeholder="Напишите сообщение" />
+					<PromptInputTextarea
+						placeholder="Напишите сообщение"
+						className="min-h-[85px] max-h-[85px]"
+					/>
 				</PromptInputBody>
-				<PromptInputFooter>
+				<PromptInputFooter className="pt-0">
 					<PromptInputSubmit
 						className="ml-auto"
 						disabled={status !== 'ready'}

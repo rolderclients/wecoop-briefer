@@ -93,8 +93,15 @@ const PromptPaper = ({
 			preload="intent"
 			reloadDocument={true}
 			className={classes.routerLink}
+			disabled={prompt.archived}
 		>
-			<Paper ref={ref} radius="md" withBorder className={classes.hoverPaper}>
+			<Paper
+				ref={ref}
+				radius="md"
+				withBorder
+				className={classes.hoverPaper}
+				mod={{ disabled: prompt.archived }}
+			>
 				<Grid px="md" py="xs" align="center">
 					<Grid.Col span="content">
 						<Checkbox

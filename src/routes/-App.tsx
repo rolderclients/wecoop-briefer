@@ -1,9 +1,8 @@
 import { AppShell, ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { IconAi, IconChecklist, IconList } from '@tabler/icons-react';
-import { HeadContent, Scripts } from '@tanstack/react-router';
-import { Navbar, type NavbarLinkProps } from '@/components';
-import { Page } from './-Page';
+import { HeadContent, Outlet, Scripts } from '@tanstack/react-router';
+import { Navbar, type NavbarLinkProps, ScrollArea } from '@/components';
 
 const menu: NavbarLinkProps[] = [
 	{ label: 'Услуги', icon: IconList, pathname: '/services' },
@@ -28,7 +27,13 @@ export const App = () => (
 					}}
 				>
 					<Navbar menu={menu} />
-					<Page />
+
+					<AppShell.Main>
+						<ScrollArea h="100vh" px="xl">
+							<Outlet />
+							<ScrollArea.ScrollButton />
+						</ScrollArea>
+					</AppShell.Main>
 				</AppShell>
 			</MantineProvider>
 
