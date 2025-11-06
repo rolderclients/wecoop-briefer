@@ -1,12 +1,30 @@
 import { createServerOnlyFn } from '@tanstack/react-start';
-import { Surreal } from 'surrealdb';
+import { getCookie } from '@tanstack/react-start/server';
+import { DateTime, Surreal } from 'surrealdb';
 
 let db: Surreal | null = null;
 
 export const getDB = createServerOnlyFn(async (): Promise<Surreal> => {
 	if (db?.isConnected) return db;
 
-	db = new Surreal();
+	db = new Surreal({
+		codecOptions: {
+			valueDecodeVisitor(value) {
+				if (value instanceof DateTime) {
+					const locale = getCookie('locale') || 'ru-RU';
+					const timeZone = getCookie('tz') || 'UTC';
+
+					return new Date(value.toDate()).toLocaleDateString(locale, {
+						hour: 'numeric',
+						minute: 'numeric',
+						timeZone,
+					});
+				}
+
+				return value;
+			},
+		},
+	});
 
 	try {
 		const url = process.env.SURREALDB_URL;
