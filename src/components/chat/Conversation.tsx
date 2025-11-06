@@ -18,7 +18,7 @@ export const ChatConversation = (props: StackProps) => {
 
 	return (
 		<Stack {...props}>
-			<Paper h="calc(100% - 134px)" withBorder radius="md">
+			<Paper h="calc(100% - 149px)" withBorder radius="md">
 				<ScrollArea autoScroll scrollToBottomOnInit>
 					<ConversationComponent>
 						<ConversationContent>
@@ -46,9 +46,12 @@ export const ChatConversation = (props: StackProps) => {
 				className="relative"
 			>
 				<PromptInputBody>
-					<PromptInputTextarea placeholder="Напишите сообщение" />
+					<PromptInputTextarea
+						placeholder="Напишите сообщение"
+						className="min-h-[85px] max-h-[85px]"
+					/>
 				</PromptInputBody>
-				<PromptInputFooter>
+				<PromptInputFooter className="pt-0">
 					<PromptInputSubmit
 						className="ml-auto"
 						disabled={status !== 'ready'}
