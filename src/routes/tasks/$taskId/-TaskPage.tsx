@@ -12,7 +12,7 @@ import { IconEdit } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { taskWithBriefQueryOptions } from '@/api';
-import { Editor } from '@/components';
+import { ClientDate, Editor } from '@/components';
 import { ScrollArea } from '@/components/kit';
 import { Route } from '.';
 
@@ -26,12 +26,11 @@ export const TaskPage = () => {
 				<Title>{task.title}</Title>
 				<Text c="dimmed">
 					Дата создания:{' '}
-					<Text c="var(--mantine-color-text)" span>
-						{new Date(task.time.created).toLocaleDateString('ru-RU', {
-							hour: 'numeric',
-							minute: 'numeric',
-						})}
-					</Text>
+					<ClientDate
+						date={task.time.created}
+						c="var(--mantine-color-text)"
+						span
+					/>
 				</Text>
 			</Group>
 
