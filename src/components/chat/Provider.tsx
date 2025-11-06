@@ -1,4 +1,5 @@
 import { useChat as useSdkChat } from '@ai-sdk/react';
+import { notifications } from '@mantine/notifications';
 import type { ChatStatus } from 'ai';
 import { createContext, type ReactNode, useContext } from 'react';
 import type { AgentUIMessage } from '@/routes/api/chat';
@@ -14,7 +15,15 @@ interface ChatContext {
 const ChatContext = createContext<ChatContext | null>(null);
 
 export const ChatProvider = ({ children }: { children: ReactNode }) => {
-	const { messages, sendMessage, status, error } = useSdkChat<AgentUIMessage>();
+	const { messages, sendMessage, status, error } = useSdkChat<AgentUIMessage>({
+		onError: (e) => {
+			notifications.show({
+				title: 'Ошибка сервера ИИ',
+				message: e.message,
+				color: 'red',
+			});
+		},
+	});
 
 	const value = {
 		messages,
