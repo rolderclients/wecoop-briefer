@@ -18,7 +18,7 @@ export const ScrollAreaContent = forwardRef<
 
 	return (
 		<MantineScrollArea
-			// h="100%"
+			h="100%"
 			className={classes.scrollArea}
 			style={{ '--radius': radius ? getRadius(radius) : undefined }}
 			{...mantineProps}
