@@ -8,18 +8,20 @@ interface ChatContext {
 	hasMessages: boolean;
 	sendMessage: ({ text }: { text: string }) => Promise<void>;
 	status: ChatStatus;
+	error?: Error;
 }
 
 const ChatContext = createContext<ChatContext | null>(null);
 
 export const ChatProvider = ({ children }: { children: ReactNode }) => {
-	const { messages, sendMessage, status } = useSdkChat<AgentUIMessage>();
+	const { messages, sendMessage, status, error } = useSdkChat<AgentUIMessage>();
 
 	const value = {
 		messages,
 		hasMessages: messages.length > 0,
 		sendMessage,
 		status,
+		error,
 	};
 
 	return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

@@ -14,9 +14,9 @@ import { ChatMessage } from './Message';
 import { useChat } from './Provider';
 
 export const ChatConversation = (props: StackProps) => {
-	const { messages, hasMessages, sendMessage, status } = useChat();
+	const { messages, hasMessages, sendMessage, status, error } = useChat();
 
-	console.log('status', status);
+	console.log({ status, error });
 
 	return (
 		<Stack {...props}>
