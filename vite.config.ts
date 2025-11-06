@@ -1,26 +1,29 @@
-import { tanstackStart } from '@tanstack/react-start/plugin/vite';
-import viteReact from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
-import tsConfigPaths from 'vite-tsconfig-paths';
+import { defineConfig } from 'vite'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import viteReact from '@vitejs/plugin-react'
+import viteTsConfigPaths from 'vite-tsconfig-paths'
+import tailwindcss from '@tailwindcss/vite'
 
-export default defineConfig({
-  server: {
-    port: 3000,
-  },
+const testing = process.env.NODE_ENV === 'testing'
+
+const config = defineConfig({
   plugins: [
-    tsConfigPaths(),
+    // this is the plugin that enables path aliases
+    viteTsConfigPaths({
+      projects: ['./tsconfig.json'],
+    }),
+    tailwindcss(),
     tanstackStart(),
     viteReact(),
-    {
-      name: 'markdown-loader',
-      transform(code, id) {
-        if (id.endsWith('.md')) {
-          return `export default ${JSON.stringify(code.trim())};`;
-        }
-      },
-    },
   ],
-  ssr: {
-    noExternal: ['streamdown'],
+  build: {
+    ...(testing && {
+      minify: false,
+    }),
   },
-});
+  ssr: {
+    noExternal: ['streamdown','@rolder/streamdown', '@rolder/ui-kit-react'],
+  },
+})
+
+export default config

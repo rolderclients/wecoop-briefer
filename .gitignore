@@ -3,13 +3,13 @@ node_modules
 dist
 dist-ssr
 *.local
+count.txt
 .env
 .nitro
 .tanstack
+.wrangler
 .output
 .vinxi
 todos.json
 
-## Panda
-styled-system
-styled-system-studio
+tmp

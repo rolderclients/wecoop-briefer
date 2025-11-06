@@ -10,13 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TasksIndexRouteImport } from './routes/tasks/index'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as PromptsIndexRouteImport } from './routes/prompts/index'
 import { Route as PromptsPromptIdRouteImport } from './routes/prompts/$promptId'
+import { Route as TasksTaskIdIndexRouteImport } from './routes/tasks/$taskId/index'
+import { Route as ApiChatIndexRouteImport } from './routes/api/chat/index'
+import { Route as TasksTaskIdBriefIndexRouteImport } from './routes/tasks/$taskId/brief/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TasksIndexRoute = TasksIndexRouteImport.update({
+  id: '/tasks/',
+  path: '/tasks/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesIndexRoute = ServicesIndexRouteImport.update({
@@ -34,18 +43,41 @@ const PromptsPromptIdRoute = PromptsPromptIdRouteImport.update({
   path: '/prompts/$promptId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TasksTaskIdIndexRoute = TasksTaskIdIndexRouteImport.update({
+  id: '/tasks/$taskId/',
+  path: '/tasks/$taskId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatIndexRoute = ApiChatIndexRouteImport.update({
+  id: '/api/chat/',
+  path: '/api/chat/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TasksTaskIdBriefIndexRoute = TasksTaskIdBriefIndexRouteImport.update({
+  id: '/tasks/$taskId/brief/',
+  path: '/tasks/$taskId/brief/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/prompts/$promptId': typeof PromptsPromptIdRoute
   '/prompts': typeof PromptsIndexRoute
   '/services': typeof ServicesIndexRoute
+  '/tasks': typeof TasksIndexRoute
+  '/api/chat': typeof ApiChatIndexRoute
+  '/tasks/$taskId': typeof TasksTaskIdIndexRoute
+  '/tasks/$taskId/brief': typeof TasksTaskIdBriefIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/prompts/$promptId': typeof PromptsPromptIdRoute
   '/prompts': typeof PromptsIndexRoute
   '/services': typeof ServicesIndexRoute
+  '/tasks': typeof TasksIndexRoute
+  '/api/chat': typeof ApiChatIndexRoute
+  '/tasks/$taskId': typeof TasksTaskIdIndexRoute
+  '/tasks/$taskId/brief': typeof TasksTaskIdBriefIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +85,42 @@ export interface FileRoutesById {
   '/prompts/$promptId': typeof PromptsPromptIdRoute
   '/prompts/': typeof PromptsIndexRoute
   '/services/': typeof ServicesIndexRoute
+  '/tasks/': typeof TasksIndexRoute
+  '/api/chat/': typeof ApiChatIndexRoute
+  '/tasks/$taskId/': typeof TasksTaskIdIndexRoute
+  '/tasks/$taskId/brief/': typeof TasksTaskIdBriefIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/prompts/$promptId' | '/prompts' | '/services'
+  fullPaths:
+    | '/'
+    | '/prompts/$promptId'
+    | '/prompts'
+    | '/services'
+    | '/tasks'
+    | '/api/chat'
+    | '/tasks/$taskId'
+    | '/tasks/$taskId/brief'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/prompts/$promptId' | '/prompts' | '/services'
-  id: '__root__' | '/' | '/prompts/$promptId' | '/prompts/' | '/services/'
+  to:
+    | '/'
+    | '/prompts/$promptId'
+    | '/prompts'
+    | '/services'
+    | '/tasks'
+    | '/api/chat'
+    | '/tasks/$taskId'
+    | '/tasks/$taskId/brief'
+  id:
+    | '__root__'
+    | '/'
+    | '/prompts/$promptId'
+    | '/prompts/'
+    | '/services/'
+    | '/tasks/'
+    | '/api/chat/'
+    | '/tasks/$taskId/'
+    | '/tasks/$taskId/brief/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +128,10 @@ export interface RootRouteChildren {
   PromptsPromptIdRoute: typeof PromptsPromptIdRoute
   PromptsIndexRoute: typeof PromptsIndexRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
+  TasksIndexRoute: typeof TasksIndexRoute
+  ApiChatIndexRoute: typeof ApiChatIndexRoute
+  TasksTaskIdIndexRoute: typeof TasksTaskIdIndexRoute
+  TasksTaskIdBriefIndexRoute: typeof TasksTaskIdBriefIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -76,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tasks/': {
+      id: '/tasks/'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services/': {
@@ -99,6 +171,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromptsPromptIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tasks/$taskId/': {
+      id: '/tasks/$taskId/'
+      path: '/tasks/$taskId'
+      fullPath: '/tasks/$taskId'
+      preLoaderRoute: typeof TasksTaskIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat/': {
+      id: '/api/chat/'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tasks/$taskId/brief/': {
+      id: '/tasks/$taskId/brief/'
+      path: '/tasks/$taskId/brief'
+      fullPath: '/tasks/$taskId/brief'
+      preLoaderRoute: typeof TasksTaskIdBriefIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,16 +200,21 @@ const rootRouteChildren: RootRouteChildren = {
   PromptsPromptIdRoute: PromptsPromptIdRoute,
   PromptsIndexRoute: PromptsIndexRoute,
   ServicesIndexRoute: ServicesIndexRoute,
+  TasksIndexRoute: TasksIndexRoute,
+  ApiChatIndexRoute: ApiChatIndexRoute,
+  TasksTaskIdIndexRoute: TasksTaskIdIndexRoute,
+  TasksTaskIdBriefIndexRoute: TasksTaskIdBriefIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }
