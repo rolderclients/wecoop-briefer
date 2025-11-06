@@ -1,3 +1,5 @@
+'use client';
+
 import { useDocument } from '@/lib';
 import { useChat } from '../chat';
 import { Editor, type EditorProps } from '.';
