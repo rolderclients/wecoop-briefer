@@ -38,6 +38,6 @@ export const useScrollArea = (): ScrollAreaHook => {
 	}
 
 	// Возвращаем только публичный API, скрывая внутренние детали
-	const { _callbackRef, mantineProps: _, ...publicAPI } = context;
+	const { _callbackRef, mantineProps: _, radius: __, ...publicAPI } = context;
 	return publicAPI;
 };

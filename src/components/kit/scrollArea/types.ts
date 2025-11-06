@@ -1,4 +1,7 @@
-import type { ScrollAreaProps as MantineScrollAreaProps } from '@mantine/core';
+import type {
+	MantineRadius,
+	ScrollAreaProps as MantineScrollAreaProps,
+} from '@mantine/core';
 import type { ReactNode } from 'react';
 
 export interface ScrollAreaProps
@@ -11,6 +14,7 @@ export interface ScrollAreaProps
 	animated?: boolean;
 	/** Отступ для near-зон в пикселях (по умолчанию 100) */
 	nearThreshold?: number;
+	radius?: MantineRadius;
 	/** Дочерние элементы - автоматически оборачиваются в ScrollArea.Content */
 	children: ReactNode;
 }
@@ -44,6 +48,7 @@ export interface ScrollAreaState extends ScrollAreaHook {
 }
 
 export interface ScrollAreaContextValue extends ScrollAreaState {
+	radius?: MantineRadius;
 	/** Пропсы Mantine ScrollArea, переданные в корневой компонент */
 	mantineProps: Omit<MantineScrollAreaProps, 'children'>;
 }

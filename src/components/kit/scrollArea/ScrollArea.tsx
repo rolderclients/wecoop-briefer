@@ -13,6 +13,7 @@ const ScrollAreaRoot = forwardRef<HTMLDivElement, ScrollAreaProps>(
 			scrollToBottomOnInit = false,
 			animated = true,
 			nearThreshold = 100,
+			radius,
 			...mantineProps
 		},
 		ref,
@@ -27,6 +28,7 @@ const ScrollAreaRoot = forwardRef<HTMLDivElement, ScrollAreaProps>(
 		// Создаем контекст с mantineProps
 		const contextValue: ScrollAreaContextValue = {
 			...scrollAreaValue,
+			radius,
 			mantineProps,
 		};
 

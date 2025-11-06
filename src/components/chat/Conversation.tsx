@@ -19,8 +19,7 @@ export const ChatConversation = (props: StackProps) => {
 	return (
 		<Stack {...props}>
 			<Paper h="calc(100% - 134px)" withBorder radius="md">
-				<ScrollArea autoScroll>
-					{/*<ScrollArea.Content>*/}
+				<ScrollArea autoScroll scrollToBottomOnInit>
 					<ConversationComponent>
 						<ConversationContent>
 							{hasMessages ? (
@@ -35,7 +34,6 @@ export const ChatConversation = (props: StackProps) => {
 							)}
 						</ConversationContent>
 					</ConversationComponent>
-					{/*</ScrollArea.Content>*/}
 
 					<ScrollArea.ScrollButton />
 				</ScrollArea>
