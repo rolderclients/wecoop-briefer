@@ -982,6 +982,7 @@ export const PromptInputSubmit = ({
 			size={size}
 			type="submit"
 			variant={variant}
+			color={status === 'error' ? 'red' : undefined}
 			loading={status === 'submitted'}
 			{...props}
 		>
