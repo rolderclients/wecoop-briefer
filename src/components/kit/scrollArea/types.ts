@@ -14,6 +14,7 @@ export interface ScrollAreaProps
 	animated?: boolean;
 	/** Отступ для near-зон в пикселях (по умолчанию 100) */
 	nearThreshold?: number;
+	/** Радиус для viewport и scrollbar на тот случай, когда они "торчат" углами*/
 	radius?: MantineRadius;
 	/** Дочерние элементы - автоматически оборачиваются в ScrollArea.Content */
 	children: ReactNode;
@@ -48,6 +49,7 @@ export interface ScrollAreaState extends ScrollAreaHook {
 }
 
 export interface ScrollAreaContextValue extends ScrollAreaState {
+	/** Радиус для viewport и scrollbar на тот случай, когда они "торчат" углами*/
 	radius?: MantineRadius;
 	/** Пропсы Mantine ScrollArea, переданные в корневой компонент */
 	mantineProps: Omit<MantineScrollAreaProps, 'children'>;

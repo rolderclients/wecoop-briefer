@@ -1,46 +1,38 @@
-import { forwardRef } from 'react';
 import { ScrollAreaProvider } from './context';
 import { ScrollAreaButton } from './ScrollAreaButton';
 import { ScrollAreaContent } from './ScrollAreaContent';
 import type { ScrollAreaContextValue, ScrollAreaProps } from './types';
 import { useScrollAreaState } from './useScrollArea';
 
-const ScrollAreaRoot = forwardRef<HTMLDivElement, ScrollAreaProps>(
-	(
-		{
-			children,
-			autoScroll = false,
-			scrollToBottomOnInit = false,
-			animated = true,
-			nearThreshold = 100,
-			radius,
-			...mantineProps
-		},
-		ref,
-	) => {
-		const scrollAreaValue = useScrollAreaState({
-			autoScroll,
-			scrollToBottomOnInit,
-			animated,
-			nearThreshold,
-		});
+const ScrollAreaRoot = ({
+	children,
+	autoScroll = false,
+	scrollToBottomOnInit = false,
+	animated = true,
+	nearThreshold = 100,
+	radius,
+	...mantineProps
+}: ScrollAreaProps) => {
+	const scrollAreaValue = useScrollAreaState({
+		autoScroll,
+		scrollToBottomOnInit,
+		animated,
+		nearThreshold,
+	});
 
-		// Создаем контекст с mantineProps
-		const contextValue: ScrollAreaContextValue = {
-			...scrollAreaValue,
-			radius,
-			mantineProps,
-		};
+	// Создаем контекст с mantineProps
+	const contextValue: ScrollAreaContextValue = {
+		...scrollAreaValue,
+		radius,
+		mantineProps,
+	};
 
-		return (
-			<div ref={ref}>
-				<ScrollAreaProvider value={contextValue}>
-					<ScrollAreaContent>{children}</ScrollAreaContent>
-				</ScrollAreaProvider>
-			</div>
-		);
-	},
-);
+	return (
+		<ScrollAreaProvider value={contextValue}>
+			<ScrollAreaContent>{children}</ScrollAreaContent>
+		</ScrollAreaProvider>
+	);
+};
 
 ScrollAreaRoot.displayName = 'ScrollArea';
 

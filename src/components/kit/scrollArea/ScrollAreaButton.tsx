@@ -18,8 +18,8 @@ export const ScrollAreaButton = ({
 
 	const isScrollingDown = isAboveCenter;
 	const icon = isScrollingDown
-		? (downIcon ?? <IconChevronDown size={16} />)
-		: (upIcon ?? <IconChevronUp size={16} />);
+		? (downIcon ?? <IconChevronDown strokeWidth={1.5} />)
+		: (upIcon ?? <IconChevronUp strokeWidth={1.5} />);
 
 	const handleClick = () => {
 		if (isScrollingDown) {
