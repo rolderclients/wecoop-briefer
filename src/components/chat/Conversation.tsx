@@ -16,6 +16,8 @@ import { useChat } from './Provider';
 export const ChatConversation = (props: StackProps) => {
 	const { messages, hasMessages, sendMessage, status } = useChat();
 
+	console.log('status', status);
+
 	return (
 		<Stack {...props}>
 			<Paper h="calc(100% - 149px)" withBorder radius="md">
