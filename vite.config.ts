@@ -8,13 +8,10 @@ const testing = process.env.NODE_ENV === 'testing'
 
 const config = defineConfig({
   plugins: [
-    // this is the plugin that enables path aliases
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
-    }),
-    tailwindcss(),
+    viteTsConfigPaths(),
     tanstackStart(),
     viteReact(),
+    tailwindcss(),
   ],
   build: {
     ...(testing && {
