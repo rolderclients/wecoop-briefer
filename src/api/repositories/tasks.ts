@@ -38,7 +38,17 @@ export const getTask = createServerFn({ method: 'POST' })
 			.query(surql`SELECT
           *,
           service.{ id, title },
-          brief.{ id, content }
+          brief.{ id, content },
+          service.prompts[WHERE enabled == true]?[0].{
+            id,
+            title,
+            content,
+            model.{
+              id,
+              name,
+              title
+            }
+          } as prompt
         FROM ONLY ${id}`)
 			.json()
 			.collect<[TaskWithBrief]>();

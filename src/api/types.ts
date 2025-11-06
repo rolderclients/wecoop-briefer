@@ -1,3 +1,5 @@
+import type { ModelName } from '@/lib';
+
 export interface Item {
 	id: string;
 	time: {
@@ -39,7 +41,7 @@ export type FormService = Required<
 >;
 
 export interface Model extends Item {
-	name: string;
+	name: ModelName;
 	title: string;
 }
 
@@ -90,6 +92,9 @@ export interface Task extends Item {
 		info?: string;
 	};
 	service: Pick<Service, 'id' | 'title'>;
+	prompt: Pick<Prompt, 'id' | 'title' | 'content'> & {
+		model: Pick<Model, 'id' | 'name' | 'title'>;
+	};
 	archived: boolean;
 }
 

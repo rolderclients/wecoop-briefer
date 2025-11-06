@@ -9,11 +9,15 @@ import {
 	PromptInputSubmit,
 	PromptInputTextarea,
 } from '@/components/ai-elements';
+import type { ModelName } from '@/lib';
 import { ScrollArea } from '../kit';
 import { ChatMessage } from './Message';
 import { useChat } from './Provider';
 
-export const ChatConversation = (props: StackProps) => {
+export const ChatConversation = ({
+	model,
+	...props
+}: StackProps & { model: ModelName }) => {
 	const { messages, hasMessages, sendMessage, status } = useChat();
 
 	return (
@@ -41,7 +45,8 @@ export const ChatConversation = (props: StackProps) => {
 
 			<PromptInput
 				onSubmit={(values) => {
-					if (values.text?.trim()) sendMessage({ text: values.text.trim() });
+					if (values.text?.trim())
+						sendMessage({ text: values.text.trim(), model });
 				}}
 				className="relative"
 			>

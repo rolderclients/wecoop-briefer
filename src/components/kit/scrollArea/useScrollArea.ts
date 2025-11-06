@@ -29,10 +29,11 @@ export const useScrollAreaState = (
 		undefined,
 	);
 	const isInitializedRef = useRef(false);
-	const escapedFromLockRef = useRef(false);
 
 	// Используем useResizeObserver для отслеживания изменений размера
 	const [resizeRef, rect] = useResizeObserver();
+	// ResizeObserver для контента - отслеживает изменения высоты содержимого
+	const [contentResizeRef, contentRect] = useResizeObserver();
 
 	const [scrollPosition, setScrollPosition] = useState<ScrollPosition>({
 		scrollTop: 0,
@@ -73,26 +74,8 @@ export const useScrollAreaState = (
 		(event: Event) => {
 			const element = event.target as HTMLElement;
 			debouncedUpdatePosition(element);
-
-			// Логика escapedFromLock - если пользователь прокрутил вверх, он "убежал" от автоскролла
-			const scrollPosition = {
-				scrollTop: element.scrollTop,
-				clientHeight: element.clientHeight,
-				scrollHeight: element.scrollHeight,
-			};
-
-			const currentIsNearBottom =
-				scrollPosition.scrollTop + scrollPosition.clientHeight >=
-				scrollPosition.scrollHeight - nearThreshold;
-
-			if (!currentIsNearBottom) {
-				escapedFromLockRef.current = true;
-			} else if (escapedFromLockRef.current && currentIsNearBottom) {
-				// Пользователь вернулся к концу - снова включаем автоскролл
-				escapedFromLockRef.current = false;
-			}
 		},
-		[debouncedUpdatePosition, nearThreshold],
+		[debouncedUpdatePosition],
 	);
 
 	// Методы управления прокруткой
@@ -115,7 +98,10 @@ export const useScrollAreaState = (
 	const scrollToBottom = useCallback(
 		(isAnimated?: boolean) => {
 			const element = scrollAreaRef.current;
-			if (!element) return;
+			if (!element) {
+				console.log('scrollToBottom: element is null');
+				return;
+			}
 
 			const shouldAnimate = isAnimated ?? animated;
 
@@ -132,9 +118,6 @@ export const useScrollAreaState = (
 	const handleUserInteraction = useCallback(() => {
 		isUserInteractingRef.current = true;
 
-		// При взаимодействии пользователь "убегает" от автоскролла
-		escapedFromLockRef.current = true;
-
 		// Сброс флага через таймаут
 		if (userInteractionTimeoutRef.current) {
 			clearTimeout(userInteractionTimeoutRef.current);
@@ -145,7 +128,7 @@ export const useScrollAreaState = (
 		}, 150);
 	}, []);
 
-	// Автоскролл убран из useEffect - теперь в ResizeObserver
+	// Автоскролл перенесен в MutationObserver
 
 	// Прокрутка к концу при инициализации
 	useEffect(() => {
@@ -159,12 +142,24 @@ export const useScrollAreaState = (
 		}
 	}, [scrollToBottomOnInit, hasScrollableContent, scrollToBottom, animated]);
 
-	// Обновление позиции при изменении размеров
+	// Обновление позиции при изменении размеров + автоскролл
 	useEffect(() => {
 		if (scrollAreaRef.current && (rect.width > 0 || rect.height > 0)) {
+			// Автоскролл при изменении размеров (добавлении контента)
+			if (autoScroll && !isUserInteractingRef.current && isNearBottom) {
+				scrollToBottom(false);
+			}
+
 			debouncedUpdatePosition(scrollAreaRef.current);
 		}
-	}, [rect.width, rect.height, debouncedUpdatePosition]);
+	}, [
+		rect.width,
+		rect.height,
+		debouncedUpdatePosition,
+		autoScroll,
+		isNearBottom,
+		scrollToBottom,
+	]);
 
 	// Установка обработчиков событий
 	useEffect(() => {
@@ -194,43 +189,24 @@ export const useScrollAreaState = (
 		};
 	}, [handleScroll, handleUserInteraction, debouncedUpdatePosition]);
 
-	// MutationObserver для отслеживания изменений контента + автоскролл
+	// Автоскролл при изменении размера контента (использует contentResizeObserver)
 	useEffect(() => {
-		const element = scrollAreaRef.current;
-		if (!element) return;
+		// Пропускаем первый вызов (инициализация)
+		if (contentRect.width === 0 && contentRect.height === 0) {
+			return;
+		}
 
-		const mutationObserver = new MutationObserver(() => {
-			// Проверяем позицию ДО обновления состояния
-			const wasNearBottom =
-				element.scrollTop + element.clientHeight >=
-				element.scrollHeight - nearThreshold;
-
-			debouncedUpdatePosition(element);
-
-			// Автоскролл при изменении контента если были рядом с концом
-			if (
-				autoScroll &&
-				wasNearBottom &&
-				!escapedFromLockRef.current &&
-				!isUserInteractingRef.current
-			) {
-				// Небольшая задержка, чтобы DOM обновился
-				setTimeout(() => {
-					scrollToBottom(false);
-				}, 0);
-			}
-		});
-
-		mutationObserver.observe(element, {
-			childList: true,
-			subtree: true,
-			characterData: true,
-		});
-
-		return () => {
-			mutationObserver.disconnect();
-		};
-	}, [debouncedUpdatePosition, autoScroll, nearThreshold, scrollToBottom]);
+		// Автоскролл при увеличении высоты контента
+		if (autoScroll && !isUserInteractingRef.current && isNearBottom) {
+			scrollToBottom(false);
+		}
+	}, [
+		contentRect.height,
+		contentRect.width,
+		autoScroll,
+		isNearBottom,
+		scrollToBottom,
+	]);
 
 	// Объединяем рефы для правильной работы с useMergedRef
 	const callbackRef = useMergedRef(scrollAreaRef, resizeRef);
@@ -246,5 +222,8 @@ export const useScrollAreaState = (
 		scrollToBottom,
 		viewportRef: scrollAreaRef,
 		_callbackRef: callbackRef,
+		_contentResizeRef: contentResizeRef as unknown as (
+			node: HTMLDivElement | null,
+		) => void,
 	};
 };

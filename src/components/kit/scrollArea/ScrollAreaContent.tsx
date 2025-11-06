@@ -14,7 +14,7 @@ export const ScrollAreaContent = forwardRef<
 		throw new Error('ScrollAreaContent must be used within ScrollArea');
 	}
 
-	const { _callbackRef, mantineProps, radius } = fullContext;
+	const { _callbackRef, mantineProps, radius, _contentResizeRef } = fullContext;
 
 	return (
 		<MantineScrollArea
@@ -25,7 +25,7 @@ export const ScrollAreaContent = forwardRef<
 			viewportRef={_callbackRef}
 			ref={ref}
 		>
-			{children}
+			<div ref={_contentResizeRef}>{children}</div>
 		</MantineScrollArea>
 	);
 });

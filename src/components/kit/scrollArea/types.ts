@@ -46,6 +46,8 @@ export interface ScrollAreaHook {
 export interface ScrollAreaState extends ScrollAreaHook {
 	/** Внутренний callback ref для подключения к Mantine ScrollArea */
 	_callbackRef: (node: HTMLDivElement | null) => void;
+	/** Внутренний ref для наблюдения за изменениями контента */
+	_contentResizeRef: (node: HTMLDivElement | null) => void;
 }
 
 export interface ScrollAreaContextValue extends ScrollAreaState {

@@ -24,15 +24,18 @@ export const BriefPage = () => {
 
 				<Grid gutter="xl" overflow="hidden">
 					<Grid.Col span={4}>
-						<ChatConversation h="calc(100vh - 112px)" />
+						<ChatConversation
+							h="calc(100vh - 112px)"
+							model={task.prompt.model.name}
+						/>
 					</Grid.Col>
 
 					<Grid.Col span={8}>
-						<AIEditor
+						{/*<AIEditor
 							content={task.brief?.content}
 							editable={!task.archived}
 							height="calc(100vh - 161px)"
-						/>
+						/>*/}
 					</Grid.Col>
 				</Grid>
 			</Stack>

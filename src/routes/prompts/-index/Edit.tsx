@@ -39,8 +39,9 @@ export const Edit = ({
 
 					close();
 					notifications.show({
-						message: `Промт "${values.title}" обновлен${willDisabled ? ' и выключен' : ''}`,
-						color: willDisabled ? 'orange' : 'green',
+						message: `Промт "${values.title}" обновлен${enabled && serviceChanged && willDisabled ? ' и выключен' : ''}`,
+						color:
+							enabled && serviceChanged && willDisabled ? 'orange' : 'green',
 					});
 				})}
 			>

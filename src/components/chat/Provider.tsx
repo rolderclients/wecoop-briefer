@@ -2,12 +2,19 @@ import { useChat as useSdkChat } from '@ai-sdk/react';
 import { notifications } from '@mantine/notifications';
 import type { ChatStatus } from 'ai';
 import { createContext, type ReactNode, useContext } from 'react';
+import type { ModelName } from '@/lib';
 import type { AgentUIMessage } from '@/routes/api/chat';
 
 interface ChatContext {
 	messages: AgentUIMessage[];
 	hasMessages: boolean;
-	sendMessage: ({ text }: { text: string }) => Promise<void>;
+	sendMessage: ({
+		text,
+		model,
+	}: {
+		text: string;
+		model: ModelName;
+	}) => Promise<void>;
 	status: ChatStatus;
 	error?: Error;
 }
@@ -25,10 +32,12 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 		},
 	});
 
-	const value = {
+	const value: ChatContext = {
 		messages,
 		hasMessages: messages.length > 0,
-		sendMessage,
+		sendMessage: async ({ text, model }) => {
+			await sendMessage({ text }, { body: { model } });
+		},
 		status,
 		error,
 	};
