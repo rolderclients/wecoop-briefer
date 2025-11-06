@@ -1,5 +1,4 @@
 export * from './ai-elements';
-export * from './ClientDate';
 export * from './chat';
 export * from './DefaultCatchBoundary';
 export * from './editor';
