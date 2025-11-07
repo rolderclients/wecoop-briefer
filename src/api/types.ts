@@ -83,10 +83,15 @@ export interface Brief extends Item {
 	content: string;
 }
 
+export interface UpdateBrief {
+	id: string;
+	content: string;
+}
+
 export interface Task extends Item {
 	title: string;
 	content?: string;
-	brief?: string;
+	brief: string;
 	company: {
 		title?: string;
 		info?: string;
@@ -99,5 +104,5 @@ export interface Task extends Item {
 }
 
 export interface TaskWithBrief extends Omit<Task, 'brief'> {
-	brief?: Brief;
+	brief: Brief;
 }

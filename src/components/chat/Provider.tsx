@@ -1,44 +1,79 @@
 import { useChat as useSdkChat } from '@ai-sdk/react';
 import { notifications } from '@mantine/notifications';
 import type { ChatStatus } from 'ai';
-import { createContext, type ReactNode, useContext } from 'react';
+import { nanoid } from 'nanoid';
+import { createContext, type ReactNode, useContext, useState } from 'react';
 import type { ModelName } from '@/lib';
 import type { AgentUIMessage } from '@/routes/api/chat';
+import { useDocument } from './useDocument';
 
 interface ChatContext {
 	messages: AgentUIMessage[];
+	document: string;
 	hasMessages: boolean;
 	sendMessage: ({
 		text,
 		model,
+		prompt,
 	}: {
 		text: string;
 		model: ModelName;
+		prompt?: string;
 	}) => Promise<void>;
-	status: ChatStatus;
+
+	chatStatus: ChatStatus;
+	documentEditedByUser: boolean;
+	setDocumentEditedByUser: (value: boolean) => void;
 	error?: Error;
 }
 
 const ChatContext = createContext<ChatContext | null>(null);
 
 export const ChatProvider = ({ children }: { children: ReactNode }) => {
-	const { messages, sendMessage, status, error } = useSdkChat<AgentUIMessage>({
-		onError: (e) => {
-			notifications.show({
-				title: 'Ошибка сервера ИИ',
-				message: e.message,
-				color: 'red',
-			});
-		},
-	});
+	const { messages, sendMessage, setMessages, status, error } =
+		useSdkChat<AgentUIMessage>({
+			onError: (e) => {
+				notifications.show({
+					title: 'Ошибка сервера ИИ',
+					message: e.message,
+					color: 'red',
+				});
+			},
+		});
+
+	const document = useDocument(messages);
+
+	const [documentEditedByUser, setDocumentEditedByUser] = useState(false);
 
 	const value: ChatContext = {
-		messages,
+		messages: messages.filter((message) => message.role !== 'system'),
+		document,
 		hasMessages: messages.length > 0,
-		sendMessage: async ({ text, model }) => {
-			await sendMessage({ text }, { body: { model } });
+		sendMessage: async ({ text, model, prompt }) => {
+			if (documentEditedByUser) {
+				setMessages([
+					{
+						id: nanoid(),
+						role: 'system',
+						parts: [
+							{
+								type: 'text',
+								text: `Документ был изменен пользователем:
+\`\`\`html
+${document}
+\`\`\`
+					`,
+							},
+						],
+					},
+					...messages,
+				]);
+			}
+			await sendMessage({ text }, { body: { model, userPrompt: prompt } });
 		},
-		status,
+		chatStatus: status,
+		documentEditedByUser,
+		setDocumentEditedByUser,
 		error,
 	};
 

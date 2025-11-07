@@ -1,7 +1,7 @@
 import { Loader } from '@mantine/core';
 import { Message, MessageContent, Response } from '@/components';
-import { useChatMessage } from '@/lib';
 import type { AgentUIMessage } from '@/routes/api/chat';
+import { useChatMessage } from './useChatMessage';
 
 export const ChatMessage = ({ message }: { message: AgentUIMessage }) => {
 	const textParts = message.parts?.filter((i) => i.type === 'text');

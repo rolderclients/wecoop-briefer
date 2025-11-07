@@ -1,6 +1,6 @@
 import type { TextUIPart } from 'ai';
 import { useEffect, useState } from 'react';
-import { parsePart } from '../utils';
+import { parsePart } from '@/lib';
 
 export const useChatMessage = (part: TextUIPart) => {
 	const [parsedText, setParsedText] = useState('');

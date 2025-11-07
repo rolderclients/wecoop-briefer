@@ -16,9 +16,10 @@ import { useChat } from './Provider';
 
 export const ChatConversation = ({
 	model,
+	prompt,
 	...props
-}: StackProps & { model: ModelName }) => {
-	const { messages, hasMessages, sendMessage, status } = useChat();
+}: StackProps & { model: ModelName; prompt?: string }) => {
+	const { messages, hasMessages, sendMessage, chatStatus } = useChat();
 
 	return (
 		<Stack {...props}>
@@ -46,7 +47,7 @@ export const ChatConversation = ({
 			<PromptInput
 				onSubmit={(values) => {
 					if (values.text?.trim())
-						sendMessage({ text: values.text.trim(), model });
+						sendMessage({ text: values.text.trim(), model, prompt });
 				}}
 				className="relative"
 			>
@@ -59,8 +60,8 @@ export const ChatConversation = ({
 				<PromptInputFooter className="pt-0">
 					<PromptInputSubmit
 						className="ml-auto"
-						disabled={status !== 'ready'}
-						status={status}
+						disabled={chatStatus !== 'ready'}
+						status={chatStatus}
 					/>
 				</PromptInputFooter>
 			</PromptInput>

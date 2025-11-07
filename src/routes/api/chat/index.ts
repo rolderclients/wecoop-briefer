@@ -25,22 +25,32 @@ const providerOptions = {
 };
 
 const schema = object({
-	document: string().describe(
-		'Документ в формате HTML. Используй только при явной потребности.',
-	),
-	chat: string().describe(
-		'Сообщения в чат для пользователя (Markdown). Никогжа не поясняй пользователю технических деталей формата документа (Markdown, HTML, CSS и т.д.)',
-	),
+	document: string().describe('Документ в формате HTML.'),
+	chat: string().describe('Сообщения в чат для пользователя.'),
 });
 
 export type StructuredTextPart = output<typeof schema>;
 
-const createAgent = (model: ModelName = 'anthropic/claude-haiku-4.5') =>
+const createAgent = (
+	model: ModelName = 'anthropic/claude-haiku-4.5',
+	userPrompt?: string,
+) =>
 	new ToolLoopAgent({
 		model,
 		providerOptions,
-		instructions:
-			'Создавай или изменяй документ только по просьбе пользователя',
+		instructions: `Структура ответа. В ответе используй два поля:
+			- "chat". Здесь пользователь видит свои и твои сообщения. Пользователь видит чат слева, он занимает 3/12 ширины экрана.
+			- "document". Здесь пользователь видит содержание документа. Пользователь видит документ справа, он занимает 9/12 ширины экрана.
+
+		Правила работы:
+		- Никогда не используй поле "document", если пользователь прямо не просит отредактировать документ.
+		- Используй поле "chat":
+		  - Когда пользователь задает вопросы или хочет пообщаться.
+			- Когда пользователь попросил отредактировать документ. В этом случае нужно написть короткое резуме изменений в документе.
+
+		Ниже правила работы, которые задает пользователь, всегда следуй им.
+			${userPrompt}`,
+
 		output: Output.object({ schema }),
 	});
 
@@ -50,12 +60,19 @@ export const Route = createFileRoute('/api/chat/')({
 	server: {
 		handlers: {
 			POST: async ({ request }) => {
-				const { messages, model }: { messages: UIMessage[]; model: ModelName } =
-					await request.json();
+				const {
+					messages,
+					model,
+					userPrompt,
+				}: {
+					messages: UIMessage[];
+					model?: ModelName;
+					userPrompt?: string;
+				} = await request.json();
 
 				try {
 					return createAgentUIStreamResponse({
-						agent: createAgent(model),
+						agent: createAgent(model, userPrompt),
 						messages,
 					});
 				} catch (error) {
