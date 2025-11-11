@@ -2,14 +2,13 @@ import { useChat as useSdkChat } from '@ai-sdk/react';
 import { notifications } from '@mantine/notifications';
 import type { ChatStatus } from 'ai';
 import { nanoid } from 'nanoid';
-import { createContext, type ReactNode, useContext, useState } from 'react';
+import { createContext, type ReactNode, useContext, useEffect } from 'react';
 import type { ModelName } from '@/lib';
 import type { AgentUIMessage } from '@/routes/api/chat';
 import { useDocument } from './useDocument';
 
 interface ChatContext {
 	messages: AgentUIMessage[];
-	document: string;
 	hasMessages: boolean;
 	sendMessage: ({
 		text,
@@ -20,10 +19,8 @@ interface ChatContext {
 		model: ModelName;
 		prompt?: string;
 	}) => Promise<void>;
-
+	document: string;
 	chatStatus: ChatStatus;
-	documentEditedByUser: boolean;
-	setDocumentEditedByUser: (value: boolean) => void;
 	error?: Error;
 }
 
@@ -37,20 +34,25 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 					title: 'Ошибка сервера ИИ',
 					message: e.message,
 					color: 'red',
+					autoClose: 5000,
 				});
 			},
 		});
 
 	const document = useDocument(messages);
 
-	const [documentEditedByUser, setDocumentEditedByUser] = useState(false);
+	// useEffect(() => {
+	// 	setDocumentFromMessages(messages);
+	// }, [setDocumentFromMessages, messages]);
 
 	const value: ChatContext = {
 		messages: messages.filter((message) => message.role !== 'system'),
-		document,
 		hasMessages: messages.length > 0,
+		// sendMessage: ({ text, model, prompt }) =>
+		// 	sendMessage({ text }, { body: { model, userPrompt: prompt } }),
 		sendMessage: async ({ text, model, prompt }) => {
 			if (documentEditedByUser) {
+				setDocumentEditedByUser(false);
 				setMessages([
 					{
 						id: nanoid(),
@@ -59,10 +61,10 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 							{
 								type: 'text',
 								text: `Документ был изменен пользователем:
-\`\`\`html
-${document}
-\`\`\`
-					`,
+			\`\`\`html
+			${document}
+			\`\`\`
+								`,
 							},
 						],
 					},
@@ -71,9 +73,8 @@ ${document}
 			}
 			await sendMessage({ text }, { body: { model, userPrompt: prompt } });
 		},
+		document,
 		chatStatus: status,
-		documentEditedByUser,
-		setDocumentEditedByUser,
 		error,
 	};
 

@@ -84,6 +84,7 @@ export const TaskPage = () => {
 							height="calc(100vh - 147px)"
 							content={task.brief?.content}
 							editable={false}
+							disabledToolbar
 						/>
 					</Stack>
 				</Grid.Col>

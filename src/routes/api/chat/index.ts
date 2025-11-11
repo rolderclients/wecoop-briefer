@@ -69,7 +69,7 @@ export const Route = createFileRoute('/api/chat/')({
 					model?: ModelName;
 					userPrompt?: string;
 				} = await request.json();
-
+				console.log(messages.flatMap((i) => i.parts));
 				try {
 					return createAgentUIStreamResponse({
 						agent: createAgent(model, userPrompt),

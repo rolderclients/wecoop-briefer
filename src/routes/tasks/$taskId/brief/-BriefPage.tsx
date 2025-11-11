@@ -7,8 +7,9 @@ import {
 	type UpdateBrief,
 	updateBrief,
 } from '@/api';
-import { AIEditor, ChatConversation } from '@/components';
+import { ChatConversation, ChatProvider, Editor } from '@/components';
 import { Route } from '.';
+import { BriefEditor } from './-Editor';
 
 export const BriefPage = () => {
 	const { taskId } = useParams({ from: Route.id });
@@ -24,36 +25,37 @@ export const BriefPage = () => {
 	}, 500);
 
 	return (
-		<Stack pb="xl" pt="lg">
-			<Group justify="space-between">
-				<Title>{task.title}</Title>
-				<Text c="dimmed">
-					Дата создания:{' '}
-					<Text c="var(--mantine-color-text)" span>
-						{task.time.created}
-					</Text>
-				</Text>
-			</Group>
+		<Editor.Provider
+			initialContent={task.brief.content}
+			onChange={debouncedUpdate}
+		>
+			<ChatProvider>
+				<Stack pb="xl" pt="lg">
+					<Group justify="space-between">
+						<Title>{task.title}</Title>
+						<Text c="dimmed">
+							Дата создания:{' '}
+							<Text c="var(--mantine-color-text)" span>
+								{task.time.created}
+							</Text>
+						</Text>
+					</Group>
 
-			<Grid gutter="xl" overflow="hidden">
-				<Grid.Col span={3}>
-					<ChatConversation
-						h="calc(100vh - 112px)"
-						model={task.prompt.model.name}
-						prompt={task.prompt.content}
-					/>
-				</Grid.Col>
+					<Grid gutter="xl" overflow="hidden">
+						<Grid.Col span={3}>
+							<ChatConversation
+								h="calc(100vh - 112px)"
+								model={task.prompt.model.name}
+								prompt={task.prompt.content}
+							/>
+						</Grid.Col>
 
-				<Grid.Col span={9}>
-					<AIEditor
-						content={task.brief?.content}
-						editable={!task.archived}
-						saving={status === 'pending'}
-						onChange={debouncedUpdate}
-						height="calc(100vh - 161px)"
-					/>
-				</Grid.Col>
-			</Grid>
-		</Stack>
+						<Grid.Col span={9}>
+							<BriefEditor saving={status === 'pending'} />
+						</Grid.Col>
+					</Grid>
+				</Stack>
+			</ChatProvider>
+		</Editor.Provider>
 	);
 };
