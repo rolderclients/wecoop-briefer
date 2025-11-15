@@ -1,6 +1,6 @@
 import { getDB } from './connection';
 
-export async function initializeSchema(): Promise<void> {
+export const initializeSchema = async (): Promise<void> => {
 	console.log('🔧 Starting database schema initialization...');
 
 	try {
@@ -12,4 +12,4 @@ export async function initializeSchema(): Promise<void> {
 		console.error('💥 Failed to initialize schema:', error);
 		throw error;
 	}
-}
+};
