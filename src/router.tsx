@@ -3,7 +3,7 @@ import { Default404Page } from '@rolder/ui-kit-react';
 import { QueryClient } from '@tanstack/react-query';
 import { createRouter, Link } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
-import { DefaultCatchBoundary } from './components/DefaultCatchBoundary';
+import { DefaultCatchBoundary } from './app';
 import { routeTree } from './routeTree.gen';
 
 export const getRouter = () => {
@@ -20,7 +20,7 @@ export const getRouter = () => {
 			<Default404Page
 				h="100%"
 				gotoHomeComponent={
-					<Link to="/" preload="intent">
+					<Link to="/">
 						<Button mt="xl" component="div" size="lg" radius="md">
 							На главную
 						</Button>
