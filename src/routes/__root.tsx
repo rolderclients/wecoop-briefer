@@ -1,8 +1,8 @@
 import mantineNotificationsCss from '@mantine/notifications/styles.css?url';
 import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext } from '@tanstack/react-router';
+import { App } from '@/app';
 import appCss from '../styles.css?url';
-import { App } from './-App';
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;

@@ -1,14 +1,15 @@
-/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 'use client';
 
-import { ActionIcon, type ActionIconProps } from '@mantine/core';
-import { IconArrowBigUp, IconX } from '@tabler/icons-react';
+import type { UseChatHelpers } from '@ai-sdk/react';
 import type { ChatStatus, FileUIPart } from 'ai';
 import {
+	CornerDownLeftIcon,
 	ImageIcon,
+	Loader2Icon,
 	MicIcon,
 	PaperclipIcon,
 	PlusIcon,
+	SquareIcon,
 	XIcon,
 } from 'lucide-react';
 import { nanoid } from 'nanoid';
@@ -69,6 +70,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+
 // ============================================================================
 // Provider Context & Types
 // ============================================================================
@@ -157,7 +159,9 @@ export function PromptInputProvider({
 
 	const add = useCallback((files: File[] | FileList) => {
 		const incoming = Array.from(files);
-		if (incoming.length === 0) return;
+		if (incoming.length === 0) {
+			return;
+		}
 
 		setAttachements((prev) =>
 			prev.concat(
@@ -175,14 +179,20 @@ export function PromptInputProvider({
 	const remove = useCallback((id: string) => {
 		setAttachements((prev) => {
 			const found = prev.find((f) => f.id === id);
-			if (found?.url) URL.revokeObjectURL(found.url);
+			if (found?.url) {
+				URL.revokeObjectURL(found.url);
+			}
 			return prev.filter((f) => f.id !== id);
 		});
 	}, []);
 
 	const clear = useCallback(() => {
 		setAttachements((prev) => {
-			for (const f of prev) if (f.url) URL.revokeObjectURL(f.url);
+			for (const f of prev) {
+				if (f.url) {
+					URL.revokeObjectURL(f.url);
+				}
+			}
 			return [];
 		});
 	}, []);
@@ -357,6 +367,8 @@ export type PromptInputAttachmentsProps = Omit<
 
 export function PromptInputAttachments({
 	children,
+	className,
+	...props
 }: PromptInputAttachmentsProps) {
 	const attachments = usePromptInputAttachments();
 
@@ -364,9 +376,16 @@ export function PromptInputAttachments({
 		return null;
 	}
 
-	return attachments.files.map((file) => (
-		<Fragment key={file.id}>{children(file)}</Fragment>
-	));
+	return (
+		<div
+			className={cn('flex flex-wrap items-center gap-2 p-3', className)}
+			{...props}
+		>
+			{attachments.files.map((file) => (
+				<Fragment key={file.id}>{children(file)}</Fragment>
+			))}
+		</div>
+	);
 }
 
 export type PromptInputActionAddAttachmentsProps = ComponentProps<
@@ -394,10 +413,7 @@ export const PromptInputActionAddAttachments = ({
 	);
 };
 
-export type PromptInputMessage = {
-	text?: string;
-	files?: FileUIPart[];
-};
+export type PromptInputMessage = UseChatHelpers<never>['sendMessage'];
 
 export type PromptInputProps = Omit<
 	HTMLAttributes<HTMLFormElement>,
@@ -680,7 +696,7 @@ export const PromptInput = ({
 		// Convert blob URLs to data URLs asynchronously
 		Promise.all(
 			files.map(async ({ id, ...item }) => {
-				if (item.url?.startsWith('blob:')) {
+				if (item.url && item.url.startsWith('blob:')) {
 					return {
 						...item,
 						url: await convertBlobUrlToDataUrl(item.url),
@@ -711,7 +727,7 @@ export const PromptInput = ({
 						controller.textInput.clear();
 					}
 				}
-			} catch (_) {
+			} catch (error) {
 				// Don't clear on error - user may want to retry
 			}
 		});
@@ -736,9 +752,7 @@ export const PromptInput = ({
 				onSubmit={handleSubmit}
 				{...props}
 			>
-				<InputGroup className="shadow-none has-[[data-slot=input-group-control]:focus-visible]:ring-0">
-					{children}
-				</InputGroup>
+				<InputGroup className="overflow-hidden">{children}</InputGroup>
 			</form>
 		</>
 	);
@@ -784,7 +798,17 @@ export const PromptInputTextarea = ({
 				return;
 			}
 			e.preventDefault();
-			e.currentTarget.form?.requestSubmit();
+
+			// Check if the submit button is disabled before submitting
+			const form = e.currentTarget.form;
+			const submitButton = form?.querySelector(
+				'button[type="submit"]',
+			) as HTMLButtonElement | null;
+			if (submitButton?.disabled) {
+				return;
+			}
+
+			form?.requestSubmit();
 		}
 
 		// Remove last attachment when Backspace is pressed and textarea is empty
@@ -957,71 +981,41 @@ export const PromptInputActionMenuItem = ({
 // Note: Actions that perform side-effects (like opening a file dialog)
 // are provided in opt-in modules (e.g., prompt-input-attachments).
 
-export type PromptInputSubmitProps = ActionIconProps & {
+export type PromptInputSubmitProps = ComponentProps<typeof InputGroupButton> & {
 	status?: ChatStatus;
 };
 
 export const PromptInputSubmit = ({
 	className,
-	variant = 'light',
-	size = 'lg',
+	variant = 'default',
+	size = 'icon-sm',
 	status,
 	children,
 	...props
 }: PromptInputSubmitProps) => {
-	let Icon = <IconArrowBigUp strokeWidth={1.5} />;
+	let Icon = <CornerDownLeftIcon className="size-4" />;
 
-	if (status === 'error') {
-		Icon = <IconX strokeWidth={1.5} />;
+	if (status === 'submitted') {
+		Icon = <Loader2Icon className="size-4 animate-spin" />;
+	} else if (status === 'streaming') {
+		Icon = <SquareIcon className="size-4" />;
+	} else if (status === 'error') {
+		Icon = <XIcon className="size-4" />;
 	}
 
 	return (
-		<ActionIcon
+		<InputGroupButton
 			aria-label="Submit"
-			className={className}
+			className={cn(className)}
 			size={size}
 			type="submit"
 			variant={variant}
-			color={status === 'error' ? 'red' : undefined}
-			loading={status === 'submitted'}
 			{...props}
 		>
 			{children ?? Icon}
-		</ActionIcon>
+		</InputGroupButton>
 	);
 };
-
-// export const PromptInputSubmit = ({
-// 	className,
-// 	variant = 'default',
-// 	size = 'icon-sm',
-// 	status,
-// 	children,
-// 	...props
-// }: PromptInputSubmitProps) => {
-// 	let Icon = <SendIcon className="size-4" />;
-
-// 	if (status === 'submitted') {
-// 		Icon = <Loader2Icon className="size-4 animate-spin" />;
-// 	} else if (status === 'streaming') {
-// 		Icon = <SquareIcon className="size-4" />;
-// 	} else if (status === 'error') {
-// 		Icon = <XIcon className="size-4" />;
-// 	}
-
-// 	return (
-// 		<InputGroupButton
-// 			aria-label="Submit"
-// 			className={cn(className)}
-// 			size={size}
-// 			type="submit"
-// 			variant={variant}
-// 			{...props}
-// 		>
-// 			{children ?? Icon}
-// 		</InputGroupButton>
-// 	);
-// };
 
 interface SpeechRecognition extends EventTarget {
 	continuous: boolean;
@@ -1183,20 +1177,20 @@ export const PromptInputSpeechButton = ({
 	);
 };
 
-export type PromptInputModelSelectProps = ComponentProps<typeof Select>;
+export type PromptInputSelectProps = ComponentProps<typeof Select>;
 
-export const PromptInputModelSelect = (props: PromptInputModelSelectProps) => (
+export const PromptInputSelect = (props: PromptInputSelectProps) => (
 	<Select {...props} />
 );
 
-export type PromptInputModelSelectTriggerProps = ComponentProps<
+export type PromptInputSelectTriggerProps = ComponentProps<
 	typeof SelectTrigger
 >;
 
-export const PromptInputModelSelectTrigger = ({
+export const PromptInputSelectTrigger = ({
 	className,
 	...props
-}: PromptInputModelSelectTriggerProps) => (
+}: PromptInputSelectTriggerProps) => (
 	<SelectTrigger
 		className={cn(
 			'border-none bg-transparent font-medium text-muted-foreground shadow-none transition-colors',
@@ -1207,34 +1201,32 @@ export const PromptInputModelSelectTrigger = ({
 	/>
 );
 
-export type PromptInputModelSelectContentProps = ComponentProps<
+export type PromptInputSelectContentProps = ComponentProps<
 	typeof SelectContent
 >;
 
-export const PromptInputModelSelectContent = ({
+export const PromptInputSelectContent = ({
 	className,
 	...props
-}: PromptInputModelSelectContentProps) => (
+}: PromptInputSelectContentProps) => (
 	<SelectContent className={cn(className)} {...props} />
 );
 
-export type PromptInputModelSelectItemProps = ComponentProps<typeof SelectItem>;
+export type PromptInputSelectItemProps = ComponentProps<typeof SelectItem>;
 
-export const PromptInputModelSelectItem = ({
+export const PromptInputSelectItem = ({
 	className,
 	...props
-}: PromptInputModelSelectItemProps) => (
+}: PromptInputSelectItemProps) => (
 	<SelectItem className={cn(className)} {...props} />
 );
 
-export type PromptInputModelSelectValueProps = ComponentProps<
-	typeof SelectValue
->;
+export type PromptInputSelectValueProps = ComponentProps<typeof SelectValue>;
 
-export const PromptInputModelSelectValue = ({
+export const PromptInputSelectValue = ({
 	className,
 	...props
-}: PromptInputModelSelectValueProps) => (
+}: PromptInputSelectValueProps) => (
 	<SelectValue className={cn(className)} {...props} />
 );
 

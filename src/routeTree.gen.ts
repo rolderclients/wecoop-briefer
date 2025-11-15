@@ -9,15 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ServicesRouteImport } from './routes/services'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TasksIndexRouteImport } from './routes/tasks/index'
-import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as PromptsIndexRouteImport } from './routes/prompts/index'
 import { Route as PromptsPromptIdRouteImport } from './routes/prompts/$promptId'
+import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as TasksTaskIdIndexRouteImport } from './routes/tasks/$taskId/index'
-import { Route as ApiChatIndexRouteImport } from './routes/api/chat/index'
-import { Route as TasksTaskIdBriefIndexRouteImport } from './routes/tasks/$taskId/brief/index'
+import { Route as TasksTaskIdBriefRouteImport } from './routes/tasks/$taskId/brief'
 
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -26,11 +31,6 @@ const IndexRoute = IndexRouteImport.update({
 const TasksIndexRoute = TasksIndexRouteImport.update({
   id: '/tasks/',
   path: '/tasks/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ServicesIndexRoute = ServicesIndexRouteImport.update({
-  id: '/services/',
-  path: '/services/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PromptsIndexRoute = PromptsIndexRouteImport.update({
@@ -43,99 +43,106 @@ const PromptsPromptIdRoute = PromptsPromptIdRouteImport.update({
   path: '/prompts/$promptId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TasksTaskIdIndexRoute = TasksTaskIdIndexRouteImport.update({
   id: '/tasks/$taskId/',
   path: '/tasks/$taskId/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiChatIndexRoute = ApiChatIndexRouteImport.update({
-  id: '/api/chat/',
-  path: '/api/chat/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TasksTaskIdBriefIndexRoute = TasksTaskIdBriefIndexRouteImport.update({
-  id: '/tasks/$taskId/brief/',
-  path: '/tasks/$taskId/brief/',
+const TasksTaskIdBriefRoute = TasksTaskIdBriefRouteImport.update({
+  id: '/tasks/$taskId/brief',
+  path: '/tasks/$taskId/brief',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/services': typeof ServicesRoute
+  '/api/chat': typeof ApiChatRoute
   '/prompts/$promptId': typeof PromptsPromptIdRoute
   '/prompts': typeof PromptsIndexRoute
-  '/services': typeof ServicesIndexRoute
   '/tasks': typeof TasksIndexRoute
-  '/api/chat': typeof ApiChatIndexRoute
+  '/tasks/$taskId/brief': typeof TasksTaskIdBriefRoute
   '/tasks/$taskId': typeof TasksTaskIdIndexRoute
-  '/tasks/$taskId/brief': typeof TasksTaskIdBriefIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/services': typeof ServicesRoute
+  '/api/chat': typeof ApiChatRoute
   '/prompts/$promptId': typeof PromptsPromptIdRoute
   '/prompts': typeof PromptsIndexRoute
-  '/services': typeof ServicesIndexRoute
   '/tasks': typeof TasksIndexRoute
-  '/api/chat': typeof ApiChatIndexRoute
+  '/tasks/$taskId/brief': typeof TasksTaskIdBriefRoute
   '/tasks/$taskId': typeof TasksTaskIdIndexRoute
-  '/tasks/$taskId/brief': typeof TasksTaskIdBriefIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/services': typeof ServicesRoute
+  '/api/chat': typeof ApiChatRoute
   '/prompts/$promptId': typeof PromptsPromptIdRoute
   '/prompts/': typeof PromptsIndexRoute
-  '/services/': typeof ServicesIndexRoute
   '/tasks/': typeof TasksIndexRoute
-  '/api/chat/': typeof ApiChatIndexRoute
+  '/tasks/$taskId/brief': typeof TasksTaskIdBriefRoute
   '/tasks/$taskId/': typeof TasksTaskIdIndexRoute
-  '/tasks/$taskId/brief/': typeof TasksTaskIdBriefIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/services'
+    | '/api/chat'
     | '/prompts/$promptId'
     | '/prompts'
-    | '/services'
     | '/tasks'
-    | '/api/chat'
-    | '/tasks/$taskId'
     | '/tasks/$taskId/brief'
+    | '/tasks/$taskId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/services'
+    | '/api/chat'
     | '/prompts/$promptId'
     | '/prompts'
-    | '/services'
     | '/tasks'
-    | '/api/chat'
-    | '/tasks/$taskId'
     | '/tasks/$taskId/brief'
+    | '/tasks/$taskId'
   id:
     | '__root__'
     | '/'
+    | '/services'
+    | '/api/chat'
     | '/prompts/$promptId'
     | '/prompts/'
-    | '/services/'
     | '/tasks/'
-    | '/api/chat/'
+    | '/tasks/$taskId/brief'
     | '/tasks/$taskId/'
-    | '/tasks/$taskId/brief/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ServicesRoute: typeof ServicesRoute
+  ApiChatRoute: typeof ApiChatRoute
   PromptsPromptIdRoute: typeof PromptsPromptIdRoute
   PromptsIndexRoute: typeof PromptsIndexRoute
-  ServicesIndexRoute: typeof ServicesIndexRoute
   TasksIndexRoute: typeof TasksIndexRoute
-  ApiChatIndexRoute: typeof ApiChatIndexRoute
+  TasksTaskIdBriefRoute: typeof TasksTaskIdBriefRoute
   TasksTaskIdIndexRoute: typeof TasksTaskIdIndexRoute
-  TasksTaskIdBriefIndexRoute: typeof TasksTaskIdBriefIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -148,13 +155,6 @@ declare module '@tanstack/react-router' {
       path: '/tasks'
       fullPath: '/tasks'
       preLoaderRoute: typeof TasksIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/services/': {
-      id: '/services/'
-      path: '/services'
-      fullPath: '/services'
-      preLoaderRoute: typeof ServicesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/prompts/': {
@@ -171,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromptsPromptIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tasks/$taskId/': {
       id: '/tasks/$taskId/'
       path: '/tasks/$taskId'
@@ -178,18 +185,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TasksTaskIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/chat/': {
-      id: '/api/chat/'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tasks/$taskId/brief/': {
-      id: '/tasks/$taskId/brief/'
+    '/tasks/$taskId/brief': {
+      id: '/tasks/$taskId/brief'
       path: '/tasks/$taskId/brief'
       fullPath: '/tasks/$taskId/brief'
-      preLoaderRoute: typeof TasksTaskIdBriefIndexRouteImport
+      preLoaderRoute: typeof TasksTaskIdBriefRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -197,13 +197,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ServicesRoute: ServicesRoute,
+  ApiChatRoute: ApiChatRoute,
   PromptsPromptIdRoute: PromptsPromptIdRoute,
   PromptsIndexRoute: PromptsIndexRoute,
-  ServicesIndexRoute: ServicesIndexRoute,
   TasksIndexRoute: TasksIndexRoute,
-  ApiChatIndexRoute: ApiChatIndexRoute,
+  TasksTaskIdBriefRoute: TasksTaskIdBriefRoute,
   TasksTaskIdIndexRoute: TasksTaskIdIndexRoute,
-  TasksTaskIdBriefIndexRoute: TasksTaskIdBriefIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
