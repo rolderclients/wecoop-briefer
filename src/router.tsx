@@ -6,7 +6,7 @@ import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query
 import { DefaultCatchBoundary } from './app';
 import { routeTree } from './routeTree.gen';
 
-export const getRouter = () => {
+export const getRouter = async () => {
 	const queryClient = new QueryClient();
 
 	const router = createRouter({

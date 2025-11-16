@@ -1,12 +1,13 @@
 import { Group, Paper, Switch } from '@mantine/core';
 import { IconArchive, IconRestore, IconTrash } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
+import { Route } from '@/routes/_authed/prompts';
 import { ArchivateRestoreDelete } from './ArchivateRestoreDelete';
 import { Create } from './Create';
 import { usePrompts } from './Provider';
 
 export const Panel = () => {
-	const navigate = useNavigate({ from: '/prompts' });
+	const navigate = useNavigate({ from: Route.fullPath });
 
 	const { setSelectedIds, archived, setArchived } = usePrompts();
 

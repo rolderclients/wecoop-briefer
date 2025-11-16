@@ -3,7 +3,7 @@ import {
 	useQueryClient,
 	useSuspenseQuery,
 } from '@tanstack/react-query';
-import { useSearch } from '@tanstack/react-router';
+import { useRouter, useSearch } from '@tanstack/react-router';
 import { createContext, type ReactNode, useContext, useState } from 'react';
 import {
 	createUser,
@@ -15,6 +15,7 @@ import {
 	updateUsers,
 	usersQueryOptions,
 } from '@/api';
+import { Route } from '@/routes/_authed/users';
 
 interface UsersContext {
 	users: User[];
@@ -32,7 +33,7 @@ const UsersContext = createContext<UsersContext | null>(null);
 
 export const UsersProvider = ({ children }: { children: ReactNode }) => {
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
-	const { archived: initialArchived } = useSearch({ from: '/users' });
+	const { archived: initialArchived } = useSearch({ from: Route.id });
 	const [archived, setArchived] = useState(initialArchived);
 	const { data: users } = useSuspenseQuery(usersQueryOptions(initialArchived));
 
@@ -42,9 +43,14 @@ export const UsersProvider = ({ children }: { children: ReactNode }) => {
 		onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
 	});
 
+	const router = useRouter();
+
 	const updateUserMutation = useMutation({
 		mutationFn: (userData: UpdateUser) => updateUser({ data: { userData } }),
-		onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }),
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: ['users'] });
+			router.invalidate();
+		},
 	});
 
 	const updateUsersMutation = useMutation({

@@ -135,3 +135,5 @@ export interface UpdateUser {
 export type FormUser = Required<
 	Pick<UpdateUser, 'id' | 'name' | 'email' | 'password'>
 > & { confirmPassword: string };
+
+export type SecuredUser = Omit<User, 'password' | 'notSecure'>;

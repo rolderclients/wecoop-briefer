@@ -1,6 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { eq, surql } from 'surrealdb';
+import { useAppSession } from '@/api/auth/useAppSession';
 import { getDB } from '../connection';
 import type { NewUser, UpdateUser, User } from '../types';
 import { fromDTO, fromDTOs } from '../utils';
@@ -43,18 +44,22 @@ export const updateUser = createServerFn({ method: 'POST' })
 	.inputValidator((data: { userData: UpdateUser }) => data)
 	.handler(async ({ data: { userData } }) => {
 		const db = await getDB();
+		const session = await useAppSession();
 
-		const item = await fromDTO(userData);
+		const user = await fromDTO(userData);
 
-		if (item.password) {
-			item.notSecure = item.password;
-			delete item.password;
+		if (user.password) {
+			user.notSecure = user.password;
+			delete user.password;
 			await db.query(
-				surql`UPDATE ${item.id} SET password = crypto::argon2::generate('${item.notSecure}')`,
+				surql`UPDATE ${user.id} SET password = crypto::argon2::generate(${user.notSecure})`,
 			);
 		}
 
-		await db.update(item.id).merge(item);
+		await db.update(user.id).merge(user);
+
+		const userWithId = { ...user, id: user.id.toString() };
+		await session.update(userWithId);
 	});
 
 export const updateUsers = createServerFn({ method: 'POST' })

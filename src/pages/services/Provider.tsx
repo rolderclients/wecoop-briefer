@@ -18,6 +18,7 @@ import {
 	updateService,
 	updateServices,
 } from '@/api';
+import { Route } from '@/routes/_authed/services';
 
 interface ServicesContext {
 	categories: Category[];
@@ -37,7 +38,7 @@ const ServicesContext = createContext<ServicesContext | null>(null);
 
 export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
-	const { archived: initialArchived } = useSearch({ from: '/services' });
+	const { archived: initialArchived } = useSearch({ from: Route.id });
 	const [archived, setArchived] = useState(initialArchived);
 	const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
 	const { data: categoriesWithServices } = useSuspenseQuery(

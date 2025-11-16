@@ -16,19 +16,17 @@ export const Route = createFileRoute('/api/chat')({
 					userPrompt?: string;
 				} = await request.json();
 
-				console.log(messages.flatMap((i) => i.parts));
-
 				try {
 					return createAgentUIStreamResponse({
 						agent: createAgent(model, userPrompt),
 						messages,
-					});
+					})
 				} catch (error) {
 					console.error(error);
 					return new Response(JSON.stringify(error), {
 						status: 500,
 						headers: { 'Content-Type': 'application/json' },
-					});
+					})
 				}
 			},
 		},

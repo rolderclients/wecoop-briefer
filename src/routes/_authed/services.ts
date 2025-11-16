@@ -1,24 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router';
 import {
-	modelsQueryOptions,
-	servicesQueryOptions,
-	servicesWithPromptsQueryOptions,
+	categoriesQueryOptions,
+	categoriesWithServicesQueryOptions,
 } from '@/api';
-import { PromptsPage } from '@/pages';
+import { ServicesPage } from '@/pages';
 
-export const Route = createFileRoute('/prompts/')({
+export const Route = createFileRoute('/_authed/services')({
 	loaderDeps: ({ search: { archived } }) => ({ archived }),
 	loader: async ({ context, deps: { archived } }) => {
-		await context.queryClient.ensureQueryData(servicesQueryOptions());
-		await context.queryClient.ensureQueryData(modelsQueryOptions());
+		await context.queryClient.ensureQueryData(categoriesQueryOptions());
 		await context.queryClient.ensureQueryData(
-			servicesWithPromptsQueryOptions(archived),
-		);
+			categoriesWithServicesQueryOptions(archived),
+		)
 	},
 	validateSearch: (search: Record<string, unknown>): { archived?: boolean } => {
 		return {
 			archived: search?.archived === true ? true : undefined,
-		};
+		}
 	},
-	component: PromptsPage,
+	component: ServicesPage,
 });

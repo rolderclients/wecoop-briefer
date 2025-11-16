@@ -22,6 +22,7 @@ import {
 	updatePrompt,
 	updatePrompts,
 } from '@/api';
+import { Route } from '@/routes/_authed/prompts';
 
 interface PromptsContext {
 	services: Service[];
@@ -44,7 +45,7 @@ export const PromptsProvider = ({ children }: { children: ReactNode }) => {
 	const queryClient = useQueryClient();
 
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
-	const { archived: initialArchived } = useSearch({ from: '/prompts/' });
+	const { archived: initialArchived } = useSearch({ from: Route.id });
 	const [archived, setArchived] = useState(initialArchived);
 	const { data: services } = useSuspenseQuery(servicesQueryOptions());
 	const { data: models } = useSuspenseQuery(modelsQueryOptions());

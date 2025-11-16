@@ -1,5 +1,9 @@
 import {
+	ActionIcon,
 	AppShell,
+	Avatar,
+	Group,
+	HoverCard,
 	NavLink,
 	ScrollArea,
 	Stack,
@@ -7,8 +11,15 @@ import {
 	Title,
 } from '@mantine/core';
 import type { Icon } from '@tabler/icons-react';
-import { IconAi, IconChecklist, IconList, IconUser } from '@tabler/icons-react';
+import {
+	IconAi,
+	IconChecklist,
+	IconList,
+	IconLogout,
+	IconUser,
+} from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
+import { useAuth } from './auth';
 
 interface NavbarLinkProps {
 	label: string;
@@ -23,49 +34,68 @@ const menu: NavbarLinkProps[] = [
 	{ label: 'Сотрудники', icon: IconUser, pathname: '/users' },
 ];
 
-export const Navbar = () => (
-	<AppShell.Navbar>
-		<AppShell.Section>
-			<Title order={3} ta="center" py="md">
-				WECOOP
-			</Title>
-		</AppShell.Section>
+export const Navbar = () => {
+	const { user, logout } = useAuth();
 
-		<AppShell.Section grow component={ScrollArea} type="never">
-			<Stack gap={0}>
-				{menu.map(({ label, pathname, icon: Icon }) => (
-					<Link
-						key={label}
-						to={pathname}
-						style={{ textDecoration: 'none', color: 'inherit' }}
-					>
-						{({ isActive }) => {
-							return (
-								<NavLink
-									component="div"
-									label={label}
-									active={isActive}
-									style={{
-										borderLeft:
-											'1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))',
-									}}
-									leftSection={
-										<ThemeIcon variant="light" size={30}>
-											<Icon size={18} />
-										</ThemeIcon>
-									}
-								/>
-							);
-						}}
-					</Link>
-				))}
-			</Stack>
-		</AppShell.Section>
+	return (
+		<AppShell.Navbar>
+			<AppShell.Section>
+				<Title order={3} ta="center" py="md">
+					WECOOP
+				</Title>
+			</AppShell.Section>
 
-		<AppShell.Section>
-			<Title order={5} ta="center" py="md">
-				Пользователь
-			</Title>
-		</AppShell.Section>
-	</AppShell.Navbar>
-);
+			<AppShell.Section grow component={ScrollArea} type="never">
+				<Stack gap={0}>
+					{menu.map(({ label, pathname, icon: Icon }) => (
+						<Link
+							key={label}
+							to={pathname}
+							style={{ textDecoration: 'none', color: 'inherit' }}
+						>
+							{({ isActive }) => {
+								return (
+									<NavLink
+										component="div"
+										label={label}
+										active={isActive}
+										style={{
+											borderLeft:
+												'1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))',
+										}}
+										leftSection={
+											<ThemeIcon variant="light" size={30}>
+												<Icon size={18} />
+											</ThemeIcon>
+										}
+									/>
+								);
+							}}
+						</Link>
+					))}
+				</Stack>
+			</AppShell.Section>
+
+			<AppShell.Section p="sm">
+				<HoverCard width={280} shadow="md" radius="md" position="top-start">
+					<HoverCard.Target>
+						<Group gap="xs" wrap="nowrap">
+							<Avatar>
+								<IconUser />
+							</Avatar>
+							<Title order={5}>Профиль</Title>
+						</Group>
+					</HoverCard.Target>
+					<HoverCard.Dropdown>
+						<Group gap="xs" wrap="nowrap">
+							<Title order={5}>{user?.name}</Title>
+							<ActionIcon variant="light" size="lg" onClick={logout}>
+								<IconLogout />
+							</ActionIcon>
+						</Group>
+					</HoverCard.Dropdown>
+				</HoverCard>
+			</AppShell.Section>
+		</AppShell.Navbar>
+	);
+};

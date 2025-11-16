@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { promptQueryOptions } from '@/api';
 import { PromptPage } from '@/pages';
 
-export const Route = createFileRoute('/prompts/$promptId')({
+export const Route = createFileRoute('/_authed/prompts/$promptId')({
 	loader: async ({ context, params: { promptId } }) => {
 		await context.queryClient.ensureQueryData(promptQueryOptions(promptId));
 	},

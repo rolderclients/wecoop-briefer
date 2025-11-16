@@ -97,8 +97,8 @@ const UserPaper = ({
 			id: user.id,
 			name: user.name,
 			email: user.email,
-			password: '',
-			confirmPassword: '',
+			password: user.notSecure,
+			confirmPassword: user.notSecure,
 		};
 		form.setInitialValues(values);
 		form.reset();

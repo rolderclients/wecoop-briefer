@@ -8,9 +8,10 @@ import {
 import { useParams } from '@tanstack/react-router';
 import { promptQueryOptions, type UpdatePrompt, updatePrompt } from '@/api';
 import { SimpleEditor } from '@/elements';
+import { Route } from '@/routes/_authed/prompts/$promptId';
 
 export const PromptPage = () => {
-	const { promptId } = useParams({ from: '/prompts/$promptId' });
+	const { promptId } = useParams({ from: Route.id });
 
 	const { data: prompt } = useSuspenseQuery(promptQueryOptions(promptId));
 
