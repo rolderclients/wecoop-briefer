@@ -14,9 +14,10 @@ import { Link, useParams } from '@tanstack/react-router';
 import { taskWithBriefQueryOptions } from '@/api';
 import { SimpleEditor } from '@/elements';
 import { ScrollArea } from '@/kit';
+import { Route } from '@/routes/_authed/tasks/$taskId';
 
 export const TaskPage = () => {
-	const { taskId } = useParams({ from: '/tasks/$taskId/' });
+	const { taskId } = useParams({ from: Route.id });
 	const { data: task } = useSuspenseQuery(taskWithBriefQueryOptions(taskId));
 
 	return (

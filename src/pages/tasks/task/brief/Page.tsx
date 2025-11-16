@@ -12,11 +12,12 @@ import {
 	updateBrief,
 } from '@/api';
 import { Chat, Editor } from '@/elements';
+import { Route } from '@/routes/_authed/tasks/$taskId/brief';
 import { BriefChat } from './Chat';
 import { BriefEditor } from './Editor';
 
 export const BriefPage = () => {
-	const { taskId } = useParams({ from: '/tasks/$taskId/brief' });
+	const { taskId } = useParams({ from: Route.id });
 	const { data: task } = useSuspenseQuery(taskWithBriefQueryOptions(taskId));
 
 	const queryClient = useQueryClient();
