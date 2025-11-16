@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UsersRouteImport } from './routes/users'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TasksIndexRouteImport } from './routes/tasks/index'
@@ -18,6 +19,11 @@ import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as TasksTaskIdIndexRouteImport } from './routes/tasks/$taskId/index'
 import { Route as TasksTaskIdBriefRouteImport } from './routes/tasks/$taskId/brief'
 
+const UsersRoute = UsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
@@ -62,6 +68,7 @@ const TasksTaskIdBriefRoute = TasksTaskIdBriefRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/services': typeof ServicesRoute
+  '/users': typeof UsersRoute
   '/api/chat': typeof ApiChatRoute
   '/prompts/$promptId': typeof PromptsPromptIdRoute
   '/prompts': typeof PromptsIndexRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/services': typeof ServicesRoute
+  '/users': typeof UsersRoute
   '/api/chat': typeof ApiChatRoute
   '/prompts/$promptId': typeof PromptsPromptIdRoute
   '/prompts': typeof PromptsIndexRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/services': typeof ServicesRoute
+  '/users': typeof UsersRoute
   '/api/chat': typeof ApiChatRoute
   '/prompts/$promptId': typeof PromptsPromptIdRoute
   '/prompts/': typeof PromptsIndexRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/services'
+    | '/users'
     | '/api/chat'
     | '/prompts/$promptId'
     | '/prompts'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/services'
+    | '/users'
     | '/api/chat'
     | '/prompts/$promptId'
     | '/prompts'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/services'
+    | '/users'
     | '/api/chat'
     | '/prompts/$promptId'
     | '/prompts/'
@@ -126,6 +138,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ServicesRoute: typeof ServicesRoute
+  UsersRoute: typeof UsersRoute
   ApiChatRoute: typeof ApiChatRoute
   PromptsPromptIdRoute: typeof PromptsPromptIdRoute
   PromptsIndexRoute: typeof PromptsIndexRoute
@@ -136,6 +149,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services': {
       id: '/services'
       path: '/services'
@@ -198,6 +218,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ServicesRoute: ServicesRoute,
+  UsersRoute: UsersRoute,
   ApiChatRoute: ApiChatRoute,
   PromptsPromptIdRoute: PromptsPromptIdRoute,
   PromptsIndexRoute: PromptsIndexRoute,

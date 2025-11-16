@@ -10,7 +10,7 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
 	});
 
 	return (
-		<Stack align="center" justify="center" gap={0} ta="center" h="100%">
+		<Stack align="center" justify="center" gap={0} ta="center" h="100vh">
 			<Title textWrap="balance" size={65}>
 				Произошла ошибка!
 			</Title>

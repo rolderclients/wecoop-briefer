@@ -78,7 +78,7 @@ export const updatePrompt = createServerFn({ method: 'POST' })
 		if (promptData.content)
 			promptData.content = sanitizeHtml(promptData.content);
 		const item = await fromDTO(promptData);
-		await db.query(surql`UPDATE ${item.id} MERGE ${item}`);
+		await db.update(item.id).merge(item);
 	});
 
 export const updatePrompts = createServerFn({ method: 'POST' })

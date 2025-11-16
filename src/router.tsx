@@ -18,7 +18,7 @@ export const getRouter = () => {
 		defaultErrorComponent: DefaultCatchBoundary,
 		defaultNotFoundComponent: () => (
 			<Default404Page
-				h="100%"
+				h="100vh"
 				gotoHomeComponent={
 					<Link to="/">
 						<Button mt="xl" component="div" size="lg" radius="md">

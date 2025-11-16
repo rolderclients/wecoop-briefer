@@ -1,5 +1,5 @@
 import { createServerOnlyFn } from '@tanstack/react-start';
-import { StringRecordId } from 'surrealdb';
+import { type RecordId, StringRecordId } from 'surrealdb';
 import { getDB } from './connection';
 
 let tableNames: string[] = [];
@@ -33,9 +33,13 @@ export const qp = {
 /**
  * Converts DTO back to SurrealDB Record recursively
  */
-export const fromDTO = async <T>(dto: T): Promise<T> => {
+export const fromDTO = async <T>(
+	dto: T,
+): Promise<Omit<T, 'id'> & { id: RecordId }> => {
 	const tableNames = await getTableNames();
-	return convertStringsToRecordIds(dto, tableNames) as T;
+	return convertStringsToRecordIds(dto, tableNames) as Omit<T, 'id'> & {
+		id: RecordId;
+	};
 };
 
 /**

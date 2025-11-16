@@ -36,8 +36,6 @@ interface ServicesContext {
 const ServicesContext = createContext<ServicesContext | null>(null);
 
 export const ServicesProvider = ({ children }: { children: ReactNode }) => {
-	const queryClient = useQueryClient();
-
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const { archived: initialArchived } = useSearch({ from: '/services' });
 	const [archived, setArchived] = useState(initialArchived);
@@ -46,6 +44,7 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 		categoriesWithServicesQueryOptions(initialArchived),
 	);
 
+	const queryClient = useQueryClient();
 	const createServiceMutation = useMutation({
 		mutationFn: (serviceData: NewService) =>
 			createService({ data: { serviceData } }),

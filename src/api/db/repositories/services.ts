@@ -77,7 +77,7 @@ export const updateService = createServerFn({ method: 'POST' })
 		const db = await getDB();
 
 		const item = await fromDTO(serviceData);
-		await db.query(surql`UPDATE ${item.id} MERGE ${item};`);
+		await db.update(item.id).merge(item);
 	});
 
 export const updateServices = createServerFn({ method: 'POST' })

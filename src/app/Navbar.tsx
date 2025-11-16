@@ -7,7 +7,7 @@ import {
 	Title,
 } from '@mantine/core';
 import type { Icon } from '@tabler/icons-react';
-import { IconAi, IconChecklist, IconList } from '@tabler/icons-react';
+import { IconAi, IconChecklist, IconList, IconUser } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 
 interface NavbarLinkProps {
@@ -20,6 +20,7 @@ const menu: NavbarLinkProps[] = [
 	{ label: 'Услуги', icon: IconList, pathname: '/services' },
 	{ label: 'Промты', icon: IconAi, pathname: '/prompts' },
 	{ label: 'Задачи', icon: IconChecklist, pathname: '/tasks' },
+	{ label: 'Сотрудники', icon: IconUser, pathname: '/users' },
 ];
 
 export const Navbar = () => (
