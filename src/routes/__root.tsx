@@ -2,7 +2,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext } from '@tanstack/react-router';
 import { getSessionUser, type SecureUser } from '@/api';
 import { App } from '@/app';
-import appCss from '../styles.css';
+// import appCss from '../styles.css?url';
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
@@ -30,12 +30,12 @@ export const Route = createRootRouteWithContext<{
 				content: 'Wecoop Briefer',
 			},
 		],
-		links: [
-			{
-				rel: 'stylesheet',
-				href: appCss,
-			},
-		],
+		// links: [
+		// 	{
+		// 		rel: 'stylesheet',
+		// 		href: appCss,
+		// 	},
+		// ],
 	}),
 	shellComponent: App,
 });
