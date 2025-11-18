@@ -5,14 +5,14 @@
 /*@import 'tailwindcss';
 @import "tailwind-preset-mantine/theme.css";
 @import 'tw-animate-css';*/
-@import "@mantine/core/styles.css";
+/*@import "@mantine/core/styles.css";
 @import '@mantine/notifications/styles.css';
 
-@source "../node_modules/streamdown/dist/index.js";
+@source "../node_modules/streamdown/dist/index.js";*/
 
 /*@custom-variant dark (&:is(.dark *));*/
 
-@custom-variant dark (&:where([data-mantine-color-scheme=dark], [data-mantine-color-scheme=dark] *));
+/*@custom-variant dark (&:where([data-mantine-color-scheme=dark], [data-mantine-color-scheme=dark] *));
 
 :root {
   --radius: 0.625rem;
@@ -154,4 +154,4 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.552 0.016 285.938);
-}
+}*/
