@@ -4,7 +4,7 @@
 @import "tailwind-preset-mantine/theme.css";
 @import 'tw-animate-css';
 @import "@mantine/core/styles.layer.css";
-@import '@mantine/notifications/styles.layer.css';
+/*@import '@mantine/notifications/styles.layer.css';*/
 
 @source "../node_modules/streamdown/dist/index.js";
 

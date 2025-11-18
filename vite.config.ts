@@ -17,7 +17,6 @@ const config = defineConfig({
     ...(dev && {
       minify: false,
     }),
-    sourcemap: true,
   },
   ssr: {
     noExternal: ['streamdown', '@rolder/streamdown', '@rolder/ui-kit-react'],
