@@ -1,10 +1,11 @@
 @layer theme, base, mantine, components, utilities;
 @import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css" layer(utilities);
 @import "tailwind-preset-mantine/theme.css";
 @import 'tw-animate-css';
 @import "@mantine/core/styles.layer.css";
-/*@import '@mantine/notifications/styles.layer.css';*/
+@import '@mantine/notifications/styles.layer.css';
 
 @source "../node_modules/streamdown/dist/index.js";
 
@@ -152,18 +153,4 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.552 0.016 285.938);
-}
-
-@layer base {
-  /* Reset ul styles to remove browser defaults */
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  ol {
-    margin: 0;
-    padding: 0;
-  }
 }
