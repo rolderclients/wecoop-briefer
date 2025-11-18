@@ -1,14 +1,14 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { eq, surql } from 'surrealdb';
-import { getDB } from '../connection';
+import { getDbSession } from '../session';
 import type { Task, TaskWithBrief } from '../types';
 import { fromDTO } from '../utils';
 
 const getTasks = createServerFn({ method: 'GET' })
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 
 		const [result] = await db
 			.query(surql`SELECT
@@ -32,7 +32,7 @@ export const tasksQueryOptions = (archived?: boolean) =>
 export const getTask = createServerFn({ method: 'POST' })
 	.inputValidator((data: { taskId: string }) => data)
 	.handler(async ({ data: { taskId } }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 
 		const id = await fromDTO(taskId);
 		const [result] = await db

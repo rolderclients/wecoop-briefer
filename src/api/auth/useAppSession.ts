@@ -1,9 +1,8 @@
 import { useSession } from '@tanstack/react-start/server';
-import type { User } from '../db';
+import type { SecureUser } from '../db';
 
 export type AppSession = {
-	user?: Omit<User, 'password' | 'notSecure'>;
-	tokens?: { access: string; refresh?: string };
+	user?: SecureUser;
 };
 
 export const useAppSession = () => {
@@ -14,6 +13,7 @@ export const useAppSession = () => {
 			secure: process.env.NODE_ENV === 'production',
 			sameSite: 'lax',
 			httpOnly: true,
+			path: '/',
 		},
 	});
 };

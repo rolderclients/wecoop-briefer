@@ -47,7 +47,7 @@ export const menu: NavbarLinkProps[] = [
 ];
 
 export const Navbar = () => {
-	const { session, logout } = useAuth();
+	const { user, logout } = useAuth();
 
 	return (
 		<AppShell.Navbar>
@@ -60,10 +60,7 @@ export const Navbar = () => {
 			<AppShell.Section grow component={ScrollArea} type="never">
 				<Stack gap={0}>
 					{menu
-						.filter(
-							({ access }) =>
-								session?.user && access.includes(session?.user?.role),
-						)
+						.filter(({ access }) => user && access.includes(user?.role))
 						.map(({ label, pathname, icon: Icon }) => (
 							<Link
 								key={label}
@@ -105,7 +102,7 @@ export const Navbar = () => {
 					</HoverCard.Target>
 					<HoverCard.Dropdown>
 						<Group gap="xs" wrap="nowrap">
-							<Title order={5}>{session?.user?.name}</Title>
+							<Title order={5}>{user?.name}</Title>
 							<ActionIcon variant="light" size="lg" onClick={logout}>
 								<IconLogout />
 							</ActionIcon>

@@ -133,6 +133,8 @@ export interface UpdateUser {
 	blocked?: boolean;
 }
 
+export type SecureUser = Omit<User, 'password' | 'notSecure'>;
+
 export type FormUser = Required<
 	Pick<UpdateUser, 'id' | 'name' | 'email' | 'password'>
 > & { confirmPassword: string };

@@ -1,18 +1,18 @@
 import mantineNotificationsCss from '@mantine/notifications/styles.css?url';
 import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext } from '@tanstack/react-router';
-import { type AppSession, getAppSession } from '@/api';
+import { getSessionUser, type SecureUser } from '@/api';
 import { App } from '@/app';
 import appCss from '../styles.css?url';
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
-	session?: AppSession | null;
+	user?: SecureUser;
 }>()({
 	beforeLoad: async () => {
-		const session = await getAppSession();
+		const user = await getSessionUser();
 
-		return { session };
+		return { user };
 	},
 	head: () => ({
 		meta: [

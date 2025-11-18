@@ -1,15 +1,15 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { eq, surql } from 'surrealdb';
-import { type AppSession, useAppSession } from '@/api/auth/useAppSession';
-import { getDB } from '../connection';
+import { type AppSession, getDbSession } from '@/api';
+import { useAppSession } from '@/api/auth/useAppSession';
 import type { NewUser, UpdateUser, User } from '../types';
 import { fromDTO, fromDTOs } from '../utils';
 
 const getUsers = createServerFn({ method: 'GET' })
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 
 		const [result] = await db
 			.query(surql`SELECT *
@@ -31,7 +31,7 @@ export const usersQueryOptions = (archived?: boolean) =>
 export const createUser = createServerFn({ method: 'POST' })
 	.inputValidator((data: { userData: NewUser }) => data)
 	.handler(async ({ data: { userData } }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 
 		const data = await fromDTO(userData);
 		await db.signup({
@@ -43,7 +43,7 @@ export const createUser = createServerFn({ method: 'POST' })
 export const updateUser = createServerFn({ method: 'POST' })
 	.inputValidator((data: { userData: UpdateUser }) => data)
 	.handler(async ({ data: { userData } }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 		const session = await useAppSession();
 
 		const user = await fromDTO(userData);
@@ -66,7 +66,7 @@ export const updateUser = createServerFn({ method: 'POST' })
 export const updateUsers = createServerFn({ method: 'POST' })
 	.inputValidator((data: { usersData: UpdateUser[] }) => data)
 	.handler(async ({ data: { usersData } }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 
 		const items = await fromDTOs(usersData);
 		await db.query(
@@ -77,7 +77,7 @@ export const updateUsers = createServerFn({ method: 'POST' })
 export const deleteUsers = createServerFn({ method: 'POST' })
 	.inputValidator((data: { ids: string[] }) => data)
 	.handler(async ({ data }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 
 		const ids = await fromDTOs(data.ids);
 		await db.query(surql`FOR $id IN ${ids} { DELETE $id };`);

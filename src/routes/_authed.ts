@@ -3,7 +3,7 @@ import { menu } from '@/app';
 
 export const Route = createFileRoute('/_authed')({
 	beforeLoad: ({ context, location }) => {
-		const role = context.session?.user?.role;
+		const role = context.user?.role;
 
 		if (!role) {
 			throw redirect({

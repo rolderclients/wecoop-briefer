@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/')({
 	beforeLoad: async ({ context, location }) => {
-		const role = context.session?.user?.role;
+		const role = context.user?.role;
 
 		if (!role) throw redirect({ to: '/login' });
 		else if (location.pathname === '/') {

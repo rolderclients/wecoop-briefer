@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import sanitizeHtml from 'sanitize-html';
 import { eq, surql } from 'surrealdb';
-import { getDB } from '../connection';
+import { getDbSession } from '../session';
 import type {
 	NewPrompt,
 	Prompt,
@@ -14,7 +14,7 @@ import { fromDTO, fromDTOs } from '../utils';
 const getServicesWithPrompts = createServerFn({ method: 'GET' })
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 
 		const [result] = await db
 			.query(surql`SELECT
@@ -44,7 +44,7 @@ export const servicesWithPromptsQueryOptions = (archived?: boolean) =>
 export const getPrompt = createServerFn({ method: 'POST' })
 	.inputValidator((data: { promptId: string }) => data)
 	.handler(async ({ data: { promptId } }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 
 		const id = await fromDTO(promptId);
 		const [result] = await db
@@ -64,7 +64,7 @@ export const promptQueryOptions = (promptId: string) =>
 export const createPrompt = createServerFn({ method: 'POST' })
 	.inputValidator((data: { promptData: NewPrompt }) => data)
 	.handler(async ({ data: { promptData } }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 
 		const data = await fromDTO(promptData);
 		await db.query(surql`CREATE prompt CONTENT ${data}`);
@@ -73,7 +73,7 @@ export const createPrompt = createServerFn({ method: 'POST' })
 export const updatePrompt = createServerFn({ method: 'POST' })
 	.inputValidator((data: { promptData: UpdatePrompt }) => data)
 	.handler(async ({ data: { promptData } }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 
 		if (promptData.content)
 			promptData.content = sanitizeHtml(promptData.content);
@@ -84,7 +84,7 @@ export const updatePrompt = createServerFn({ method: 'POST' })
 export const updatePrompts = createServerFn({ method: 'POST' })
 	.inputValidator((data: { promptsData: UpdatePrompt[] }) => data)
 	.handler(async ({ data: { promptsData } }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 
 		const items = await fromDTOs(promptsData);
 		await db.query(
@@ -95,7 +95,7 @@ export const updatePrompts = createServerFn({ method: 'POST' })
 export const deletePrompts = createServerFn({ method: 'POST' })
 	.inputValidator((data: { ids: string[] }) => data)
 	.handler(async ({ data }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 
 		const ids = await fromDTOs(data.ids);
 		await db.query(surql`FOR $id IN ${ids} { DELETE $id };`);

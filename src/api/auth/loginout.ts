@@ -1,7 +1,6 @@
 import { redirect } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
-import type { User } from '../db';
-import { getDB } from '../db/connection';
+import { getDbSession, type User } from '../db';
 import { useAppSession } from './useAppSession';
 
 const codes = {
@@ -21,11 +20,11 @@ export type LoginResult = ReturnType<typeof login>;
 export const login = createServerFn({ method: 'POST' })
 	.inputValidator((data: LoginProps) => data)
 	.handler(async ({ data }) => {
-		const db = await getDB();
+		const db = await getDbSession();
 		const appSession = await useAppSession();
 
 		try {
-			const { access, refresh } = await db.signin({
+			await db.signin({
 				namespace: db.namespace,
 				database: db.database,
 				access: 'user',
@@ -43,14 +42,7 @@ export const login = createServerFn({ method: 'POST' })
 			const userDTO = { ...user, id: user.id.toString() };
 			const { password: _, notSecure: __, ...securedUser } = userDTO;
 
-			await appSession.update({
-				user: securedUser,
-				tokens: { access, refresh },
-			});
-
-			const unsub = db.subscribe('auth', (p) => {
-				console.log('auth', p);
-			});
+			await appSession.update({ user: securedUser });
 		} catch (error) {
 			const message = (error as Error).message;
 			const parsedCode = message.split('An error occurred: ')[1];

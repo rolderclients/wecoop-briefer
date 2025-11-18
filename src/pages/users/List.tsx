@@ -93,7 +93,7 @@ const UserPaper = ({
 }) => {
 	const { hovered, ref } = useHover();
 	const { selectedIds, setSelectedIds, archived, updateUser } = useUsers();
-	const { session } = useAuth();
+	const { user: authUser } = useAuth();
 
 	const handleEditClick = () => {
 		const values = {
@@ -118,11 +118,11 @@ const UserPaper = ({
 						label="Не возможно архивировать собственную учетную запись"
 						multiline
 						w={210}
-						disabled={session?.user?.id !== user.id}
+						disabled={authUser?.id !== user.id}
 					>
 						<Checkbox
 							checked={selectedIds.includes(user.id)}
-							disabled={session?.user?.id === user.id}
+							disabled={authUser?.id === user.id}
 							onChange={(e) => {
 								setSelectedIds(
 									e.currentTarget.checked
@@ -151,12 +151,12 @@ const UserPaper = ({
 							multiline
 							w={210}
 							refProp="rootRef"
-							disabled={session?.user?.id !== user.id}
+							disabled={authUser?.id !== user.id}
 						>
 							<Switch
 								color="red"
 								checked={blocked}
-								disabled={archived || session?.user?.id === user.id}
+								disabled={archived || authUser?.id === user.id}
 								onChange={(event) => {
 									setBlocked(event.currentTarget.checked);
 									updateUser({
