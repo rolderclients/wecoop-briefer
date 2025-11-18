@@ -25,10 +25,11 @@ export const login = createServerFn({ method: 'POST' })
 		const appSession = await useAppSession();
 
 		try {
-			const { access } = await db.signin({
+			const { access, refresh } = await db.signin({
 				namespace: db.namespace,
 				database: db.database,
 				access: 'user',
+
 				variables: {
 					email: data.email,
 					password: data.password,
@@ -42,7 +43,10 @@ export const login = createServerFn({ method: 'POST' })
 			const userDTO = { ...user, id: user.id.toString() };
 			const { password: _, notSecure: __, ...securedUser } = userDTO;
 
-			await appSession.update({ user: securedUser, token: access });
+			await appSession.update({
+				user: securedUser,
+				tokens: { access, refresh },
+			});
 
 			const unsub = db.subscribe('auth', (p) => {
 				console.log('auth', p);

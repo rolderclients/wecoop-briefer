@@ -4,9 +4,11 @@ import { DateTime, Surreal } from 'surrealdb';
 import { useAppSession } from '../auth/useAppSession';
 
 let db: Surreal | null = null;
+let authEventListener: (() => void) | null = null;
 
 export const getDB = createServerOnlyFn(async (): Promise<Surreal> => {
-	const { data } = await useAppSession();
+	const session = await useAppSession();
+	const { data } = session;
 
 	if (db?.isConnected) return db;
 
@@ -41,13 +43,56 @@ export const getDB = createServerOnlyFn(async (): Promise<Surreal> => {
 
 		await db.connect(url, {
 			reconnect: true,
-			authentication: data.token,
+			authentication: data.tokens?.access,
 		});
 
 		await db.use({
 			namespace,
 			database,
 		});
+
+		// Set up auth event listener
+		if (!authEventListener) {
+			console.log('🎧 Setting up auth event listener');
+			authEventListener = db.subscribe('auth', async (tokens) => {
+				// Add a small delay to avoid conflicts with login process
+				setTimeout(async () => {
+					if (tokens) {
+						console.log('🔔 Auth event: New tokens received', {
+							hasAccess: !!tokens.access,
+							hasRefresh: !!tokens.refresh,
+						});
+
+						// Only update if we don't already have these tokens
+						const currentData = session.data;
+						const currentTokens = currentData?.tokens;
+
+						if (!currentTokens || currentTokens.access !== tokens.access) {
+							// await session.update({
+							// 	...currentData,
+							// 	tokens: {
+							// 		access: tokens.access,
+							// 		refresh: tokens.refresh,
+							// 	},
+							// });
+							console.log('✅ Session updated via auth event');
+						} else {
+							console.log(
+								'🔔 Auth event: Tokens already up to date, skipping update',
+							);
+						}
+					} else {
+						console.log('🔔 Auth event: Session invalidated');
+						// Only clear if we actually have a session
+						const currentData = session.data;
+						if (currentData?.user) {
+							await session.clear();
+							console.log('🧹 Session cleared due to auth invalidation');
+						}
+					}
+				}, 100); // Small delay to let login complete first
+			});
+		}
 
 		console.log('Connected to SurrealDB');
 		return db;

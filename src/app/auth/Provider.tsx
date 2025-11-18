@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		<AuthContext.Provider
 			value={{
 				session,
-				active: Boolean(session?.token),
+				active: Boolean(session?.tokens?.access),
 				loading,
 				login: async (data) => {
 					setLoading(true);

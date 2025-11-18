@@ -3,7 +3,7 @@ import type { User } from '../db';
 
 export type AppSession = {
 	user?: Omit<User, 'password' | 'notSecure'>;
-	token?: string;
+	tokens?: { access: string; refresh?: string };
 };
 
 export const useAppSession = () => {
