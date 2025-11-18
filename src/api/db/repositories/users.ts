@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { eq, surql } from 'surrealdb';
-import { useAppSession } from '@/api/auth/useAppSession';
+import { type AppSession, useAppSession } from '@/api/auth/useAppSession';
 import { getDB } from '../connection';
 import type { NewUser, UpdateUser, User } from '../types';
 import { fromDTO, fromDTOs } from '../utils';
@@ -56,10 +56,11 @@ export const updateUser = createServerFn({ method: 'POST' })
 			);
 		}
 
-		await db.update(user.id).merge(user);
+		if (session.data.user?.id === userData.id) {
+			await session.update({ user: userData as AppSession['user'] });
+		}
 
-		const userWithId = { ...user, id: user.id.toString() };
-		await session.update(userWithId);
+		await db.update(user.id).merge(user);
 	});
 
 export const updateUsers = createServerFn({ method: 'POST' })

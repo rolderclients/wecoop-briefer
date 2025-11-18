@@ -13,12 +13,12 @@ export const Route = createFileRoute('/_authed/prompts/')({
 		await context.queryClient.ensureQueryData(modelsQueryOptions());
 		await context.queryClient.ensureQueryData(
 			servicesWithPromptsQueryOptions(archived),
-		)
+		);
 	},
 	validateSearch: (search: Record<string, unknown>): { archived?: boolean } => {
 		return {
 			archived: search?.archived === true ? true : undefined,
-		}
+		};
 	},
 	component: PromptsPage,
 });

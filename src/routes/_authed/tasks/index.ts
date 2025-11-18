@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_authed/tasks/')({
 	validateSearch: (search: Record<string, unknown>): { archived?: boolean } => {
 		return {
 			archived: search?.archived === true ? true : undefined,
-		}
+		};
 	},
 	component: TasksPage,
 });

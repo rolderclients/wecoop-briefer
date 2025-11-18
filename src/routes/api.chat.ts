@@ -20,13 +20,13 @@ export const Route = createFileRoute('/api/chat')({
 					return createAgentUIStreamResponse({
 						agent: createAgent(model, userPrompt),
 						messages,
-					})
+					});
 				} catch (error) {
 					console.error(error);
 					return new Response(JSON.stringify(error), {
 						status: 500,
 						headers: { 'Content-Type': 'application/json' },
-					})
+					});
 				}
 			},
 		},

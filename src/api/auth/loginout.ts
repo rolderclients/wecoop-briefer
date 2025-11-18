@@ -22,10 +22,12 @@ export const login = createServerFn({ method: 'POST' })
 	.inputValidator((data: LoginProps) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
-		const session = await useAppSession();
+		const appSession = await useAppSession();
 
 		try {
-			await db.signin({
+			const { access } = await db.signin({
+				namespace: db.namespace,
+				database: db.database,
 				access: 'user',
 				variables: {
 					email: data.email,
@@ -33,14 +35,18 @@ export const login = createServerFn({ method: 'POST' })
 				},
 			});
 
-			const dbUser = await db.auth<User>();
+			const user = await db.auth<User>();
 
-			if (!dbUser) return { error: codes.UNKNOWN_ERROR };
+			if (!user) return { error: codes.UNKNOWN_ERROR };
 
-			const userWithId = { ...dbUser, id: dbUser.id.toString() };
-			const { password: _, notSecure: __, ...user } = userWithId;
+			const userDTO = { ...user, id: user.id.toString() };
+			const { password: _, notSecure: __, ...securedUser } = userDTO;
 
-			await session.update(user);
+			await appSession.update({ user: securedUser, token: access });
+
+			const unsub = db.subscribe('auth', (p) => {
+				console.log('auth', p);
+			});
 		} catch (error) {
 			const message = (error as Error).message;
 			const parsedCode = message.split('An error occurred: ')[1];

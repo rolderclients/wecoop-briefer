@@ -1,5 +1,5 @@
 import { createServerOnlyFn } from '@tanstack/react-start';
-import { type RecordId, StringRecordId } from 'surrealdb';
+import { type RecordId, StringRecordId, surql } from 'surrealdb';
 import { getDB } from './connection';
 
 let tableNames: string[] = [];
@@ -10,9 +10,7 @@ export const getTableNames = createServerOnlyFn(async (): Promise<string[]> => {
 	const db = await getDB();
 
 	try {
-		const [result] = await db
-			.query('object::keys((INFO FOR DB).tables);')
-			.collect<[string[]]>();
+		const [result] = await db.query(surql`$tableNames`).collect<[string[]]>();
 
 		tableNames = result;
 
@@ -23,12 +21,6 @@ export const getTableNames = createServerOnlyFn(async (): Promise<string[]> => {
 		throw error;
 	}
 });
-
-export const qp = {
-	time: 'time.{ created: created.to_string(), updated: updated.to_string() }',
-	id: 'id.to_string()',
-	idO: 'id: id.to_string()',
-};
 
 /**
  * Converts DTO back to SurrealDB Record recursively

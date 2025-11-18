@@ -19,23 +19,35 @@ import {
 	IconUser,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
+import type { User } from '@/api';
 import { useAuth } from './auth';
 
 interface NavbarLinkProps {
 	label: string;
 	pathname?: string;
 	icon: Icon;
+	access: User['role'][];
 }
 
-const menu: NavbarLinkProps[] = [
-	{ label: 'Услуги', icon: IconList, pathname: '/services' },
-	{ label: 'Промты', icon: IconAi, pathname: '/prompts' },
-	{ label: 'Задачи', icon: IconChecklist, pathname: '/tasks' },
-	{ label: 'Сотрудники', icon: IconUser, pathname: '/users' },
+export const menu: NavbarLinkProps[] = [
+	{ label: 'Услуги', pathname: '/services', icon: IconList, access: ['admin'] },
+	{ label: 'Промты', pathname: '/prompts', icon: IconAi, access: ['admin'] },
+	{
+		label: 'Задачи',
+		pathname: '/tasks',
+		icon: IconChecklist,
+		access: ['admin', 'manager'],
+	},
+	{
+		label: 'Сотрудники',
+		pathname: '/users',
+		icon: IconUser,
+		access: ['admin'],
+	},
 ];
 
 export const Navbar = () => {
-	const { user, logout } = useAuth();
+	const { session, logout } = useAuth();
 
 	return (
 		<AppShell.Navbar>
@@ -47,32 +59,37 @@ export const Navbar = () => {
 
 			<AppShell.Section grow component={ScrollArea} type="never">
 				<Stack gap={0}>
-					{menu.map(({ label, pathname, icon: Icon }) => (
-						<Link
-							key={label}
-							to={pathname}
-							style={{ textDecoration: 'none', color: 'inherit' }}
-						>
-							{({ isActive }) => {
-								return (
-									<NavLink
-										component="div"
-										label={label}
-										active={isActive}
-										style={{
-											borderLeft:
-												'1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))',
-										}}
-										leftSection={
-											<ThemeIcon variant="light" size={30}>
-												<Icon size={18} />
-											</ThemeIcon>
-										}
-									/>
-								);
-							}}
-						</Link>
-					))}
+					{menu
+						.filter(
+							({ access }) =>
+								session?.user && access.includes(session?.user?.role),
+						)
+						.map(({ label, pathname, icon: Icon }) => (
+							<Link
+								key={label}
+								to={pathname}
+								style={{ textDecoration: 'none', color: 'inherit' }}
+							>
+								{({ isActive }) => {
+									return (
+										<NavLink
+											component="div"
+											label={label}
+											active={isActive}
+											style={{
+												borderLeft:
+													'1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4))',
+											}}
+											leftSection={
+												<ThemeIcon variant="light" size={30}>
+													<Icon size={18} />
+												</ThemeIcon>
+											}
+										/>
+									);
+								}}
+							</Link>
+						))}
 				</Stack>
 			</AppShell.Section>
 
@@ -80,7 +97,7 @@ export const Navbar = () => {
 				<HoverCard width={280} shadow="md" radius="md" position="top-start">
 					<HoverCard.Target>
 						<Group gap="xs" wrap="nowrap">
-							<Avatar>
+							<Avatar color="blue" variant="light">
 								<IconUser />
 							</Avatar>
 							<Title order={5}>Профиль</Title>
@@ -88,7 +105,7 @@ export const Navbar = () => {
 					</HoverCard.Target>
 					<HoverCard.Dropdown>
 						<Group gap="xs" wrap="nowrap">
-							<Title order={5}>{user?.name}</Title>
+							<Title order={5}>{session?.user?.name}</Title>
 							<ActionIcon variant="light" size="lg" onClick={logout}>
 								<IconLogout />
 							</ActionIcon>

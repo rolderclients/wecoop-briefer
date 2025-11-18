@@ -11,12 +11,12 @@ export const Route = createFileRoute('/_authed/services')({
 		await context.queryClient.ensureQueryData(categoriesQueryOptions());
 		await context.queryClient.ensureQueryData(
 			categoriesWithServicesQueryOptions(archived),
-		)
+		);
 	},
 	validateSearch: (search: Record<string, unknown>): { archived?: boolean } => {
 		return {
 			archived: search?.archived === true ? true : undefined,
-		}
+		};
 	},
 	component: ServicesPage,
 });

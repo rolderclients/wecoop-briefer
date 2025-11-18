@@ -2,15 +2,16 @@ import { useRouteContext } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import { createContext, type ReactNode, useContext, useState } from 'react';
 import {
+	type AppSession,
 	type LoginProps,
 	type LoginResult,
 	login,
 	logout,
-	type SecuredUser,
 } from '@/api';
 
 type AuthContextType = {
-	user?: SecuredUser | null;
+	session: AppSession | null;
+	active: boolean;
 	loading: boolean;
 	login: (data: LoginProps) => LoginResult;
 	logout: () => Promise<void>;
@@ -22,14 +23,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const loginFn = useServerFn(login);
 	const logoutFn = useServerFn(logout);
 
-	const { user } = useRouteContext({ from: '__root__' });
+	const { session } = useRouteContext({ from: '__root__' });
 
 	const [loading, setLoading] = useState(false);
 
 	return (
 		<AuthContext.Provider
 			value={{
-				user,
+				session,
+				active: Boolean(session?.token),
 				loading,
 				login: async (data) => {
 					setLoading(true);

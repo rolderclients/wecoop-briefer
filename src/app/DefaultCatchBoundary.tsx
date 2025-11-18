@@ -2,7 +2,7 @@ import { Button, Group, Stack, Title } from '@mantine/core';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { Link, rootRouteId, useMatch, useRouter } from '@tanstack/react-router';
 
-export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
+export const DefaultCatchBoundary = ({ error }: ErrorComponentProps) => {
 	const router = useRouter();
 	const isRoot = useMatch({
 		strict: false,
@@ -58,4 +58,4 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
 			</Group>
 		</Stack>
 	);
-}
+};

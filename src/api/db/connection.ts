@@ -1,10 +1,13 @@
 import { createServerOnlyFn } from '@tanstack/react-start';
 import { getCookie } from '@tanstack/react-start/server';
 import { DateTime, Surreal } from 'surrealdb';
+import { useAppSession } from '../auth/useAppSession';
 
 let db: Surreal | null = null;
 
 export const getDB = createServerOnlyFn(async (): Promise<Surreal> => {
+	const { data } = await useAppSession();
+
 	if (db?.isConnected) return db;
 
 	// Нужно чтобы был в корне для получения контекста запроса серверной функции
@@ -31,26 +34,19 @@ export const getDB = createServerOnlyFn(async (): Promise<Surreal> => {
 		const url = process.env.SURREALDB_URL;
 		const namespace = process.env.SURREALDB_NAMESPACE;
 		const database = process.env.SURREALDB_DATABASE;
-		const username = process.env.SURREALDB_USER;
-		const password = process.env.SURREALDB_PASSWORD;
 
-		if (!url || !namespace || !database || !username || !password) {
+		if (!url || !namespace || !database) {
 			throw new Error('Missing required SurrealDB environment variables');
 		}
 
-		// Connect to the database
-		await db.connect(url, { reconnect: true });
+		await db.connect(url, {
+			reconnect: true,
+			authentication: data.token,
+		});
 
-		// Select a specific namespace / database
 		await db.use({
 			namespace,
 			database,
-		});
-
-		// Signin as root user
-		await db.signin({
-			username,
-			password,
 		});
 
 		console.log('Connected to SurrealDB');

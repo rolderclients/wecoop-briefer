@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_authed/tasks/$taskId/brief')({
 	loader: async ({ context, params: { taskId } }) => {
 		await context.queryClient.ensureQueryData(
 			taskWithBriefQueryOptions(taskId),
-		)
+		);
 	},
 	head: () => ({
 		links: [

@@ -24,7 +24,10 @@ export const Login = () => {
 		initialValues: { email: '', password: '' },
 		validate: {
 			email: isNotEmpty(),
-			password: hasLength({ min: 6 }),
+			password: hasLength(
+				{ min: 6 },
+				'Пароль должен содержать не менее 6 символов',
+			),
 		},
 	});
 
@@ -51,7 +54,7 @@ export const Login = () => {
 				<Paper withBorder p="xl" radius="md">
 					<Stack>
 						<FocusTrap>
-							<Stack>
+							<Stack miw={420}>
 								<TextInput
 									size="xl"
 									label="Почта"

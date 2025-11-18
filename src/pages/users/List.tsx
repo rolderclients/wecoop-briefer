@@ -8,6 +8,7 @@ import {
 	Stack,
 	Switch,
 	Text,
+	Tooltip,
 } from '@mantine/core';
 import {
 	hasLength,
@@ -21,6 +22,7 @@ import { useDisclosure, useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
 import { useState } from 'react';
 import type { FormUser, User } from '@/api';
+import { useAuth } from '@/app';
 import classes from '@/lib/styles.module.css';
 import { Edit } from './Edit';
 import { useUsers } from './Provider';
@@ -91,6 +93,7 @@ const UserPaper = ({
 }) => {
 	const { hovered, ref } = useHover();
 	const { selectedIds, setSelectedIds, archived, updateUser } = useUsers();
+	const { session } = useAuth();
 
 	const handleEditClick = () => {
 		const values = {
@@ -111,16 +114,24 @@ const UserPaper = ({
 		<Paper ref={ref} radius="md" withBorder>
 			<Grid px="md" py="xs" align="center">
 				<Grid.Col span="content">
-					<Checkbox
-						checked={selectedIds.includes(user.id)}
-						onChange={(e) => {
-							setSelectedIds(
-								e.currentTarget.checked
-									? [...selectedIds, user.id]
-									: selectedIds.filter((id) => id !== user.id),
-							);
-						}}
-					/>
+					<Tooltip
+						label="Не возможно архивировать собственную учетную запись"
+						multiline
+						w={210}
+						disabled={session?.user?.id !== user.id}
+					>
+						<Checkbox
+							checked={selectedIds.includes(user.id)}
+							disabled={session?.user?.id === user.id}
+							onChange={(e) => {
+								setSelectedIds(
+									e.currentTarget.checked
+										? [...selectedIds, user.id]
+										: selectedIds.filter((id) => id !== user.id),
+								);
+							}}
+						/>
+					</Tooltip>
 				</Grid.Col>
 				<Grid.Col span="auto">
 					<Text inline>{user.name}</Text>
@@ -128,24 +139,33 @@ const UserPaper = ({
 				<Grid.Col span="auto">
 					<Text inline>{user.email}</Text>
 				</Grid.Col>
+
 				<Grid.Col span="auto">
 					<Text inline>{user.notSecure}</Text>
 				</Grid.Col>
 
 				<Grid.Col span="content">
 					<Box w={88} onClick={(e) => e.stopPropagation()}>
-						<Switch
-							color="red"
-							checked={blocked}
-							disabled={archived}
-							onChange={(event) => {
-								setBlocked(event.currentTarget.checked);
-								updateUser({
-									id: user.id,
-									blocked: event.currentTarget.checked,
-								});
-							}}
-						/>
+						<Tooltip
+							label="Не возможно блокировать собственную учетную запись"
+							multiline
+							w={210}
+							refProp="rootRef"
+							disabled={session?.user?.id !== user.id}
+						>
+							<Switch
+								color="red"
+								checked={blocked}
+								disabled={archived || session?.user?.id === user.id}
+								onChange={(event) => {
+									setBlocked(event.currentTarget.checked);
+									updateUser({
+										id: user.id,
+										blocked: event.currentTarget.checked,
+									});
+								}}
+							/>
+						</Tooltip>
 					</Box>
 				</Grid.Col>
 

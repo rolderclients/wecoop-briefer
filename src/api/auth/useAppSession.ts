@@ -1,15 +1,19 @@
 import { useSession } from '@tanstack/react-start/server';
-import type { SecuredUser } from '../db';
+import type { User } from '../db';
+
+export type AppSession = {
+	user?: Omit<User, 'password' | 'notSecure'>;
+	token?: string;
+};
 
 export const useAppSession = () => {
-	return useSession<SecuredUser>({
+	return useSession<AppSession>({
 		name: 'app-session',
 		password: process.env.SESSION_SECRET || '',
-		// Optional: customize cookie settings
-		// cookie: {
-		// 	secure: process.env.NODE_ENV === 'production',
-		// 	sameSite: 'lax',
-		// 	httpOnly: true,
-		// },
+		cookie: {
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: 'lax',
+			httpOnly: true,
+		},
 	});
 };

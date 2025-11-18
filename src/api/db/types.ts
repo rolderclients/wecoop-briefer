@@ -110,6 +110,7 @@ export interface TaskWithBrief extends Omit<Task, 'brief'> {
 export interface User extends Item {
 	name: string;
 	email: string;
+	role: 'admin' | 'manager';
 	password: string;
 	notSecure: string;
 	archived: boolean;
@@ -135,5 +136,3 @@ export interface UpdateUser {
 export type FormUser = Required<
 	Pick<UpdateUser, 'id' | 'name' | 'email' | 'password'>
 > & { confirmPassword: string };
-
-export type SecuredUser = Omit<User, 'password' | 'notSecure'>;
