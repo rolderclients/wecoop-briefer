@@ -2,7 +2,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext } from '@tanstack/react-router';
 import { getSessionUser, type SecureUser } from '@/api';
 import { App } from '@/app';
-import appCss from '../styles.css?url';
+import appCss from '../styles.css';
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
