@@ -1,9 +1,10 @@
 @layer theme, base, mantine, components, utilities;
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
-@import "@mantine/core/styles.layer.css";
 @import "tailwind-preset-mantine/theme.css";
 @import 'tw-animate-css';
+@import "@mantine/core/styles.layer.css";
+@import '@mantine/notifications/styles.layer.css';
 
 @source "../node_modules/streamdown/dist/index.js";
 
@@ -153,11 +154,16 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
-/*@layer base {
-  * {
-    @apply border-border outline-ring/50;
+@layer base {
+  /* Reset ul styles to remove browser defaults */
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  ol {
+    margin: 0;
+    padding: 0;
   }
-}*/
+}

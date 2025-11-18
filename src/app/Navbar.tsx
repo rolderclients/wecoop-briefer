@@ -24,7 +24,7 @@ import { useAuth } from './auth';
 
 interface NavbarLinkProps {
 	label: string;
-	pathname?: string;
+	pathname: string;
 	icon: Icon;
 	access: User['role'][];
 }

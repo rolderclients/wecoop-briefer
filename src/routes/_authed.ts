@@ -12,7 +12,8 @@ export const Route = createFileRoute('/_authed')({
 			});
 		} else {
 			const hasAccess = menu.some(
-				(i) => i.access.includes(role) && location.pathname === i.pathname,
+				(i) =>
+					i.access.includes(role) && location.pathname.includes(i.pathname),
 			);
 			if (!hasAccess) throw redirect({ to: '/forbidden' });
 		}
