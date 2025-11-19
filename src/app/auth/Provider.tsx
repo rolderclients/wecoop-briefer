@@ -10,37 +10,39 @@ import {
 } from '@/api';
 
 type AuthContextType = {
-	user?: SecureUser | null;
-	authed: boolean;
-	loading: boolean;
-	login: (data: LoginProps) => LoginResult;
-	logout: () => Promise<void>;
+	// user?: SecureUser | null;
+	// authed: boolean;
+	// loading: boolean;
+	// login: (data: LoginProps) => LoginResult;
+	// logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-	const loginFn = useServerFn(login);
-	const logoutFn = useServerFn(logout);
+	// const loginFn = useServerFn(login);
+	// const logoutFn = useServerFn(logout);
 
-	const { user } = useRouteContext({ from: '__root__' });
+	// const { user } = useRouteContext({ from: '__root__' });
 
-	const [loading, setLoading] = useState(false);
+	// const [loading, setLoading] = useState(false);
 
 	return (
 		<AuthContext.Provider
-			value={{
-				user,
-				authed: Boolean(user),
-				loading,
-				login: async (data) => {
-					setLoading(true);
-					const result = await loginFn({ data });
-					setLoading(false);
-					return result;
-				},
-				logout: logoutFn,
-			}}
+			value={
+				{
+					// user,
+					// authed: Boolean(user),
+					// loading,
+					// login: async (data) => {
+					// 	setLoading(true);
+					// 	const result = await loginFn({ data });
+					// 	setLoading(false);
+					// 	return result;
+					// },
+					// logout: logoutFn,
+				}
+			}
 		>
 			{children}
 		</AuthContext.Provider>

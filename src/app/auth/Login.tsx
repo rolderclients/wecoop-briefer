@@ -17,7 +17,7 @@ import { useAuth } from './Provider';
 
 export const Login = () => {
 	// const { redirect } = useSearch({ from: '/login' });
-	const { login, loading } = useAuth();
+	// const { login, loading } = useAuth();
 
 	const form = useForm({
 		mode: 'uncontrolled',
@@ -75,7 +75,7 @@ export const Login = () => {
 						<Group ml="auto" mt="lg">
 							<Button
 								size="lg"
-								loading={loading}
+								// loading={loading}
 								leftSection={<IconLogin2 />}
 								type="submit"
 							>
