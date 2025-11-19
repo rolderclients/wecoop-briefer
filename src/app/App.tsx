@@ -24,8 +24,9 @@ export const App = () => {
 			</head>
 			<body>
 				<MantineProvider defaultColorScheme="auto">
+					<Notifications />
+
 					<AuthProvider>
-						<Notifications />
 						TEST
 						<Outlet />
 						{/*<Shell />*/}
