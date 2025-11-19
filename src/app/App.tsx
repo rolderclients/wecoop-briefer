@@ -23,14 +23,14 @@ export const App = () => {
 				<ColorSchemeScript defaultColorScheme="auto" />
 			</head>
 			<body>
-				<AuthProvider>
-					<MantineProvider defaultColorScheme="auto">
-						<Notifications />
-						TEST
-						<Outlet />
-						{/*<Shell />*/}
-					</MantineProvider>
-				</AuthProvider>
+				{/*<AuthProvider>*/}
+				<MantineProvider defaultColorScheme="auto">
+					<Notifications />
+					TEST
+					<Outlet />
+					{/*<Shell />*/}
+				</MantineProvider>
+				{/*</AuthProvider>*/}
 
 				<SetTimeZoneCookie />
 
