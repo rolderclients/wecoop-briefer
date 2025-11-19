@@ -1,7 +1,7 @@
 import { Box, getRadius, ScrollArea as MantineScrollArea } from '@mantine/core';
 import { useContext } from 'react';
 import { ScrollAreaContext } from './context';
-// import classes from './styles.module.css';
+import classes from './styles.module.css';
 
 export const ScrollAreaContent = ({
 	children,
@@ -19,7 +19,7 @@ export const ScrollAreaContent = ({
 	return (
 		<MantineScrollArea
 			h="100%"
-			// className={classes.scrollArea}
+			className={classes.scrollArea}
 			style={{ '--radius': radius ? getRadius(radius) : undefined }}
 			{...mantineProps}
 			viewportRef={_callbackRef}

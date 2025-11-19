@@ -14,13 +14,6 @@ import { Route as ForbiddenRouteImport } from './routes/forbidden'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
-import { Route as AuthedUsersRouteImport } from './routes/_authed/users'
-import { Route as AuthedServicesRouteImport } from './routes/_authed/services'
-import { Route as AuthedTasksIndexRouteImport } from './routes/_authed/tasks/index'
-import { Route as AuthedPromptsIndexRouteImport } from './routes/_authed/prompts/index'
-import { Route as AuthedPromptsPromptIdRouteImport } from './routes/_authed/prompts/$promptId'
-import { Route as AuthedTasksTaskIdIndexRouteImport } from './routes/_authed/tasks/$taskId/index'
-import { Route as AuthedTasksTaskIdBriefRouteImport } from './routes/_authed/tasks/$taskId/brief'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -46,129 +39,38 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthedUsersRoute = AuthedUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AuthedRoute,
-} as any)
-const AuthedServicesRoute = AuthedServicesRouteImport.update({
-  id: '/services',
-  path: '/services',
-  getParentRoute: () => AuthedRoute,
-} as any)
-const AuthedTasksIndexRoute = AuthedTasksIndexRouteImport.update({
-  id: '/tasks/',
-  path: '/tasks/',
-  getParentRoute: () => AuthedRoute,
-} as any)
-const AuthedPromptsIndexRoute = AuthedPromptsIndexRouteImport.update({
-  id: '/prompts/',
-  path: '/prompts/',
-  getParentRoute: () => AuthedRoute,
-} as any)
-const AuthedPromptsPromptIdRoute = AuthedPromptsPromptIdRouteImport.update({
-  id: '/prompts/$promptId',
-  path: '/prompts/$promptId',
-  getParentRoute: () => AuthedRoute,
-} as any)
-const AuthedTasksTaskIdIndexRoute = AuthedTasksTaskIdIndexRouteImport.update({
-  id: '/tasks/$taskId/',
-  path: '/tasks/$taskId/',
-  getParentRoute: () => AuthedRoute,
-} as any)
-const AuthedTasksTaskIdBriefRoute = AuthedTasksTaskIdBriefRouteImport.update({
-  id: '/tasks/$taskId/brief',
-  path: '/tasks/$taskId/brief',
-  getParentRoute: () => AuthedRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
-  '/services': typeof AuthedServicesRoute
-  '/users': typeof AuthedUsersRoute
   '/api/chat': typeof ApiChatRoute
-  '/prompts/$promptId': typeof AuthedPromptsPromptIdRoute
-  '/prompts': typeof AuthedPromptsIndexRoute
-  '/tasks': typeof AuthedTasksIndexRoute
-  '/tasks/$taskId/brief': typeof AuthedTasksTaskIdBriefRoute
-  '/tasks/$taskId': typeof AuthedTasksTaskIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
-  '/services': typeof AuthedServicesRoute
-  '/users': typeof AuthedUsersRoute
   '/api/chat': typeof ApiChatRoute
-  '/prompts/$promptId': typeof AuthedPromptsPromptIdRoute
-  '/prompts': typeof AuthedPromptsIndexRoute
-  '/tasks': typeof AuthedTasksIndexRoute
-  '/tasks/$taskId/brief': typeof AuthedTasksTaskIdBriefRoute
-  '/tasks/$taskId': typeof AuthedTasksTaskIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authed': typeof AuthedRouteWithChildren
+  '/_authed': typeof AuthedRoute
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
-  '/_authed/services': typeof AuthedServicesRoute
-  '/_authed/users': typeof AuthedUsersRoute
   '/api/chat': typeof ApiChatRoute
-  '/_authed/prompts/$promptId': typeof AuthedPromptsPromptIdRoute
-  '/_authed/prompts/': typeof AuthedPromptsIndexRoute
-  '/_authed/tasks/': typeof AuthedTasksIndexRoute
-  '/_authed/tasks/$taskId/brief': typeof AuthedTasksTaskIdBriefRoute
-  '/_authed/tasks/$taskId/': typeof AuthedTasksTaskIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/forbidden'
-    | '/login'
-    | '/services'
-    | '/users'
-    | '/api/chat'
-    | '/prompts/$promptId'
-    | '/prompts'
-    | '/tasks'
-    | '/tasks/$taskId/brief'
-    | '/tasks/$taskId'
+  fullPaths: '/' | '/forbidden' | '/login' | '/api/chat'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/forbidden'
-    | '/login'
-    | '/services'
-    | '/users'
-    | '/api/chat'
-    | '/prompts/$promptId'
-    | '/prompts'
-    | '/tasks'
-    | '/tasks/$taskId/brief'
-    | '/tasks/$taskId'
-  id:
-    | '__root__'
-    | '/'
-    | '/_authed'
-    | '/forbidden'
-    | '/login'
-    | '/_authed/services'
-    | '/_authed/users'
-    | '/api/chat'
-    | '/_authed/prompts/$promptId'
-    | '/_authed/prompts/'
-    | '/_authed/tasks/'
-    | '/_authed/tasks/$taskId/brief'
-    | '/_authed/tasks/$taskId/'
+  to: '/' | '/forbidden' | '/login' | '/api/chat'
+  id: '__root__' | '/' | '/_authed' | '/forbidden' | '/login' | '/api/chat'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthedRoute: typeof AuthedRouteWithChildren
+  AuthedRoute: typeof AuthedRoute
   ForbiddenRoute: typeof ForbiddenRoute
   LoginRoute: typeof LoginRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -211,84 +113,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authed/users': {
-      id: '/_authed/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof AuthedUsersRouteImport
-      parentRoute: typeof AuthedRoute
-    }
-    '/_authed/services': {
-      id: '/_authed/services'
-      path: '/services'
-      fullPath: '/services'
-      preLoaderRoute: typeof AuthedServicesRouteImport
-      parentRoute: typeof AuthedRoute
-    }
-    '/_authed/tasks/': {
-      id: '/_authed/tasks/'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof AuthedTasksIndexRouteImport
-      parentRoute: typeof AuthedRoute
-    }
-    '/_authed/prompts/': {
-      id: '/_authed/prompts/'
-      path: '/prompts'
-      fullPath: '/prompts'
-      preLoaderRoute: typeof AuthedPromptsIndexRouteImport
-      parentRoute: typeof AuthedRoute
-    }
-    '/_authed/prompts/$promptId': {
-      id: '/_authed/prompts/$promptId'
-      path: '/prompts/$promptId'
-      fullPath: '/prompts/$promptId'
-      preLoaderRoute: typeof AuthedPromptsPromptIdRouteImport
-      parentRoute: typeof AuthedRoute
-    }
-    '/_authed/tasks/$taskId/': {
-      id: '/_authed/tasks/$taskId/'
-      path: '/tasks/$taskId'
-      fullPath: '/tasks/$taskId'
-      preLoaderRoute: typeof AuthedTasksTaskIdIndexRouteImport
-      parentRoute: typeof AuthedRoute
-    }
-    '/_authed/tasks/$taskId/brief': {
-      id: '/_authed/tasks/$taskId/brief'
-      path: '/tasks/$taskId/brief'
-      fullPath: '/tasks/$taskId/brief'
-      preLoaderRoute: typeof AuthedTasksTaskIdBriefRouteImport
-      parentRoute: typeof AuthedRoute
-    }
   }
 }
 
-interface AuthedRouteChildren {
-  AuthedServicesRoute: typeof AuthedServicesRoute
-  AuthedUsersRoute: typeof AuthedUsersRoute
-  AuthedPromptsPromptIdRoute: typeof AuthedPromptsPromptIdRoute
-  AuthedPromptsIndexRoute: typeof AuthedPromptsIndexRoute
-  AuthedTasksIndexRoute: typeof AuthedTasksIndexRoute
-  AuthedTasksTaskIdBriefRoute: typeof AuthedTasksTaskIdBriefRoute
-  AuthedTasksTaskIdIndexRoute: typeof AuthedTasksTaskIdIndexRoute
-}
-
-const AuthedRouteChildren: AuthedRouteChildren = {
-  AuthedServicesRoute: AuthedServicesRoute,
-  AuthedUsersRoute: AuthedUsersRoute,
-  AuthedPromptsPromptIdRoute: AuthedPromptsPromptIdRoute,
-  AuthedPromptsIndexRoute: AuthedPromptsIndexRoute,
-  AuthedTasksIndexRoute: AuthedTasksIndexRoute,
-  AuthedTasksTaskIdBriefRoute: AuthedTasksTaskIdBriefRoute,
-  AuthedTasksTaskIdIndexRoute: AuthedTasksTaskIdIndexRoute,
-}
-
-const AuthedRouteWithChildren =
-  AuthedRoute._addFileChildren(AuthedRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthedRoute: AuthedRouteWithChildren,
+  AuthedRoute: AuthedRoute,
   ForbiddenRoute: ForbiddenRoute,
   LoginRoute: LoginRoute,
   ApiChatRoute: ApiChatRoute,
