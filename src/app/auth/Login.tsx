@@ -34,27 +34,27 @@ export const Login = () => {
 	});
 
 	return (
-		<form
-			onSubmit={form.onSubmit(
-				async (values) => {
-					// const result = await login({ ...values, redirect });
-					// if (result?.error) {
-					// 	notifications.show({
-					// 		message: result.error,
-					// 		color: result.unknownError ? 'red' : 'orange',
-					// 	});
-					// }
-				},
-				(errors) => {
-					const firstErrorPath = Object.keys(errors)[0];
-					form.getInputNode(firstErrorPath)?.focus();
-				},
-			)}
-		>
-			<Center h="100vh">
-				<Paper withBorder p="xl" radius="md">
-					<Stack>
-						<ClientOnly>
+		<ClientOnly>
+			<form
+				onSubmit={form.onSubmit(
+					async (values) => {
+						// const result = await login({ ...values, redirect });
+						// if (result?.error) {
+						// 	notifications.show({
+						// 		message: result.error,
+						// 		color: result.unknownError ? 'red' : 'orange',
+						// 	});
+						// }
+					},
+					(errors) => {
+						const firstErrorPath = Object.keys(errors)[0];
+						form.getInputNode(firstErrorPath)?.focus();
+					},
+				)}
+			>
+				<Center h="100vh">
+					<Paper withBorder p="xl" radius="md">
+						<Stack>
 							<FocusTrap>
 								<Stack miw={420}>
 									<TextInput
@@ -74,21 +74,21 @@ export const Login = () => {
 									/>
 								</Stack>
 							</FocusTrap>
-						</ClientOnly>
 
-						<Group ml="auto" mt="lg">
-							<Button
-								size="lg"
-								// loading={loading}
-								leftSection={<IconLogin2 />}
-								type="submit"
-							>
-								Войти
-							</Button>
-						</Group>
-					</Stack>
-				</Paper>
-			</Center>
-		</form>
+							<Group ml="auto" mt="lg">
+								<Button
+									size="lg"
+									// loading={loading}
+									leftSection={<IconLogin2 />}
+									type="submit"
+								>
+									Войти
+								</Button>
+							</Group>
+						</Stack>
+					</Paper>
+				</Center>
+			</form>
+		</ClientOnly>
 	);
 };
