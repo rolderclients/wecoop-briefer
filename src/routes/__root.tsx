@@ -37,5 +37,5 @@ export const Route = createRootRouteWithContext<{
 			},
 		],
 	}),
-	shellComponent: App,
+	shellComponent: () => <>TEST</>,
 });
