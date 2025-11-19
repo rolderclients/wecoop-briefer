@@ -2,7 +2,7 @@ import { AppShell } from '@mantine/core';
 import { Outlet } from '@tanstack/react-router';
 import { ScrollArea } from '@/kit';
 // import { useAuth } from './auth';
-// import { Navbar } from './Navbar';
+import { Navbar } from './Navbar';
 
 export const Shell = () => {
 	// const { authed } = useAuth();
@@ -15,7 +15,7 @@ export const Shell = () => {
 			}}
 			// disabled={!authed}
 		>
-			{/*<Navbar />*/}
+			<Navbar />
 
 			<AppShell.Main>
 				<ScrollArea h="100vh" px="xl">
