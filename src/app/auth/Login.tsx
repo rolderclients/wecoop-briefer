@@ -11,8 +11,10 @@ import {
 import { hasLength, isNotEmpty, useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconLogin2 } from '@tabler/icons-react';
+
 // import { useSearch } from '@tanstack/react-router';
 
+import { ClientOnly } from '@tanstack/react-router';
 import { useAuth } from './Provider';
 
 export const Login = () => {
@@ -52,25 +54,27 @@ export const Login = () => {
 			<Center h="100vh">
 				<Paper withBorder p="xl" radius="md">
 					<Stack>
-						<FocusTrap>
-							<Stack miw={420}>
-								<TextInput
-									size="xl"
-									label="Почта"
-									placeholder="Введите почту"
-									key={form.key('email')}
-									{...form.getInputProps('email')}
-								/>
+						<ClientOnly>
+							<FocusTrap>
+								<Stack miw={420}>
+									<TextInput
+										size="xl"
+										label="Почта"
+										placeholder="Введите почту"
+										key={form.key('email')}
+										{...form.getInputProps('email')}
+									/>
 
-								<PasswordInput
-									size="xl"
-									label="Пароль"
-									placeholder="Введите пароль"
-									key={form.key('password')}
-									{...form.getInputProps('password')}
-								/>
-							</Stack>
-						</FocusTrap>
+									<PasswordInput
+										size="xl"
+										label="Пароль"
+										placeholder="Введите пароль"
+										key={form.key('password')}
+										{...form.getInputProps('password')}
+									/>
+								</Stack>
+							</FocusTrap>
+						</ClientOnly>
 
 						<Group ml="auto" mt="lg">
 							<Button
