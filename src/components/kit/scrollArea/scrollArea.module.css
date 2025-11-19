@@ -1,9 +1,0 @@
-.scrollArea {
-	& :global(.mantine-ScrollArea-viewport) {
-		border-radius: var(--radius);
-	}
-	& :global(.mantine-ScrollArea-scrollbar) {
-		border-top-right-radius: var(--radius);
-		border-bottom-right-radius: var(--radius);
-	}
-}

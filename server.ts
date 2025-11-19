@@ -522,6 +522,8 @@ async function initializeServer() {
   const server = Bun.serve({
     port: SERVER_PORT,
 
+    idleTimeout: 60,
+
     routes: {
       // Serve static assets (preloaded or on-demand)
       ...routes,

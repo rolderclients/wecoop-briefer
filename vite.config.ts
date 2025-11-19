@@ -4,7 +4,7 @@ import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 
-const testing = process.env.NODE_ENV === 'testing'
+const dev = process.env.NODE_ENV === 'development'
 
 const config = defineConfig({
   plugins: [
@@ -14,12 +14,12 @@ const config = defineConfig({
     tailwindcss(),
   ],
   build: {
-    ...(testing && {
+    ...(dev && {
       minify: false,
     }),
   },
   ssr: {
-    noExternal: ['streamdown','@rolder/streamdown', '@rolder/ui-kit-react'],
+    noExternal: ['streamdown'],
   },
 })
 
