@@ -4,10 +4,10 @@ import { useAppSession } from './useAppSession';
 
 export const getSessionUser = createServerFn({ method: 'GET' }).handler(
 	async () => {
-		const appSession = await useAppSession();
+		// const appSession = await useAppSession();
 
-		const appUser = appSession.data.user;
-		if (!appUser) return null;
+		// const appUser = appSession.data.user;
+		// if (!appUser) return null;
 
 		// const dbSession = await getDbSession();
 		// if (!dbSession.accessToken) {
@@ -15,6 +15,7 @@ export const getSessionUser = createServerFn({ method: 'GET' }).handler(
 		// 	return null;
 		// }
 
-		return appUser;
+		// return appUser;
+		return null;
 	},
 );
