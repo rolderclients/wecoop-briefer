@@ -4,7 +4,7 @@ import { DateTime, Surreal } from 'surrealdb';
 
 let db: Surreal | null = null;
 
-export const getDB = createServerOnlyFn(async (): Promise<Surreal> => {
+export const getDBFn = createServerOnlyFn(async (): Promise<Surreal> => {
 	if (db?.isConnected) return db;
 
 	// Нужно чтобы был в корне для получения контекста запроса серверной функции

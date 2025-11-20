@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Login } from '@/app';
+// import { Login } from '@/app';
 
 export const Route = createFileRoute('/login')({
 	loaderDeps: ({ search: { redirect } }) => ({ redirect }),
@@ -8,5 +8,5 @@ export const Route = createFileRoute('/login')({
 			redirect: search?.redirect as string,
 		};
 	},
-	component: Login,
+	// component: Login,
 });

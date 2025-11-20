@@ -1,13 +1,15 @@
 import { createServerFn } from '@tanstack/react-start';
 import { surql } from 'surrealdb';
-import { getDbSession } from '../session';
+import { authMiddleware } from '@/app';
+import { getDBFn } from '../connection';
 import type { UpdateBrief } from '../types';
 import { fromDTO } from '../utils';
 
-export const updateBrief = createServerFn({ method: 'POST' })
+export const updateBriefFn = createServerFn({ method: 'POST' })
+	.middleware([authMiddleware])
 	.inputValidator((data: { briefData: UpdateBrief }) => data)
 	.handler(async ({ data: { briefData } }) => {
-		const db = await getDbSession();
+		const db = await getDBFn();
 
 		const item = await fromDTO(briefData);
 		await db.query(surql`UPDATE ${item.id} MERGE ${item};`);

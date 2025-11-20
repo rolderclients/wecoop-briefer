@@ -1,12 +1,11 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { createRootRouteWithContext } from '@tanstack/react-router';
-import type { SecureUser } from '@/api';
+import { createRootRouteWithContext, redirect } from '@tanstack/react-router';
+// import type { SecureUser } from '@/api';
 import { App } from '@/app';
 import appCss from '../styles.css?url';
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
-	user: SecureUser | null;
 }>()({
 	head: () => ({
 		meta: [

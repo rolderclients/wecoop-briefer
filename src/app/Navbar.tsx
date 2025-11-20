@@ -20,7 +20,8 @@ import {
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import type { User } from '@/api';
-import { useAuth } from './auth';
+
+// import { useAuth } from './auth';
 
 interface NavbarLinkProps {
 	label: string;
@@ -47,7 +48,7 @@ export const menu: NavbarLinkProps[] = [
 ];
 
 export const Navbar = () => {
-	const { user, logout } = useAuth();
+	// const { user, logout } = useAuth();
 
 	return (
 		<AppShell.Navbar>
@@ -60,14 +61,14 @@ export const Navbar = () => {
 			<AppShell.Section grow component={ScrollArea} type="never">
 				<Stack gap={0}>
 					{menu
-						.filter(({ access }) => user && access.includes(user?.role))
+						// .filter(({ access }) => user && access.includes(user?.role))
 						.map(({ label, pathname, icon: Icon }) => (
 							<Link
 								key={label}
 								to={pathname}
 								style={{ textDecoration: 'none', color: 'inherit' }}
 							>
-								{({ isActive }) => {
+								{({ isActive }: { isActive: boolean }) => {
 									return (
 										<NavLink
 											component="div"
@@ -102,10 +103,10 @@ export const Navbar = () => {
 					</HoverCard.Target>
 					<HoverCard.Dropdown>
 						<Group gap="xs" wrap="nowrap">
-							<Title order={5}>{user?.name}</Title>
+							{/*<Title order={5}>{user?.name}</Title>
 							<ActionIcon variant="light" size="lg" onClick={logout}>
 								<IconLogout />
-							</ActionIcon>
+							</ActionIcon>*/}
 						</Group>
 					</HoverCard.Dropdown>
 				</HoverCard>

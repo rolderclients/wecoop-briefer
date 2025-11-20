@@ -13,7 +13,9 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForbiddenRouteImport } from './routes/forbidden'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as AuthedServicesRouteImport } from './routes/_authed/services'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthedApiChatRouteImport } from './routes/_authed/api.chat'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -34,46 +36,76 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiChatRoute = ApiChatRouteImport.update({
+const AuthedServicesRoute = AuthedServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedApiChatRoute = AuthedApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
-  '/api/chat': typeof ApiChatRoute
+  '/services': typeof AuthedServicesRoute
+  '/api/chat': typeof AuthedApiChatRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
-  '/api/chat': typeof ApiChatRoute
+  '/services': typeof AuthedServicesRoute
+  '/api/chat': typeof AuthedApiChatRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authed': typeof AuthedRoute
+  '/_authed': typeof AuthedRouteWithChildren
   '/forbidden': typeof ForbiddenRoute
   '/login': typeof LoginRoute
-  '/api/chat': typeof ApiChatRoute
+  '/_authed/services': typeof AuthedServicesRoute
+  '/_authed/api/chat': typeof AuthedApiChatRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/forbidden' | '/login' | '/api/chat'
+  fullPaths:
+    | '/'
+    | '/forbidden'
+    | '/login'
+    | '/services'
+    | '/api/chat'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/forbidden' | '/login' | '/api/chat'
-  id: '__root__' | '/' | '/_authed' | '/forbidden' | '/login' | '/api/chat'
+  to: '/' | '/forbidden' | '/login' | '/services' | '/api/chat' | '/api/auth/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authed'
+    | '/forbidden'
+    | '/login'
+    | '/_authed/services'
+    | '/_authed/api/chat'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthedRoute: typeof AuthedRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
   ForbiddenRoute: typeof ForbiddenRoute
   LoginRoute: typeof LoginRoute
-  ApiChatRoute: typeof ApiChatRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -106,22 +138,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/chat': {
-      id: '/api/chat'
+    '/_authed/services': {
+      id: '/_authed/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof AuthedServicesRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/api/chat': {
+      id: '/_authed/api/chat'
       path: '/api/chat'
       fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthedApiChatRouteImport
+      parentRoute: typeof AuthedRoute
     }
   }
 }
 
+interface AuthedRouteChildren {
+  AuthedServicesRoute: typeof AuthedServicesRoute
+  AuthedApiChatRoute: typeof AuthedApiChatRoute
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedServicesRoute: AuthedServicesRoute,
+  AuthedApiChatRoute: AuthedApiChatRoute,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthedRoute: AuthedRoute,
+  AuthedRoute: AuthedRouteWithChildren,
   ForbiddenRoute: ForbiddenRoute,
   LoginRoute: LoginRoute,
-  ApiChatRoute: ApiChatRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
