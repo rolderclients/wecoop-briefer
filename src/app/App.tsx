@@ -2,7 +2,8 @@ import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { HeadContent, Outlet, Scripts } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { AuthProvider } from './auth';
+
+// import { AuthProvider } from './auth';
 
 // import { Shell } from './Shell';
 
