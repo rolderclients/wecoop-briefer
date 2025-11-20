@@ -21,7 +21,7 @@ export const App = () => {
 		<html lang="ru" suppressHydrationWarning>
 			<head>
 				<HeadContent />
-				<ColorSchemeScript defaultColorScheme="auto" />
+				{/*<ColorSchemeScript defaultColorScheme="auto" />*/}
 			</head>
 			<body>
 				{/*<AuthProvider>*/}
