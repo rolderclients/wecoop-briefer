@@ -1,6 +1,12 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
+import { getSessionUser } from '@/api';
 
 export const Route = createFileRoute('/')({
+	beforeLoad: async () => {
+		const user = await getSessionUser();
+		console.log('========================', user);
+		return { user };
+	},
 	// beforeLoad: async ({ context, location }) => {
 	// 	const role = context.user?.role;
 	// 	if (!role) throw redirect({ to: '/login' });

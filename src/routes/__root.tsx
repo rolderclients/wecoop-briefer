@@ -8,11 +8,11 @@ export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
 	user?: SecureUser;
 }>()({
-	beforeLoad: async () => {
-		// const user = await getSessionUser();
-		// console.log('========================', user);
-		// return { user };
-	},
+	// beforeLoad: async () => {
+	// 	const user = await getSessionUser();
+	// 	console.log('========================', user);
+	// 	return { user };
+	// },
 	head: () => ({
 		meta: [
 			{
