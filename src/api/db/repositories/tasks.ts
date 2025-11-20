@@ -1,14 +1,16 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { eq, surql } from 'surrealdb';
-import { getDbSession } from '../session';
+import { authMiddleware } from '@/app';
+import { getDBFn } from '../connection';
 import type { Task, TaskWithBrief } from '../types';
 import { fromDTO } from '../utils';
 
-const getTasks = createServerFn({ method: 'GET' })
+const getTasksFn = createServerFn({ method: 'GET' })
+	.middleware([authMiddleware])
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
-		const db = await getDbSession();
+		const db = await getDBFn();
 
 		const [result] = await db
 			.query(surql`SELECT
@@ -26,13 +28,14 @@ const getTasks = createServerFn({ method: 'GET' })
 export const tasksQueryOptions = (archived?: boolean) =>
 	queryOptions<Task[]>({
 		queryKey: ['tasks', archived],
-		queryFn: () => getTasks({ data: { archived } }),
+		queryFn: () => getTasksFn({ data: { archived } }),
 	});
 
-export const getTask = createServerFn({ method: 'POST' })
+export const getTaskFn = createServerFn({ method: 'POST' })
+	.middleware([authMiddleware])
 	.inputValidator((data: { taskId: string }) => data)
 	.handler(async ({ data: { taskId } }) => {
-		const db = await getDbSession();
+		const db = await getDBFn();
 
 		const id = await fromDTO(taskId);
 		const [result] = await db
@@ -60,5 +63,5 @@ export const getTask = createServerFn({ method: 'POST' })
 export const taskWithBriefQueryOptions = (taskId: string) =>
 	queryOptions<TaskWithBrief>({
 		queryKey: ['taskWithBrief'],
-		queryFn: () => getTask({ data: { taskId } }),
+		queryFn: () => getTaskFn({ data: { taskId } }),
 	});

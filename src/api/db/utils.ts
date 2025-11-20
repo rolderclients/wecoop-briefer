@@ -1,26 +1,28 @@
 import { createServerOnlyFn } from '@tanstack/react-start';
 import { type RecordId, StringRecordId, surql } from 'surrealdb';
-import { getDB } from './connection';
+import { getDBFn } from './connection';
 
 let tableNames: string[] = [];
 
-export const getTableNames = createServerOnlyFn(async (): Promise<string[]> => {
-	if (tableNames.length) return tableNames;
+export const getTableNamesFn = createServerOnlyFn(
+	async (): Promise<string[]> => {
+		if (tableNames.length) return tableNames;
 
-	const db = await getDB();
+		const db = await getDBFn();
 
-	try {
-		const [result] = await db.query(surql`$tableNames`).collect<[string[]]>();
+		try {
+			const [result] = await db.query(surql`$tableNames`).collect<[string[]]>();
 
-		tableNames = result;
+			tableNames = result;
 
-		return result;
-	} catch (error) {
-		console.error('Failed to get table names from SurrealDB:', error);
-		tableNames = [];
-		throw error;
-	}
-});
+			return result;
+		} catch (error) {
+			console.error('Failed to get table names from SurrealDB:', error);
+			tableNames = [];
+			throw error;
+		}
+	},
+);
 
 /**
  * Converts DTO back to SurrealDB Record recursively
@@ -28,7 +30,7 @@ export const getTableNames = createServerOnlyFn(async (): Promise<string[]> => {
 export const fromDTO = async <T>(
 	dto: T,
 ): Promise<Omit<T, 'id'> & { id: RecordId }> => {
-	const tableNames = await getTableNames();
+	const tableNames = await getTableNamesFn();
 	return convertStringsToRecordIds(dto, tableNames) as Omit<T, 'id'> & {
 		id: RecordId;
 	};
@@ -38,7 +40,7 @@ export const fromDTO = async <T>(
  * Converts array of DTOs back to SurrealDB Records recursively
  */
 export const fromDTOs = async <T>(dtos: T[]): Promise<T[]> => {
-	const tableNames = await getTableNames();
+	const tableNames = await getTableNamesFn();
 	return dtos.map((dto) => convertStringsToRecordIds(dto, tableNames) as T);
 };
 
