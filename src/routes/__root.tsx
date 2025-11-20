@@ -9,9 +9,8 @@ export const Route = createRootRouteWithContext<{
 	user?: SecureUser;
 }>()({
 	beforeLoad: async () => {
-		const user = await getSessionUser();
-		console.log('========================', user);
-
+		// const user = await getSessionUser();
+		// console.log('========================', user);
 		// return { user };
 	},
 	head: () => ({
