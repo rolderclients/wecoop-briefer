@@ -7,14 +7,14 @@ import { useEffect } from 'react';
 
 // import { Shell } from './Shell';
 
-const SetTimeZoneCookie = () => {
-	useEffect(() => {
-		const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-		// biome-ignore lint/suspicious/noDocumentCookie: <>
-		document.cookie = `tz=${tz}; path=/; max-age=31536000`;
-	}, []);
-	return null;
-};
+// const SetTimeZoneCookie = () => {
+// 	useEffect(() => {
+// 		const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+// 		// biome-ignore lint/suspicious/noDocumentCookie: <>
+// 		document.cookie = `tz=${tz}; path=/; max-age=31536000`;
+// 	}, []);
+// 	return null;
+// };
 
 export const App = () => {
 	return (
@@ -32,7 +32,7 @@ export const App = () => {
 				{/*<Shell />*/}
 				{/*</MantineProvider>*/}
 				{/*</AuthProvider>*/}
-				<SetTimeZoneCookie />
+				{/*<SetTimeZoneCookie />*/}
 				<Scripts />
 			</body>
 		</html>
