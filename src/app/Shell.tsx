@@ -19,7 +19,6 @@ export const Shell = () => {
 
 			<AppShell.Main>
 				<ScrollArea h="100vh" px="xl">
-					TEST
 					<Outlet />
 					<ScrollArea.ScrollButton />
 				</ScrollArea>
