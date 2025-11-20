@@ -33,7 +33,7 @@ export const App = () => {
 				{/*</MantineProvider>*/}
 				{/*</AuthProvider>*/}
 				{/*<SetTimeZoneCookie />*/}
-				{/*<Scripts />*/}
+				<Scripts />
 			</body>
 		</html>
 	);
