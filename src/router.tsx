@@ -8,15 +8,7 @@ import { routeTree } from './routeTree.gen';
 export const getRouter = async () => {
 	const queryClient = new QueryClient();
 
-	const user = (await getSessionUser()) || {
-		id: 'test',
-		name: 'tt',
-		email: 'eee',
-		role: 'admin',
-		archived: false,
-		blocked: false,
-		time: { created: 'dd', updated: 'dd' },
-	};
+	const user = await getSessionUser();
 
 	const router = createRouter({
 		routeTree,
