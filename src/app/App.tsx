@@ -25,16 +25,14 @@ export const App = () => {
 			</head>
 			<body>
 				{/*<AuthProvider>*/}
-				<MantineProvider defaultColorScheme="auto">
-					{/*<Notifications />*/}
-					TEST
-					<Outlet />
-					{/*<Shell />*/}
-				</MantineProvider>
+				{/*<MantineProvider defaultColorScheme="auto">*/}
+				{/*<Notifications />*/}
+				TEST
+				<Outlet />
+				{/*<Shell />*/}
+				{/*</MantineProvider>*/}
 				{/*</AuthProvider>*/}
-
 				<SetTimeZoneCookie />
-
 				<Scripts />
 			</body>
 		</html>
