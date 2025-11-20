@@ -1,18 +1,13 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext } from '@tanstack/react-router';
-import { getSessionUser, type SecureUser } from '@/api';
+import type { SecureUser } from '@/api';
 import { App } from '@/app';
 import appCss from '../styles.css?url';
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
-	user?: SecureUser;
+	user: SecureUser | null;
 }>()({
-	// beforeLoad: async () => {
-	// 	const user = await getSessionUser();
-	// 	console.log('========================', user);
-	// 	return { user };
-	// },
 	head: () => ({
 		meta: [
 			{
