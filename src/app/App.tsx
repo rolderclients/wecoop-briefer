@@ -1,38 +1,36 @@
-// import { ColorSchemeScript, MantineProvider } from '@mantine/core';
-// import { Notifications } from '@mantine/notifications';
-import { HeadContent, Outlet, Scripts } from '@tanstack/react-router';
-// import { useEffect } from 'react';
+import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
+import { HeadContent, Scripts } from '@tanstack/react-router';
+import { useEffect } from 'react';
+import { AuthProvider } from './auth';
+import { Shell } from './Shell';
 
-// import { AuthProvider } from './auth';
-
-// import { Shell } from './Shell';
-
-// const SetTimeZoneCookie = () => {
-// 	useEffect(() => {
-// 		const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-// 		// biome-ignore lint/suspicious/noDocumentCookie: <>
-// 		document.cookie = `tz=${tz}; path=/; max-age=31536000`;
-// 	}, []);
-// 	return null;
-// };
+const SetTimeZoneCookie = () => {
+	useEffect(() => {
+		const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		// biome-ignore lint/suspicious/noDocumentCookie: <>
+		document.cookie = `tz=${tz}; path=/; max-age=31536000`;
+	}, []);
+	return null;
+};
 
 export const App = () => {
 	return (
 		<html lang="ru" suppressHydrationWarning>
 			<head>
 				<HeadContent />
-				{/*<ColorSchemeScript defaultColorScheme="auto" />*/}
+				<ColorSchemeScript defaultColorScheme="auto" />
 			</head>
 			<body>
-				{/*<AuthProvider>*/}
-				{/*<MantineProvider defaultColorScheme="auto">*/}
-				{/*<Notifications />*/}
-				TEST
-				<Outlet />
-				{/*<Shell />*/}
-				{/*</MantineProvider>*/}
-				{/*</AuthProvider>*/}
-				{/*<SetTimeZoneCookie />*/}
+				<AuthProvider>
+					<MantineProvider defaultColorScheme="auto">
+						<Notifications />
+
+						<Shell />
+					</MantineProvider>
+				</AuthProvider>
+
+				<SetTimeZoneCookie />
 				<Scripts />
 			</body>
 		</html>
