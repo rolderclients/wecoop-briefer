@@ -4,7 +4,7 @@ import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 
-const dev = process.env.NODE_ENV === 'development'
+// const dev = process.env.NODE_ENV === 'development'
 
 const config = defineConfig({
   plugins: [
@@ -13,11 +13,11 @@ const config = defineConfig({
     viteReact(),
     tailwindcss(),
   ],
-  build: {
-    ...(dev && {
-      minify: false,
-    }),
-  },
+  // build: {
+  //   ...(dev && {
+  //     minify: false,
+  //   }),
+  // },
   ssr: {
     noExternal: ['streamdown'],
   },
