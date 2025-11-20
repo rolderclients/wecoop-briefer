@@ -9,11 +9,11 @@ export const getSessionUser = createServerFn({ method: 'GET' }).handler(
 		const appUser = appSession.data.user;
 		if (!appUser) return null;
 
-		const dbSession = await getDbSession();
-		if (!dbSession.accessToken) {
-			appSession.clear();
-			return null;
-		}
+		// const dbSession = await getDbSession();
+		// if (!dbSession.accessToken) {
+		// 	appSession.clear();
+		// 	return null;
+		// }
 
 		return appUser;
 	},
