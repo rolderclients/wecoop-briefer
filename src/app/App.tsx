@@ -1,5 +1,5 @@
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
-import { Notifications } from '@mantine/notifications';
+// import { Notifications } from '@mantine/notifications';
 import { HeadContent, Outlet, Scripts } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
@@ -26,7 +26,7 @@ export const App = () => {
 			<body>
 				{/*<AuthProvider>*/}
 				<MantineProvider defaultColorScheme="auto">
-					<Notifications />
+					{/*<Notifications />*/}
 					TEST
 					<Outlet />
 					{/*<Shell />*/}
