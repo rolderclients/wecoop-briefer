@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { eq, surql } from 'surrealdb';
 import { authMiddleware } from '@/app';
-import { getDBFn } from '../connection';
+import { getDB } from '..';
 import type {
 	CategoryWithServices,
 	NewService,
@@ -15,7 +15,7 @@ const getServicesFn = createServerFn({ method: 'GET' })
 	.middleware([authMiddleware])
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
-		const db = await getDBFn();
+		const db = await getDB();
 
 		const [result] = await db
 			.query(surql`SELECT *
@@ -38,7 +38,7 @@ const getCategoriesWithServicesFn = createServerFn({ method: 'GET' })
 	.middleware([authMiddleware])
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
-		const db = await getDBFn();
+		const db = await getDB();
 
 		const [result] = await db
 			.query(surql`SELECT
@@ -69,7 +69,7 @@ export const createServiceFn = createServerFn({ method: 'POST' })
 	.middleware([authMiddleware])
 	.inputValidator((data: { serviceData: NewService }) => data)
 	.handler(async ({ data: { serviceData } }) => {
-		const db = await getDBFn();
+		const db = await getDB();
 
 		const data = await fromDTO(serviceData);
 		await db.query(surql`CREATE service CONTENT ${data};`);
@@ -79,7 +79,7 @@ export const updateServiceFn = createServerFn({ method: 'POST' })
 	.middleware([authMiddleware])
 	.inputValidator((data: { serviceData: UpdateService }) => data)
 	.handler(async ({ data: { serviceData } }) => {
-		const db = await getDBFn();
+		const db = await getDB();
 
 		const item = await fromDTO(serviceData);
 		await db.update(item.id).merge(item);
@@ -89,7 +89,7 @@ export const updateServicesFn = createServerFn({ method: 'POST' })
 	.middleware([authMiddleware])
 	.inputValidator((data: { servicesData: UpdateService[] }) => data)
 	.handler(async ({ data: { servicesData } }) => {
-		const db = await getDBFn();
+		const db = await getDB();
 
 		const items = await fromDTOs(servicesData);
 		await db.query(
@@ -101,7 +101,7 @@ export const deleteServicesFn = createServerFn({ method: 'POST' })
 	.middleware([authMiddleware])
 	.inputValidator((data: { ids: string[] }) => data)
 	.handler(async ({ data }) => {
-		const db = await getDBFn();
+		const db = await getDB();
 
 		const ids = await fromDTOs(data.ids);
 		await db.query(surql`FOR $id IN ${ids} { DELETE $id };`);

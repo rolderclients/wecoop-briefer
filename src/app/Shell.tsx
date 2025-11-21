@@ -1,5 +1,5 @@
 import { AppShell, Button } from '@mantine/core';
-import { Outlet } from '@tanstack/react-router';
+import { Outlet, useRouteContext } from '@tanstack/react-router';
 import { ScrollArea } from '@/kit';
 import { signIn, signOut, signUp, useSession } from './auth';
 // import { useAuth } from './auth';
@@ -9,6 +9,8 @@ export const Shell = () => {
 	// const { authed } = useAuth();
 
 	const { data: session } = useSession();
+	// const s = useRouteContext({ from: '/_authed' });
+	// console.log(s.user);
 
 	return (
 		<AppShell
@@ -29,6 +31,7 @@ export const Shell = () => {
 									email: 'mail@decard.space',
 									password: '123123123',
 									name: 'John Doe',
+									// role: 'admin',
 									// image: 'https://example.com/image.jpg',
 									// callbackURL: "/dashboard" // A URL to redirect to after the user verifies their email (optional)
 								},
@@ -78,6 +81,7 @@ export const Shell = () => {
 					</Button>
 
 					{session?.user.email}
+					{session?.user.role}
 
 					<Outlet />
 					<ScrollArea.ScrollButton />
