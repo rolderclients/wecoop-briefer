@@ -5,7 +5,7 @@ export const Route = createFileRoute('/_authed')({
 	beforeLoad: async ({ location }) => {
 		const user = await getUserFn();
 
-		console.log({ user });
+		console.log(user);
 
 		return { user };
 

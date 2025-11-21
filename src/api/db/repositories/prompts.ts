@@ -3,7 +3,7 @@ import { createServerFn } from '@tanstack/react-start';
 import sanitizeHtml from 'sanitize-html';
 import { eq, surql } from 'surrealdb';
 import { authMiddleware } from '@/app';
-import { getDBFn } from '../connection';
+import { getDB } from '..';
 import type {
 	NewPrompt,
 	Prompt,
@@ -16,7 +16,7 @@ const getServicesWithPromptsFn = createServerFn({ method: 'GET' })
 	.middleware([authMiddleware])
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
-		const db = await getDBFn();
+		const db = await getDB();
 
 		const [result] = await db
 			.query(surql`SELECT
@@ -47,7 +47,7 @@ export const getPromptFn = createServerFn({ method: 'POST' })
 	.middleware([authMiddleware])
 	.inputValidator((data: { promptId: string }) => data)
 	.handler(async ({ data: { promptId } }) => {
-		const db = await getDBFn();
+		const db = await getDB();
 
 		const id = await fromDTO(promptId);
 		const [result] = await db
@@ -68,7 +68,7 @@ export const createPromptFn = createServerFn({ method: 'POST' })
 	.middleware([authMiddleware])
 	.inputValidator((data: { promptData: NewPrompt }) => data)
 	.handler(async ({ data: { promptData } }) => {
-		const db = await getDBFn();
+		const db = await getDB();
 
 		const data = await fromDTO(promptData);
 		await db.query(surql`CREATE prompt CONTENT ${data}`);
@@ -78,7 +78,7 @@ export const updatePromptFn = createServerFn({ method: 'POST' })
 	.middleware([authMiddleware])
 	.inputValidator((data: { promptData: UpdatePrompt }) => data)
 	.handler(async ({ data: { promptData } }) => {
-		const db = await getDBFn();
+		const db = await getDB();
 
 		if (promptData.content)
 			promptData.content = sanitizeHtml(promptData.content);
@@ -90,7 +90,7 @@ export const updatePromptsFn = createServerFn({ method: 'POST' })
 	.middleware([authMiddleware])
 	.inputValidator((data: { promptsData: UpdatePrompt[] }) => data)
 	.handler(async ({ data: { promptsData } }) => {
-		const db = await getDBFn();
+		const db = await getDB();
 
 		const items = await fromDTOs(promptsData);
 		await db.query(
@@ -102,7 +102,7 @@ export const deletePromptsFn = createServerFn({ method: 'POST' })
 	.middleware([authMiddleware])
 	.inputValidator((data: { ids: string[] }) => data)
 	.handler(async ({ data }) => {
-		const db = await getDBFn();
+		const db = await getDB();
 
 		const ids = await fromDTOs(data.ids);
 		await db.query(surql`FOR $id IN ${ids} { DELETE $id };`);

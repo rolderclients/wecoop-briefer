@@ -61,7 +61,7 @@ const convertStringsToRecordIds = (
 	}
 
 	// If it's an object, recursively process each property
-	if (typeof obj === 'object') {
+	if (typeof obj === 'object' && !(obj instanceof Date)) {
 		const result: Record<string, unknown> = {};
 		for (const [key, value] of Object.entries(obj)) {
 			// Convert id fields and fields ending with Id back to RecordId

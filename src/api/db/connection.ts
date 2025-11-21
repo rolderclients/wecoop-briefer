@@ -46,6 +46,7 @@ export const getDBFn = createServerOnlyFn(async (): Promise<Surreal> => {
 		db = instance;
 
 		console.log('Connected to SurrealDB');
+
 		return instance;
 	} catch (error) {
 		console.error('Failed to connect to SurrealDB:', error);
