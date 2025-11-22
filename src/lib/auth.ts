@@ -4,7 +4,7 @@ import {
 	createAuthMiddleware,
 	username as usernamePlugin,
 } from 'better-auth/plugins';
-import { reactStartCookies } from 'better-auth/react-start';
+import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { surql } from 'surrealdb';
 import { getDB, getDBFn } from '@/api';
 import { type AuthErrorCodes, ac, parseAuthError, roles } from '@/app';
@@ -44,7 +44,7 @@ export const auth = betterAuth({
 			verify: async () => true,
 		},
 	},
-	plugins: [reactStartCookies(), admin({ ac, roles }), usernamePlugin()],
+	plugins: [tanstackStartCookies(), admin({ ac, roles }), usernamePlugin()],
 	database: surrealAdapter(db),
 	hooks: {
 		before: createAuthMiddleware(async (ctx) => {
