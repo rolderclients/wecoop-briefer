@@ -1,27 +1,77 @@
-import { betterAuth } from 'better-auth';
-import { admin } from 'better-auth/plugins';
+import { APIError, betterAuth } from 'better-auth';
+import {
+	admin,
+	createAuthMiddleware,
+	username as usernamePlugin,
+} from 'better-auth/plugins';
 import { reactStartCookies } from 'better-auth/react-start';
+import { surql } from 'surrealdb';
+import { getDB, getDBFn } from '@/api';
+import { type AuthErrorCodes, ac, parseAuthError, roles } from '@/app';
 import { surrealAdapter } from './authDbAdapter/adapter';
 
-const endpoint = process.env.SURREALDB_URL;
-const namespace = process.env.SURREALDB_NAMESPACE;
-const database = process.env.SURREALDB_DATABASE;
-const username = process.env.SURREALDB_USERNAME;
-const password = process.env.SURREALDB_PASSWORD;
+const username = process.env.AUTH_ROOT_USERNAME;
+const password = process.env.AUTH_ROOT_PASSWORD;
 
-if (!endpoint || !namespace || !database || !username || !password) {
-	throw new Error('Missing required SurrealDB environment variables');
+if (!username || !password) {
+	throw new Error(
+		'Missing AUTH_ROOT_USERNAME or AUTH_ROOT_PASSWORD environment variables',
+	);
 }
+
+const dbInstance = await getDBFn();
+const db = await dbInstance.newSession();
+await db.use({
+	namespace: dbInstance.namespace,
+	database: dbInstance.database,
+});
+await db.signin({
+	access: 'user',
+	variables: { username, password },
+});
 
 export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
+		password: {
+			hash: async (password) => {
+				const [hash] = await db
+					.query(surql`crypto::argon2::generate(${password})`)
+					.collect<string[]>();
+
+				return hash;
+			},
+			verify: async () => true,
+		},
 	},
-	plugins: [reactStartCookies(), admin()],
-	database: surrealAdapter({
-		endpoint,
-		namespace,
-		database,
-		authentication: { username, password },
-	}),
+	plugins: [reactStartCookies(), admin({ ac, roles }), usernamePlugin()],
+	database: surrealAdapter(db),
+	hooks: {
+		before: createAuthMiddleware(async (ctx) => {
+			if (ctx.path === '/sign-in/username') {
+				const db = await getDB();
+
+				try {
+					const { username, password } = ctx.body;
+					await db.signin({
+						access: 'user',
+						variables: { username, password },
+					});
+				} catch (error) {
+					const message = (error as Error).message;
+					const code = message.split(
+						'An error occurred: ',
+					)[1] as AuthErrorCodes;
+
+					const authError = parseAuthError(code, message);
+					throw new APIError('UNAUTHORIZED', { code, ...authError });
+				}
+			}
+
+			if (ctx.path === '/sign-out') {
+				const db = await getDB();
+				await db.invalidate();
+			}
+		}),
+	},
 });

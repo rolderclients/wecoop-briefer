@@ -6,12 +6,11 @@ import {
 import { APIError } from 'better-auth/api';
 import type { DBFieldAttribute, DBFieldType } from 'better-auth/db';
 import {
-	type ConnectOptions,
-	type Engines,
 	escapeIdent,
 	RecordId,
 	type RecordIdValue,
-	Surreal,
+	type Surreal,
+	type SurrealSession,
 	surql,
 	Table,
 } from 'surrealdb';
@@ -26,30 +25,16 @@ import type {
 	UpdateParams,
 } from './types';
 
-interface SurrealAdapterOptions extends ConnectOptions {
-	engines?: Engines;
-	endpoint: string;
+interface SurrealAdapterOptions {
 	debugLogs?: DBAdapterDebugLogOption;
 	usePlural?: boolean;
 }
 
-export function surrealAdapter(options?: SurrealAdapterOptions) {
-	const { engines, endpoint, debugLogs, usePlural, ...connectOptions } =
-		options || {};
-
-	const surreal = new Surreal(engines ? { engines } : undefined);
-
-	if (!endpoint) {
-		throw new Error('SurrealDB endpoint is required');
-	}
-
-	const ensureConnection = async () => {
-		if (surreal.status === 'disconnected') {
-			await surreal.connect(endpoint, connectOptions);
-		}
-
-		return surreal;
-	};
+export function surrealAdapter(
+	db: Surreal | SurrealSession,
+	options?: SurrealAdapterOptions,
+) {
+	const { debugLogs, usePlural } = options || {};
 
 	return createAdapterFactory({
 		config: {
@@ -83,7 +68,6 @@ export function surrealAdapter(options?: SurrealAdapterOptions) {
 		},
 		adapter: (context) => ({
 			count: async ({ model, where }) => {
-				const db = await ensureConnection();
 				const query = generateSurrealQL(
 					{
 						method: 'count',
@@ -100,7 +84,6 @@ export function surrealAdapter(options?: SurrealAdapterOptions) {
 				where,
 				select,
 			}: Omit<FindOneParams, 'method' | 'context'>) => {
-				const db = await ensureConnection();
 				const query = generateSurrealQL(
 					{
 						method: 'findOne',
@@ -120,7 +103,6 @@ export function surrealAdapter(options?: SurrealAdapterOptions) {
 				sortBy,
 				offset,
 			}: Omit<FindManyParams, 'method'>) => {
-				const db = await ensureConnection();
 				const query = generateSurrealQL(
 					{
 						method: 'findMany',
@@ -141,7 +123,6 @@ export function surrealAdapter(options?: SurrealAdapterOptions) {
 				model,
 				select,
 			}: Omit<CreateParams<T>, 'method'>) => {
-				const db = await ensureConnection();
 				const query = generateSurrealQL(
 					{
 						method: 'create',
@@ -162,7 +143,6 @@ export function surrealAdapter(options?: SurrealAdapterOptions) {
 				where,
 				update,
 			}: Omit<UpdateParams<T>, 'method'>) => {
-				const db = await ensureConnection();
 				const query = generateSurrealQL(
 					{
 						method: 'update',
@@ -180,7 +160,6 @@ export function surrealAdapter(options?: SurrealAdapterOptions) {
 				where,
 				update,
 			}: Omit<UpdateManyParams, 'method'>) => {
-				const db = await ensureConnection();
 				const query = generateSurrealQL(
 					{
 						method: 'updateMany',
@@ -194,7 +173,6 @@ export function surrealAdapter(options?: SurrealAdapterOptions) {
 				return result || 0;
 			},
 			delete: async <T>({ model, where }: Omit<DeleteParams, 'method'>) => {
-				const db = await ensureConnection();
 				const query = generateSurrealQL<T>(
 					{
 						method: 'delete',
@@ -206,7 +184,6 @@ export function surrealAdapter(options?: SurrealAdapterOptions) {
 				await db.query<T[][]>(query);
 			},
 			deleteMany: async ({ model, where }) => {
-				const db = await ensureConnection();
 				const query = generateSurrealQL(
 					{
 						method: 'deleteMany',
