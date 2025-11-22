@@ -1,4 +1,4 @@
-import { redirect, useRouteContext, useRouter } from '@tanstack/react-router';
+import { useRouteContext, useRouter } from '@tanstack/react-router';
 import type { UserWithRole } from 'better-auth/plugins';
 import {
 	createContext,
@@ -46,10 +46,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				signIn: async ({ username, password, redirect: to }) => {
 					setLoading(true);
 					const { error } = await signIn.username({ username, password });
-					setTimeout(() => {
-						setLoading(false);
-						if (!error && redirect) redirect({ to });
-					}, 100);
+					if (!error && to) router.navigate({ to, replace: true });
+					setTimeout(() => setLoading(false), 100);
 					return error;
 				},
 				signOut: async () => {

@@ -46,6 +46,12 @@ export const auth = betterAuth({
 	},
 	plugins: [tanstackStartCookies(), admin({ ac, roles }), usernamePlugin()],
 	database: surrealAdapter(db),
+	session: {
+		cookieCache: {
+			enabled: true,
+			maxAge: 5 * 60,
+		},
+	},
 	hooks: {
 		before: createAuthMiddleware(async (ctx) => {
 			if (ctx.path === '/sign-in/username') {
