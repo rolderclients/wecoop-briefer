@@ -80,8 +80,8 @@ DEFINE FIELD OVERWRITE updatedAt ON user TYPE datetime;
 // Admin plugin
 DEFINE FIELD OVERWRITE role ON user TYPE option<string>;
 DEFINE FIELD OVERWRITE banned ON user TYPE option<bool>;
-DEFINE FIELD OVERWRITE banReason ON user TYPE option<string>;
-DEFINE FIELD OVERWRITE banExpires ON user TYPE option<datetime>;
+DEFINE FIELD OVERWRITE banReason ON user TYPE option<string> | NULL;
+DEFINE FIELD OVERWRITE banExpires ON user TYPE option<datetime> | NULL;
 // Username plugin
 DEFINE FIELD OVERWRITE username ON user TYPE string;
 DEFINE FIELD OVERWRITE displayUsername ON user TYPE string;
@@ -139,3 +139,24 @@ DEFINE ACCESS OVERWRITE user ON DATABASE TYPE RECORD
         IF !crypto::argon2::compare($hash, $password) { THROW 'INVALID_CREDENTIALS' }
         ELSE { RETURN [$user] }
     };
+
+// Root auth user
+UPSERT user:aJenQtYqu5tFZdRp86XETG2z1y69CrAE CONTENT {
+    name: 'Системная учетная запись',
+    role: 'admin',
+    username: 'root'   ,
+    displayUsername: 'Root',
+    email: 'mail@rolder.dev',
+    emailVerified: false,
+    banned: false,
+    createdAt: d'2025-11-22T23:18:28.472Z',
+    updatedAt: d'2025-11-22T23:18:28.472Z'
+};
+UPSERT account:lixmyJWvexwKhKUcrsIIAwxhbNRC5gmr CONTENT {
+    accountId: 'aJenQtYqu5tFZdRp86XETG2z1y69CrAE',
+    userId: user:aJenQtYqu5tFZdRp86XETG2z1y69CrAE,
+    password: '$argon2id$v=19$m=19456,t=2,p=1$HT9GAQ8ynIEpN/H7KgaqLw$5fBNiaN7P2hGayKS+bfc5NAscakz7ON2bZxF8JvyLAg',
+    providerId: 'credential',
+    createdAt: d'2025-11-22T23:18:29.159Z',
+    updatedAt: d'2025-11-22T23:18:29.159Z'
+};

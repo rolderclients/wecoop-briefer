@@ -4,6 +4,7 @@ import { HeadContent, Scripts } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { AuthProvider } from './auth';
 import { Shell } from './Shell';
+import { theme } from './theme';
 
 const SetTimeZoneCookie = () => {
 	useEffect(() => {
@@ -23,7 +24,7 @@ export const App = () => {
 			</head>
 			<body>
 				<AuthProvider>
-					<MantineProvider defaultColorScheme="auto">
+					<MantineProvider defaultColorScheme="auto" theme={theme}>
 						<Notifications />
 
 						<Shell />

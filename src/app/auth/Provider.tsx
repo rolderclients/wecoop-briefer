@@ -22,6 +22,7 @@ type AuthContextType = {
 	loading: boolean;
 	signIn: (data: SignInProps) => Promise<AuthError>;
 	signOut: () => Promise<AuthError>;
+	refetch: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,7 +30,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const router = useRouter();
 	const { user: initialUser } = useRouteContext({ from: '__root__' });
-	const { data, isPending, isRefetching } = useSession();
+	const { data, isPending, isRefetching, refetch } = useSession();
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -59,6 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 					}, 100);
 					return error;
 				},
+				refetch: () => refetch({ query: { disableCookieCache: true } }),
 			}}
 		>
 			{children}

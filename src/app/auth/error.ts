@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
 import type { BetterAuthErrorCodes } from '@/app';
 
 export type AuthError = {
@@ -17,6 +18,8 @@ type AllErrorCodes = Partial<
 const codes = {
 	INVALID_CREDENTIALS: 'Неверный логин или пароль',
 	INVALID_USERNAME_OR_PASSWORD: 'Неверный логин или пароль',
+	USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL:
+		'Пользователь с таким email уже существует',
 	BLOCKED: 'Пользователь заблокирован',
 	BANNED_USER: 'Пользователь заблокирован',
 	UNKNOWN_ERROR: 'Неизвестная ошибка',
@@ -24,17 +27,23 @@ const codes = {
 
 export type AuthErrorCodes = keyof typeof codes;
 
-// biome-ignore lint/suspicious/noExplicitAny: <>
-export const parseAuthError = (code?: AuthErrorCodes, details?: any) => {
+export type ParsedAuthError = {
+	message: string;
+	unknownError?: boolean;
+	details?: any;
+};
+
+export const parseAuthError = (
+	code?: AuthErrorCodes,
+	details?: any,
+): ParsedAuthError => {
 	if (code && code in codes)
 		return {
-			error: true,
 			message: codes[code],
 			details,
 		};
 
 	return {
-		error: true,
 		message: codes.UNKNOWN_ERROR,
 		unknownError: true,
 		details,
