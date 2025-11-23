@@ -4,10 +4,9 @@ import { Group, Modal, Stack } from '@mantine/core';
 import generatePassword from 'omgopass';
 import { useEffect } from 'react';
 import z from 'zod/v4';
-import { blurOnError, useAppForm } from '@/components';
+import { blurOnError, filedsSchema, useAppForm } from '@/components';
 import { useUsers } from '../Provider';
 import type { CredentialsUser } from '../types';
-import { filedsSchema } from './filedsSchema';
 
 const schema = z.object({
 	id: filedsSchema.id,
