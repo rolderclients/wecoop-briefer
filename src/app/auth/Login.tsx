@@ -1,88 +1,81 @@
-import {
-	Button,
-	Center,
-	FocusTrap,
-	Group,
-	Paper,
-	PasswordInput,
-	Stack,
-	TextInput,
-} from '@mantine/core';
-import { hasLength, isNotEmpty, useForm } from '@mantine/form';
+/** biome-ignore-all lint/correctness/noChildrenProp: <> */
+import { Center, FocusTrap, Paper, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconLogin2 } from '@tabler/icons-react';
 import { useSearch } from '@tanstack/react-router';
-
+import z from 'zod/v4';
+import { blurOnError, filedsSchema, useAppForm } from '@/components';
 import { useAuth } from './Provider';
+
+const schema = z.object({
+	username: filedsSchema.username,
+	password: filedsSchema.password,
+});
+
+const defaultValues = {
+	username: '',
+	password: '',
+};
 
 export const Login = () => {
 	const { redirect } = useSearch({ from: '/auth/login' });
-	const { signIn, loading } = useAuth();
+	const { signIn } = useAuth();
 
-	const form = useForm({
-		mode: 'uncontrolled',
-		initialValues: { username: '', password: '' },
-		validate: {
-			username: isNotEmpty(),
-			password: hasLength(
-				{ min: 8 },
-				'Пароль должен содержать не менее 8 символов',
-			),
+	const form = useAppForm({
+		defaultValues,
+		validators: { onSubmit: schema },
+		onSubmitInvalid: blurOnError,
+		onSubmit: async ({ value }) => {
+			const result = await signIn({ ...value, redirect });
+
+			if (result) {
+				notifications.show({
+					message: result.message,
+					color: result.code === 'UNKNOWN_ERROR' ? 'red' : 'orange',
+				});
+			}
 		},
 	});
 
 	return (
 		<form
-			onSubmit={form.onSubmit(
-				async (values) => {
-					const result = await signIn({ ...values, redirect });
-
-					if (result) {
-						notifications.show({
-							message: result.message,
-							color: result.code === 'UNKNOWN_ERROR' ? 'red' : 'orange',
-						});
-					}
-				},
-				(errors) => {
-					const firstErrorPath = Object.keys(errors)[0];
-					form.getInputNode(firstErrorPath)?.focus();
-				},
-			)}
+			id="form"
+			onSubmit={(e) => {
+				e.preventDefault();
+				form.handleSubmit();
+			}}
 		>
 			<Center h="100vh">
 				<Paper withBorder p="xl" radius="md">
 					<Stack>
 						<FocusTrap>
 							<Stack miw={420}>
-								<TextInput
-									size="lg"
-									label="Логин"
-									placeholder="Введите логин"
-									key={form.key('username')}
-									{...form.getInputProps('username')}
+								<form.AppField
+									name="username"
+									children={(field) => (
+										<field.TextField
+											label="Логин"
+											placeholder="Введите логин"
+											size="lg"
+										/>
+									)}
 								/>
 
-								<PasswordInput
-									size="lg"
-									label="Пароль"
-									placeholder="Введите пароль"
-									key={form.key('password')}
-									{...form.getInputProps('password')}
+								<form.AppField
+									name="password"
+									children={(field) => <field.PassowrdField />}
 								/>
 							</Stack>
 						</FocusTrap>
 
-						<Group ml="auto" mt="lg">
-							<Button
+						<form.AppForm>
+							<form.SubmitButton
+								ml="auto"
+								mt="lg"
 								size="lg"
-								loading={loading}
 								leftSection={<IconLogin2 />}
-								type="submit"
-							>
-								Войти
-							</Button>
-						</Group>
+							/>
+						</form.AppForm>
 					</Stack>
 				</Paper>
 			</Center>

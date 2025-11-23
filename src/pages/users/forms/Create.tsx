@@ -4,10 +4,9 @@ import { IconPlus } from '@tabler/icons-react';
 //@ts-expect-error
 import generatePassword from 'omgopass';
 import z from 'zod/v4';
-import { blurOnError, useAppForm } from '@/components';
+import { blurOnError, filedsSchema, useAppForm } from '@/components';
 import { useUsers } from '../Provider';
 import type { CreateUser } from '../types';
-import { filedsSchema } from './filedsSchema';
 
 const schema = z.object({
 	name: filedsSchema.name,

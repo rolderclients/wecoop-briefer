@@ -2,10 +2,9 @@
 import { Group, Modal, Stack } from '@mantine/core';
 import { useEffect } from 'react';
 import z from 'zod/v4';
-import { blurOnError, useAppForm } from '@/components';
+import { blurOnError, filedsSchema, useAppForm } from '@/components';
 import { useUsers } from '../Provider';
 import type { EditUser } from '../types';
-import { filedsSchema } from './filedsSchema';
 
 const schema = z.object({
 	id: filedsSchema.id,
