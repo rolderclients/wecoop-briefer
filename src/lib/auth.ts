@@ -1,4 +1,4 @@
-import { APIError, betterAuth } from 'better-auth';
+import { betterAuth } from 'better-auth';
 import {
 	admin,
 	createAuthMiddleware,
@@ -7,7 +7,8 @@ import {
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { surql } from 'surrealdb';
 import { getDB, getDBFn } from '@/api';
-import { type AuthErrorCodes, ac, parseAuthError, roles } from '@/app';
+import { getDbSessionFn } from '@/api/db/session';
+import { type AuthErrorCodes, parseAuthError, roles } from '@/app';
 import { surrealAdapter } from './authDbAdapter/adapter';
 
 const username = process.env.AUTH_ROOT_USERNAME;
@@ -44,8 +45,22 @@ export const auth = betterAuth({
 			verify: async () => true,
 		},
 	},
-	plugins: [tanstackStartCookies(), admin({ ac, roles }), usernamePlugin()],
+	plugins: [
+		admin({
+			roles,
+			bannedUserMessage:
+				'Доступ к приложению заблокирован. Обратитесь к администратору.',
+		}),
+		usernamePlugin(),
+		tanstackStartCookies(),
+	],
 	database: surrealAdapter(db),
+	user: {
+		changeEmail: {
+			enabled: true,
+			updateEmailWithoutVerification: true,
+		},
+	},
 	session: {
 		cookieCache: {
 			enabled: true,
@@ -54,29 +69,34 @@ export const auth = betterAuth({
 	},
 	hooks: {
 		before: createAuthMiddleware(async (ctx) => {
-			if (ctx.path === '/sign-in/username') {
-				const db = await getDB();
+			const invalidateSession = async () => {
+				const dbSession = await getDbSessionFn(ctx.body.userId);
+				await dbSession.invalidate();
+			};
 
-				try {
+			try {
+				if (ctx.path === '/sign-in/username') {
+					const db = await getDB();
 					const { username, password } = ctx.body;
 					await db.signin({
 						access: 'user',
 						variables: { username, password },
 					});
-				} catch (error) {
-					const message = (error as Error).message;
-					const code = message.split(
-						'An error occurred: ',
-					)[1] as AuthErrorCodes;
-
-					const authError = parseAuthError(code, message);
-					throw new APIError('UNAUTHORIZED', { code, ...authError });
 				}
-			}
 
-			if (ctx.path === '/sign-out') {
-				const db = await getDB();
-				await db.invalidate();
+				if (ctx.path === '/sign-out') {
+					const db = await getDB();
+					await db.invalidate();
+				}
+
+				if (ctx.path === '/admin/set-user-password') await invalidateSession();
+				if (ctx.path === '/admin/set-role') await invalidateSession();
+				if (ctx.path === '/admin/ban-user') await invalidateSession();
+				if (ctx.path === '/admin/remove-user') await invalidateSession();
+			} catch (error) {
+				const message = (error as Error).message;
+				const code = message.split('An error occurred: ')[1] as AuthErrorCodes;
+				throw parseAuthError(code, message);
 			}
 		}),
 	},

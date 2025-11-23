@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForbiddenRouteImport } from './routes/auth/forbidden'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AuthedUsersRouteImport } from './routes/_authed/users'
 import { Route as AuthedTasksRouteImport } from './routes/_authed/tasks'
 import { Route as AuthedServicesRouteImport } from './routes/_authed/services'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -42,6 +43,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedUsersRoute = AuthedUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedTasksRoute = AuthedTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
@@ -62,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/services': typeof AuthedServicesRoute
   '/tasks': typeof AuthedTasksRoute
+  '/users': typeof AuthedUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/auth/forbidden': typeof AuthForbiddenRoute
   '/auth/login': typeof AuthLoginRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/services': typeof AuthedServicesRoute
   '/tasks': typeof AuthedTasksRoute
+  '/users': typeof AuthedUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/auth/forbidden': typeof AuthForbiddenRoute
   '/auth/login': typeof AuthLoginRoute
@@ -82,6 +90,7 @@ export interface FileRoutesById {
   '/_authed': typeof AuthedRouteWithChildren
   '/_authed/services': typeof AuthedServicesRoute
   '/_authed/tasks': typeof AuthedTasksRoute
+  '/_authed/users': typeof AuthedUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/auth/forbidden': typeof AuthForbiddenRoute
   '/auth/login': typeof AuthLoginRoute
@@ -93,6 +102,7 @@ export interface FileRouteTypes {
     | '/'
     | '/services'
     | '/tasks'
+    | '/users'
     | '/api/chat'
     | '/auth/forbidden'
     | '/auth/login'
@@ -102,6 +112,7 @@ export interface FileRouteTypes {
     | '/'
     | '/services'
     | '/tasks'
+    | '/users'
     | '/api/chat'
     | '/auth/forbidden'
     | '/auth/login'
@@ -112,6 +123,7 @@ export interface FileRouteTypes {
     | '/_authed'
     | '/_authed/services'
     | '/_authed/tasks'
+    | '/_authed/users'
     | '/api/chat'
     | '/auth/forbidden'
     | '/auth/login'
@@ -164,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/users': {
+      id: '/_authed/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AuthedUsersRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/tasks': {
       id: '/_authed/tasks'
       path: '/tasks'
@@ -191,11 +210,13 @@ declare module '@tanstack/react-router' {
 interface AuthedRouteChildren {
   AuthedServicesRoute: typeof AuthedServicesRoute
   AuthedTasksRoute: typeof AuthedTasksRoute
+  AuthedUsersRoute: typeof AuthedUsersRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedServicesRoute: AuthedServicesRoute,
   AuthedTasksRoute: AuthedTasksRoute,
+  AuthedUsersRoute: AuthedUsersRoute,
 }
 
 const AuthedRouteWithChildren =
