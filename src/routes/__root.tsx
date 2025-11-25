@@ -1,11 +1,12 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext } from '@tanstack/react-router';
-
-import { App, getUserFn } from '@/app';
+import { App, type User } from '@/app';
+import { getUserFn } from '@/app/auth/better';
 import appCss from '../styles.css?url';
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
+	user?: User;
 }>()({
 	beforeLoad: async () => {
 		const user = await getUserFn();

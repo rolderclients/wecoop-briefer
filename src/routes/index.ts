@@ -6,8 +6,8 @@ export const Route = createFileRoute('/')({
 
 		if (!role) {
 			throw redirect({
-				to: '/auth/login',
-				search: { redirect: location.href },
+				to: '/auth/signin',
+				search: { redirectPath: location.href },
 			});
 		} else if (location.pathname === '/') {
 			if (role === 'admin')

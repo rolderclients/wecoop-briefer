@@ -1,6 +1,6 @@
 import { createStart } from '@tanstack/react-start';
-import { localeTzMiddleware } from './app';
+import { localeMiddleware } from './app';
 
 export const startInstance = createStart(() => ({
-	requestMiddleware: [localeTzMiddleware],
+	requestMiddleware: [localeMiddleware],
 }));
