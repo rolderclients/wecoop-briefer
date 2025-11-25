@@ -1,12 +1,12 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { surql } from 'surrealdb';
-import { authMiddleware } from '@/app/auth/middleware';
+import type { Category, CreateCategory } from '@/app';
+// import { authMiddleware } from '@/app/auth/middleware';
 import { getDB } from '..';
-import type { Category } from '../types';
 
 const getCategoriesFn = createServerFn({ method: 'GET' })
-	.middleware([authMiddleware])
+	// .middleware([authMiddleware])
 	.handler(async () => {
 		const db = await getDB();
 
@@ -22,4 +22,13 @@ export const categoriesQueryOptions = () =>
 	queryOptions<Category[]>({
 		queryKey: ['categories'],
 		queryFn: getCategoriesFn,
+	});
+
+export const createCategoryFn = createServerFn({ method: 'POST' })
+	// .middleware([authMiddleware])
+	.inputValidator((data: CreateCategory) => data)
+	.handler(async ({ data }) => {
+		const db = await getDB();
+
+		await db.query(surql`CREATE category CONTENT ${data};`);
 	});

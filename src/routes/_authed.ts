@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
-import { menu } from '@/app';
+import { menu } from '@/app/shell';
 
 export const Route = createFileRoute('/_authed')({
 	beforeLoad: async ({ context, location }) => {
@@ -7,8 +7,8 @@ export const Route = createFileRoute('/_authed')({
 
 		if (!role) {
 			throw redirect({
-				to: '/auth/login',
-				search: { redirect: location.href },
+				to: '/auth/signin',
+				search: { redirectPath: location.href },
 			});
 		} else {
 			const hasAccess = menu.some(

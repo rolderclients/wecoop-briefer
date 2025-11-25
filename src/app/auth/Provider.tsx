@@ -1,5 +1,4 @@
 import { useRouteContext, useRouter } from '@tanstack/react-router';
-import type { UserWithRole } from 'better-auth/plugins';
 import {
 	createContext,
 	type ReactNode,
@@ -7,21 +6,21 @@ import {
 	useEffect,
 	useState,
 } from 'react';
-import { signIn, signOut, useSession } from './client';
-import type { AuthError } from './error';
+import { signIn, signOut, useSession } from './better';
+import { authErrorNotification, type ParsedAuthError } from './error';
+import type { User } from './types';
 
 export interface SignInProps {
 	username: string;
 	password: string;
-	redirect?: string;
+	redirectPath?: string;
 }
 
 type AuthContextType = {
-	user?: UserWithRole;
-	authed: boolean;
+	user?: User;
 	loading: boolean;
-	signIn: (data: SignInProps) => Promise<AuthError>;
-	signOut: () => Promise<AuthError>;
+	signIn: (data: SignInProps) => Promise<void>;
+	signOut: () => Promise<void>;
 	refetch: () => Promise<void>;
 };
 
@@ -30,35 +29,52 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const router = useRouter();
 	const { user: initialUser } = useRouteContext({ from: '__root__' });
-	const { data, isPending, isRefetching, refetch } = useSession();
+	const { data, isPending, isRefetching, refetch, error } = useSession();
 	const [loading, setLoading] = useState(true);
+	const [user, setUser] = useState(initialUser);
+
+	useEffect(() => {
+		setUser(data?.user as User);
+	}, [data?.user]);
 
 	useEffect(() => {
 		if (isPending || isRefetching) setLoading(true);
 		else setLoading(false);
 	}, [isPending, isRefetching]);
 
+	useEffect(() => {
+		if (error) {
+			const parsedError = error as ParsedAuthError;
+			if (parsedError) {
+				authErrorNotification(parsedError);
+				signOut();
+			}
+		}
+	}, [error]);
+
 	return (
 		<AuthContext.Provider
 			value={{
-				user: (data?.user as UserWithRole) || initialUser,
-				authed: Boolean((data?.user as UserWithRole) || initialUser),
+				user,
 				loading,
-				signIn: async ({ username, password, redirect: to }) => {
+				signIn: async ({ username, password, redirectPath: to }) => {
 					setLoading(true);
 					const { error } = await signIn.username({ username, password });
-					if (!error && to) router.navigate({ to, replace: true });
+					const parsedError = error as ParsedAuthError;
+					if (parsedError) authErrorNotification(parsedError);
+					else router.navigate({ to: to || '/', replace: true });
+
 					setTimeout(() => setLoading(false), 100);
-					return error;
 				},
 				signOut: async () => {
 					setLoading(true);
+
 					const { error } = await signOut();
-					setTimeout(() => {
-						setLoading(false);
-						router.invalidate({ sync: true });
-					}, 100);
-					return error;
+					const parsedError = error as ParsedAuthError;
+					if (parsedError) authErrorNotification(parsedError);
+					else router.navigate({ to: '/auth/signin', replace: true });
+
+					setTimeout(() => setLoading(false), 100);
 				},
 				refetch: () => refetch({ query: { disableCookieCache: true } }),
 			}}

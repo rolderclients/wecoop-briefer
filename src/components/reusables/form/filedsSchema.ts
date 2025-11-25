@@ -7,4 +7,5 @@ export const filedsSchema = {
 	role: z.enum(['manager', 'admin']),
 	username: z.string().min(3, 'Логин должен содержать не менее 3 символов'),
 	password: z.string().min(8, 'Пароль должен содержать не менее 8 символов'),
+	title: z.string().min(3, 'Название должно содержать не менее 3 символов'),
 };

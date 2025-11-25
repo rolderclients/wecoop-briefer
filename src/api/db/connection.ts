@@ -12,19 +12,18 @@ export const getDBFn = createServerOnlyFn(async (): Promise<Surreal> => {
 	const timeZone = getCookie('tz') || 'UTC';
 
 	const instance = new Surreal({
-		codecOptions: {
-			valueDecodeVisitor(value) {
-				if (value instanceof DateTime) {
-					return new Date(value.toDate()).toLocaleDateString(locale, {
-						hour: 'numeric',
-						minute: 'numeric',
-						timeZone,
-					});
-				}
-
-				return value;
-			},
-		},
+		// codecOptions: {
+		// 	valueDecodeVisitor(value) {
+		// 		if (value instanceof DateTime) {
+		// 			return new Date(value.toDate()).toLocaleDateString(locale, {
+		// 				hour: 'numeric',
+		// 				minute: 'numeric',
+		// 				timeZone,
+		// 			});
+		// 		}
+		// 		return value;
+		// 	},
+		// },
 	});
 
 	try {

@@ -7,24 +7,18 @@ import { getDBFn } from './connection';
 const sessions = new Map<string, SurrealSession>();
 
 export const getDbSessionFn = createServerOnlyFn(
-	async (userId?: string): Promise<SurrealSession> => {
+	async (inputSessionId?: string): Promise<SurrealSession> => {
 		const headers = getRequestHeaders();
 
-		let sessionUserId: string | undefined;
+		let sessionId = inputSessionId;
 
-		if (userId) {
-			const { sessions } = await auth.api.listUserSessions({
-				headers,
-				body: { userId },
-			});
-			sessionUserId = sessions?.[0]?.userId;
-		} else {
+		if (!sessionId) {
 			const s = await auth.api.getSession({ headers });
-			sessionUserId = s?.session?.userId;
+			sessionId = s?.session?.id;
 		}
 
-		if (sessionUserId && sessions.has(sessionUserId)) {
-			const dbSession = sessions.get(sessionUserId);
+		if (sessionId && sessions.has(sessionId)) {
+			const dbSession = sessions.get(sessionId);
 			if (dbSession) return dbSession;
 		}
 
@@ -33,8 +27,7 @@ export const getDbSessionFn = createServerOnlyFn(
 		const dbSession = await db.newSession();
 		await dbSession.use({ namespace: db.namespace, database: db.database });
 
-		if (sessionUserId && dbSession.session)
-			sessions.set(sessionUserId, dbSession);
+		if (sessionId) sessions.set(sessionId, dbSession);
 
 		return dbSession;
 	},

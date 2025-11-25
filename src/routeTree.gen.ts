@@ -11,10 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as AuthForbiddenRouteImport } from './routes/auth/forbidden'
-import { Route as ApiChatRouteImport } from './routes/api/chat'
-import { Route as AuthedUsersRouteImport } from './routes/_authed/users'
 import { Route as AuthedTasksRouteImport } from './routes/_authed/tasks'
 import { Route as AuthedServicesRouteImport } from './routes/_authed/services'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -28,25 +26,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/auth/login',
-  path: '/auth/login',
+const AuthSigninRoute = AuthSigninRouteImport.update({
+  id: '/auth/signin',
+  path: '/auth/signin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthForbiddenRoute = AuthForbiddenRouteImport.update({
   id: '/auth/forbidden',
   path: '/auth/forbidden',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthedUsersRoute = AuthedUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedTasksRoute = AuthedTasksRouteImport.update({
   id: '/tasks',
@@ -68,20 +56,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/services': typeof AuthedServicesRoute
   '/tasks': typeof AuthedTasksRoute
-  '/users': typeof AuthedUsersRoute
-  '/api/chat': typeof ApiChatRoute
   '/auth/forbidden': typeof AuthForbiddenRoute
-  '/auth/login': typeof AuthLoginRoute
+  '/auth/signin': typeof AuthSigninRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/services': typeof AuthedServicesRoute
   '/tasks': typeof AuthedTasksRoute
-  '/users': typeof AuthedUsersRoute
-  '/api/chat': typeof ApiChatRoute
   '/auth/forbidden': typeof AuthForbiddenRoute
-  '/auth/login': typeof AuthLoginRoute
+  '/auth/signin': typeof AuthSigninRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -90,10 +74,8 @@ export interface FileRoutesById {
   '/_authed': typeof AuthedRouteWithChildren
   '/_authed/services': typeof AuthedServicesRoute
   '/_authed/tasks': typeof AuthedTasksRoute
-  '/_authed/users': typeof AuthedUsersRoute
-  '/api/chat': typeof ApiChatRoute
   '/auth/forbidden': typeof AuthForbiddenRoute
-  '/auth/login': typeof AuthLoginRoute
+  '/auth/signin': typeof AuthSigninRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -102,20 +84,16 @@ export interface FileRouteTypes {
     | '/'
     | '/services'
     | '/tasks'
-    | '/users'
-    | '/api/chat'
     | '/auth/forbidden'
-    | '/auth/login'
+    | '/auth/signin'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/services'
     | '/tasks'
-    | '/users'
-    | '/api/chat'
     | '/auth/forbidden'
-    | '/auth/login'
+    | '/auth/signin'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -123,19 +101,16 @@ export interface FileRouteTypes {
     | '/_authed'
     | '/_authed/services'
     | '/_authed/tasks'
-    | '/_authed/users'
-    | '/api/chat'
     | '/auth/forbidden'
-    | '/auth/login'
+    | '/auth/signin'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
-  ApiChatRoute: typeof ApiChatRoute
   AuthForbiddenRoute: typeof AuthForbiddenRoute
-  AuthLoginRoute: typeof AuthLoginRoute
+  AuthSigninRoute: typeof AuthSigninRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -155,11 +130,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
+    '/auth/signin': {
+      id: '/auth/signin'
+      path: '/auth/signin'
+      fullPath: '/auth/signin'
+      preLoaderRoute: typeof AuthSigninRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/forbidden': {
@@ -168,20 +143,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/forbidden'
       preLoaderRoute: typeof AuthForbiddenRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authed/users': {
-      id: '/_authed/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof AuthedUsersRouteImport
-      parentRoute: typeof AuthedRoute
     }
     '/_authed/tasks': {
       id: '/_authed/tasks'
@@ -210,13 +171,11 @@ declare module '@tanstack/react-router' {
 interface AuthedRouteChildren {
   AuthedServicesRoute: typeof AuthedServicesRoute
   AuthedTasksRoute: typeof AuthedTasksRoute
-  AuthedUsersRoute: typeof AuthedUsersRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedServicesRoute: AuthedServicesRoute,
   AuthedTasksRoute: AuthedTasksRoute,
-  AuthedUsersRoute: AuthedUsersRoute,
 }
 
 const AuthedRouteWithChildren =
@@ -225,9 +184,8 @@ const AuthedRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
-  ApiChatRoute: ApiChatRoute,
   AuthForbiddenRoute: AuthForbiddenRoute,
-  AuthLoginRoute: AuthLoginRoute,
+  AuthSigninRoute: AuthSigninRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
