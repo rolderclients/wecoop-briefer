@@ -1,6 +1,6 @@
-import { getDbSessionFn } from './session';
+import { getDBFn } from './connection';
 
 export * from './connection';
 export * from './repositories';
 
-export const getDB = getDbSessionFn;
+export const getDB = getDBFn;

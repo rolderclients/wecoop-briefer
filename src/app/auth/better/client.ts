@@ -9,8 +9,6 @@ export const {
 	useSession,
 	revokeSessions,
 	$ERROR_CODES,
-} = createAuthClient({
-	plugins: [adminClient({ roles }), usernameClient()],
-});
+} = createAuthClient({ plugins: [adminClient({ roles }), usernameClient()] });
 
 export type BetterAuthErrorCodes = keyof typeof $ERROR_CODES;

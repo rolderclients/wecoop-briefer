@@ -7,16 +7,7 @@ export type AuthError = {
 	statusText: string;
 } | null;
 
-export type AllErrorCodes = Partial<
-	Record<
-		| BetterAuthErrorCodes
-		| 'INVALID_CREDENTIALS'
-		| 'BLOCKED'
-		| 'UNKNOWN_ERROR'
-		| 'DB_UNAUTHORIZED',
-		string
-	>
->;
+export type ErrorCodes = Partial<Record<BetterAuthErrorCodes, string>>;
 
 export type ParsedAuthError = {
 	message: string;

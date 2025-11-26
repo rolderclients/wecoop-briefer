@@ -15,6 +15,7 @@ import type {
 	CreateCategory,
 	CreateService,
 	Service,
+	UpdateCategory,
 	UpdateService,
 } from '@/app';
 import { Route } from '@/routes/_authed/services';
@@ -34,6 +35,12 @@ interface ServicesContext {
 		CreateCategory,
 		unknown
 	>;
+	updateCategoryMutation: UseMutationResult<
+		void,
+		Error,
+		UpdateCategory,
+		unknown
+	>;
 	selectedIds: string[];
 	setSelectedIds: (ids: string[]) => void;
 	archived?: boolean;
@@ -41,6 +48,8 @@ interface ServicesContext {
 	createOpened: boolean;
 	openCreate: () => void;
 	closeCreate: () => void;
+	isEditingCategory: boolean;
+	setIsEditingCategory: (editing: boolean) => void;
 }
 
 const ServicesContext = createContext<ServicesContext | null>(null);
@@ -49,6 +58,7 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const { archived: initialArchived } = useSearch({ from: Route.id });
 	const [archived, setArchived] = useState(initialArchived);
+	const [isEditingCategory, setIsEditingCategory] = useState(false);
 	const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
 	const { data: categoriesWithServices } = useSuspenseQuery(
 		categoriesWithServicesQueryOptions(initialArchived),
@@ -63,6 +73,7 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 		updateManyMutation,
 		deleteManyMutation,
 		createCategoryMutation,
+		updateCategoryMutation,
 	} = useMutations({ closeCreate });
 
 	const value = {
@@ -74,6 +85,7 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 		updateManyMutation,
 		deleteManyMutation,
 		createCategoryMutation,
+		updateCategoryMutation,
 		selectedIds,
 		setSelectedIds,
 		archived,
@@ -81,6 +93,8 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 		createOpened,
 		openCreate,
 		closeCreate,
+		isEditingCategory,
+		setIsEditingCategory,
 	};
 
 	return (

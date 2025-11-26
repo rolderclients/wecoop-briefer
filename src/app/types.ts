@@ -15,6 +15,11 @@ export interface CreateCategory {
 	title: string;
 }
 
+export interface UpdateCategory {
+	id: string;
+	title?: string;
+}
+
 export interface Service extends Item {
 	title: string;
 	category: string;

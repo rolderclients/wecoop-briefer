@@ -1,5 +1,5 @@
 import { createServerOnlyFn } from '@tanstack/react-start';
-import { type RecordId, StringRecordId, surql } from 'surrealdb';
+import { type RecordId, StringRecordId } from 'surrealdb';
 import { getDB } from '.';
 
 let tableNames: string[] = [];
@@ -11,7 +11,7 @@ export const getTableNamesFn = createServerOnlyFn(
 		const db = await getDB();
 
 		try {
-			const [result] = await db.query(surql`$tableNames`).collect<[string[]]>();
+			const result = await db.run<string[]>('fn::tableNames');
 
 			tableNames = result;
 

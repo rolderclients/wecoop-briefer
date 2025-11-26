@@ -7,12 +7,10 @@ import type {
 	Service,
 	UpdateService,
 } from '@/app';
-// import { authMiddleware } from '@/app/auth/middleware';
 import { getDB } from '..';
 import { fromDTO, fromDTOs } from '../utils';
 
 const getServicesFn = createServerFn({ method: 'GET' })
-	// .middleware([authMiddleware])
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
 		const db = await getDB();
@@ -35,7 +33,6 @@ export const servicesQueryOptions = (archived?: boolean) =>
 	});
 
 const getCategoriesWithServicesFn = createServerFn({ method: 'GET' })
-	// .middleware([authMiddleware])
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
 		const db = await getDB();
@@ -66,7 +63,6 @@ export const categoriesWithServicesQueryOptions = (archived?: boolean) =>
 	});
 
 export const createServiceFn = createServerFn({ method: 'POST' })
-	// .middleware([authMiddleware])
 	.inputValidator((data: CreateService) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
@@ -76,7 +72,6 @@ export const createServiceFn = createServerFn({ method: 'POST' })
 	});
 
 export const updateServiceFn = createServerFn({ method: 'POST' })
-	// .middleware([authMiddleware])
 	.inputValidator((data: UpdateService) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
@@ -86,7 +81,6 @@ export const updateServiceFn = createServerFn({ method: 'POST' })
 	});
 
 export const updateServicesFn = createServerFn({ method: 'POST' })
-	// .middleware([authMiddleware])
 	.inputValidator((data: UpdateService[]) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
@@ -98,7 +92,6 @@ export const updateServicesFn = createServerFn({ method: 'POST' })
 	});
 
 export const deleteServicesFn = createServerFn({ method: 'POST' })
-	// .middleware([authMiddleware])
 	.inputValidator((data: string[]) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();

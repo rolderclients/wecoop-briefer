@@ -5,7 +5,7 @@ import { useAuth } from '../auth';
 import { Navbar } from './Navbar';
 
 export const Shell = () => {
-	const { user } = useAuth();
+	const { authed } = useAuth();
 
 	return (
 		<AppShell
@@ -13,7 +13,7 @@ export const Shell = () => {
 				width: 160,
 				breakpoint: 0,
 			}}
-			disabled={!user || !!user?.banned}
+			disabled={!authed}
 		>
 			<Navbar />
 

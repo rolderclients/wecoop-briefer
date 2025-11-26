@@ -1,13 +1,16 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <> */
 import {
+	ActionIcon,
 	Combobox,
 	Group,
 	InputBase,
+	Loader,
 	Modal,
 	Stack,
+	Text,
 	useCombobox,
 } from '@mantine/core';
-import { IconPlus } from '@tabler/icons-react';
+import { IconCheck, IconEdit, IconPlus, IconX } from '@tabler/icons-react';
 import { useState } from 'react';
 import z from 'zod/v4';
 import type { CreateService } from '@/app';
@@ -32,6 +35,7 @@ export const Create = () => {
 		createOpened,
 		openCreate,
 		closeCreate,
+		isEditingCategory,
 	} = useServices();
 
 	const form = useAppForm({
@@ -59,6 +63,7 @@ export const Create = () => {
 			<Modal
 				opened={createOpened}
 				onClose={closeCreate}
+				closeOnEscape={!isEditingCategory}
 				centered
 				title="Добавление услуги"
 				padding="lg"
@@ -102,23 +107,23 @@ export const Create = () => {
 	);
 };
 
-// const groceries = [
-// 	'🍎 Apples',
-// 	'🍌 Bananas',
-// 	'🥦 Broccoli',
-// 	'🥕 Carrots',
-// 	'🍫 Chocolate',
-// 	'🍇 Grapes',
-// ];
-
 const CreateNewService = () => {
-	const { categories, createCategoryMutation } = useServices();
+	const {
+		categories,
+		createCategoryMutation,
+		updateCategoryMutation,
+		isEditingCategory,
+		setIsEditingCategory,
+	} = useServices();
+	const [creating, setCreating] = useState(false);
+	const [editingId, setEditingId] = useState<string | null>(null);
+	const [editingText, setEditingText] = useState('');
+	const [editingLoading, setEditingLoading] = useState(false);
 
 	const combobox = useCombobox({
 		onDropdownClose: () => combobox.resetSelectedOption(),
 	});
 
-	// const [data, setData] = useState(groceries);
 	const [value, setValue] = useState<string | null>(null);
 	const [search, setSearch] = useState('');
 
@@ -129,9 +134,56 @@ const CreateNewService = () => {
 				item.title.toLowerCase().includes(search.toLowerCase().trim()),
 			);
 
+	const handleStartEdit = (item: { id: string; title: string }) => {
+		setEditingId(item.id);
+		setEditingText(item.title);
+		setIsEditingCategory(true);
+		setSearch(item.title);
+		combobox.closeDropdown();
+	};
+
+	const handleSaveEdit = async () => {
+		if (editingId && editingText.trim()) {
+			setEditingLoading(true);
+			await updateCategoryMutation.mutateAsync({
+				id: editingId,
+				title: editingText,
+			});
+			setEditingLoading(false);
+			setValue(editingText);
+			setSearch(editingText);
+		}
+		setEditingId(null);
+		setEditingText('');
+		setIsEditingCategory(false);
+	};
+
+	const handleCancelEdit = () => {
+		const originalTitle =
+			categories.find((c) => c.id === editingId)?.title || '';
+		setValue(originalTitle);
+		setSearch(originalTitle);
+		setEditingId(null);
+		setEditingText('');
+		setIsEditingCategory(false);
+	};
+
 	const options = filteredOptions.map((item) => (
 		<Combobox.Option value={item.title} key={item.id}>
-			{item.title}
+			<Group gap={8} justify="space-between">
+				<Text inline size="sm">
+					{item.title}
+				</Text>
+				<ActionIcon
+					size="sm"
+					onClick={(e) => {
+						e.stopPropagation();
+						handleStartEdit(item);
+					}}
+				>
+					<IconEdit size={16} />
+				</ActionIcon>
+			</Group>
 		</Combobox.Option>
 	));
 
@@ -141,9 +193,10 @@ const CreateNewService = () => {
 			withinPortal={true}
 			onOptionSubmit={async (val) => {
 				if (val === '$create') {
-					// setData((current) => [...current, search]);
+					setCreating(true);
 					await createCategoryMutation.mutateAsync({ title: search });
 					setValue(search);
+					setCreating(false);
 				} else {
 					setValue(val);
 					setSearch(val);
@@ -154,21 +207,65 @@ const CreateNewService = () => {
 		>
 			<Combobox.Target>
 				<InputBase
-					rightSection={<Combobox.Chevron />}
-					value={search}
+					rightSection={
+						creating || editingLoading ? (
+							<Loader size="sm" />
+						) : isEditingCategory ? (
+							<Group gap={4} wrap="nowrap">
+								<ActionIcon size="sm" color="green" onClick={handleSaveEdit}>
+									<IconCheck size={16} />
+								</ActionIcon>
+								<ActionIcon size="sm" color="red" onClick={handleCancelEdit}>
+									<IconX size={16} />
+								</ActionIcon>
+							</Group>
+						) : (
+							<Combobox.Chevron />
+						)
+					}
+					rightSectionWidth={
+						isEditingCategory && !editingLoading ? 64 : undefined
+					}
+					value={isEditingCategory ? editingText : search}
 					onChange={(event) => {
-						combobox.openDropdown();
-						combobox.updateSelectedOptionIndex();
-						setSearch(event.currentTarget.value);
+						if (isEditingCategory) {
+							setEditingText(event.currentTarget.value);
+						} else {
+							combobox.openDropdown();
+							combobox.updateSelectedOptionIndex();
+							setSearch(event.currentTarget.value);
+						}
 					}}
-					onClick={() => combobox.openDropdown()}
-					onFocus={() => combobox.openDropdown()}
+					onKeyDown={
+						isEditingCategory
+							? (e) => {
+									if (e.key === 'Enter') {
+										e.preventDefault();
+										e.stopPropagation();
+										handleSaveEdit();
+									} else if (e.key === 'Escape') {
+										e.preventDefault();
+										e.stopPropagation();
+										handleCancelEdit();
+									}
+								}
+							: undefined
+					}
+					onClick={() => !isEditingCategory && combobox.openDropdown()}
+					onFocus={() => !isEditingCategory && combobox.openDropdown()}
 					onBlur={() => {
-						combobox.closeDropdown();
-						setSearch(value || '');
+						if (!isEditingCategory) {
+							combobox.closeDropdown();
+							setSearch(value || '');
+						}
 					}}
-					placeholder="Search value"
-					rightSectionPointerEvents="none"
+					label="Категория"
+					placeholder={
+						isEditingCategory
+							? 'Редактирование категории...'
+							: 'Выберите категорию'
+					}
+					rightSectionPointerEvents={isEditingCategory ? 'auto' : 'none'}
 				/>
 			</Combobox.Target>
 
@@ -177,7 +274,12 @@ const CreateNewService = () => {
 					{options}
 					{!exactOptionMatch && search.trim().length > 0 && (
 						<Combobox.Option value="$create">
-							+ Создать {search}
+							<Group gap={8}>
+								<IconPlus size={16} />
+								<Text inline size="sm">
+									Создать категорию "{search}"
+								</Text>
+							</Group>
 						</Combobox.Option>
 					)}
 				</Combobox.Options>

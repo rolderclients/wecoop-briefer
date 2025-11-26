@@ -4,10 +4,16 @@ import {
 	createCategoryFn,
 	createServiceFn,
 	deleteServicesFn,
+	updateCategoryFn,
 	updateServiceFn,
 	updateServicesFn,
 } from '@/api';
-import type { CreateCategory, CreateService, UpdateService } from '@/app';
+import type {
+	CreateCategory,
+	CreateService,
+	UpdateCategory,
+	UpdateService,
+} from '@/app';
 
 export const useMutations = ({ closeCreate }: { closeCreate: () => void }) => {
 	const queryClient = useQueryClient();
@@ -85,11 +91,25 @@ export const useMutations = ({ closeCreate }: { closeCreate: () => void }) => {
 		},
 	});
 
+	const updateCategoryMutation = useMutation<void, Error, UpdateCategory>({
+		mutationFn: (data) => updateCategoryFn({ data }),
+		onSettled: (_, error, vars) => {
+			if (!error)
+				queryClient.invalidateQueries({ queryKey: ['categories'] }).then(() => {
+					notifications.show({
+						message: `Категория "${vars.title}" обновлена`,
+						color: 'green',
+					});
+				});
+		},
+	});
+
 	return {
 		createMutation,
 		updateMutation,
 		updateManyMutation,
 		deleteManyMutation,
 		createCategoryMutation,
+		updateCategoryMutation,
 	};
 };
