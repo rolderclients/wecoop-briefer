@@ -43,6 +43,8 @@ interface ServicesContext {
 	>;
 	selectedIds: string[];
 	setSelectedIds: (ids: string[]) => void;
+	selectedService: Service | null;
+	setSelectedService: (service: Service | null) => void;
 	isArchived?: boolean;
 	setIsArchived: (archived: boolean) => void;
 	isCreateOpened: boolean;
@@ -50,21 +52,28 @@ interface ServicesContext {
 	closeCreate: () => void;
 	isEditingCategory: boolean;
 	setIsEditingCategory: (editing: boolean) => void;
+	isEditingOpened: boolean;
+	openEdit: () => void;
+	closeEdit: () => void;
 }
 
 const ServicesContext = createContext<ServicesContext | null>(null);
 
 export const ServicesProvider = ({ children }: { children: ReactNode }) => {
-	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const { archived: initialArchived } = useSearch({ from: Route.id });
-	const [isArchived, setIsArchived] = useState(initialArchived);
-	const [isEditingCategory, setIsEditingCategory] = useState(false);
 	const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
 	const { data: categoriesWithServices } = useSuspenseQuery(
 		categoriesWithServicesQueryOptions(initialArchived),
 	);
 
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
+	const [selectedService, setSelectedService] = useState<Service | null>(null);
+	const [isArchived, setIsArchived] = useState(initialArchived);
+	const [isEditingCategory, setIsEditingCategory] = useState(false);
+
 	const [isCreateOpened, { open: openCreate, close: closeCreate }] =
+		useDisclosure(false);
+	const [isEditingOpened, { open: openEdit, close: closeEdit }] =
 		useDisclosure(false);
 
 	const {
@@ -88,6 +97,8 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 		updateCategoryMutation,
 		selectedIds,
 		setSelectedIds,
+		selectedService,
+		setSelectedService,
 		isArchived,
 		setIsArchived,
 		isCreateOpened,
@@ -95,6 +106,9 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 		closeCreate,
 		isEditingCategory,
 		setIsEditingCategory,
+		isEditingOpened,
+		openEdit,
+		closeEdit,
 	};
 
 	return (

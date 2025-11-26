@@ -41,10 +41,10 @@ export const useMutations = ({ closeCreate }: { closeCreate: () => void }) => {
 				queryClient
 					.invalidateQueries({ queryKey: ['categoriesWithServices'] })
 					.then(() => {
-						// notifications.show({
-						// 	message: `Учетная запись сотрудника "${vars.name}" добавлена`,
-						// 	color: 'green',
-						// });
+						notifications.show({
+							message: `Услуга "${vars.title}" обновлена`,
+							color: 'green',
+						});
 					});
 		},
 	});
