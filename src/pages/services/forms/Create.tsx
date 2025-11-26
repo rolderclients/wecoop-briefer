@@ -31,7 +31,9 @@ export const Create = () => {
 		defaultValues,
 		validators: { onSubmit: schema },
 		onSubmitInvalid: blurOnError,
-		onSubmit: ({ value }) => createMutation.mutateAsync(value),
+		onSubmit: async ({ value }) => {
+			await createMutation.mutateAsync(value);
+		},
 	});
 
 	return (

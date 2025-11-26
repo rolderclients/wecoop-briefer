@@ -4,6 +4,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { Route } from '@/routes/_authed/services';
 import { Create } from '../forms';
 import { useServices } from '../provider';
+import { ArchivateRestoreDelete } from './ArchivateRestoreDelete';
 
 export const Panel = () => {
 	const navigate = useNavigate({ from: Route.fullPath });
@@ -26,7 +27,7 @@ export const Panel = () => {
 						}}
 					/>
 
-					{/*{archived ? (
+					{isArchived ? (
 						<Group wrap="nowrap">
 							<ArchivateRestoreDelete
 								type="restore"
@@ -46,7 +47,7 @@ export const Panel = () => {
 							label="Архивировать"
 							icon={IconArchive}
 						/>
-					)}*/}
+					)}
 				</Group>
 
 				<Create />
