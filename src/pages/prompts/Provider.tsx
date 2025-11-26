@@ -22,7 +22,7 @@ import type {
 	ServiceWithPrompts,
 	UpdatePrompt,
 } from '@/app';
-import { useQueryWithInvalidate } from '@/components';
+import { useMutaitionWithInvalidate } from '@/components';
 import { Route } from '@/routes/_authed/prompts';
 
 interface PromptsContext {
@@ -67,19 +67,22 @@ export const PromptsProvider = ({ children }: { children: ReactNode }) => {
 	const [isEditingOpened, { open: openEdit, close: closeEdit }] =
 		useDisclosure(false);
 
-	const createMutation = useQueryWithInvalidate<CreatePrompt>(createPromptFn, [
-		'servicesWithPrompts',
-	]);
-	const updateMutation = useQueryWithInvalidate<UpdatePrompt>(updatePromptFn, [
-		'servicesWithPrompts',
-	]);
-	const updateManyMutation = useQueryWithInvalidate<UpdatePrompt[]>(
+	const createMutation = useMutaitionWithInvalidate<CreatePrompt>(
+		createPromptFn,
+		['servicesWithPrompts'],
+	);
+	const updateMutation = useMutaitionWithInvalidate<UpdatePrompt>(
+		updatePromptFn,
+		['servicesWithPrompts'],
+	);
+	const updateManyMutation = useMutaitionWithInvalidate<UpdatePrompt[]>(
 		updatePromptsFn,
 		['servicesWithPrompts'],
 	);
-	const deleteManyMutation = useQueryWithInvalidate<string[]>(deletePromptsFn, [
-		'servicesWithPrompts',
-	]);
+	const deleteManyMutation = useMutaitionWithInvalidate<string[]>(
+		deletePromptsFn,
+		['servicesWithPrompts'],
+	);
 
 	const value = {
 		services,

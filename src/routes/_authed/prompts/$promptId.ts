@@ -1,7 +1,7 @@
 import tiptapCss from '@mantine/tiptap/styles.css?url';
 import { createFileRoute } from '@tanstack/react-router';
 import { promptQueryOptions } from '@/api';
-// import { PromptPage } from '@/pages';
+import { PromptPage } from '@/pages';
 
 export const Route = createFileRoute('/_authed/prompts/$promptId')({
 	loader: async ({ context, params: { promptId } }) => {
@@ -15,5 +15,5 @@ export const Route = createFileRoute('/_authed/prompts/$promptId')({
 			},
 		],
 	}),
-	// component: PromptPage,
+	component: PromptPage,
 });

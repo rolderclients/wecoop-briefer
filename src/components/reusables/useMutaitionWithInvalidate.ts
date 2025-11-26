@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export const useQueryWithInvalidate = <T>(
+export const useMutaitionWithInvalidate = <T>(
 	fn: ({ data }: { data: T }) => Promise<void>,
 	queryKey: string[],
 ) => {
