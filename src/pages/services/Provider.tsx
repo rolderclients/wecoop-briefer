@@ -43,9 +43,9 @@ interface ServicesContext {
 	>;
 	selectedIds: string[];
 	setSelectedIds: (ids: string[]) => void;
-	archived?: boolean;
-	setArchived: (archived: boolean) => void;
-	createOpened: boolean;
+	isArchived?: boolean;
+	setIsArchived: (archived: boolean) => void;
+	isCreateOpened: boolean;
 	openCreate: () => void;
 	closeCreate: () => void;
 	isEditingCategory: boolean;
@@ -57,14 +57,14 @@ const ServicesContext = createContext<ServicesContext | null>(null);
 export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const { archived: initialArchived } = useSearch({ from: Route.id });
-	const [archived, setArchived] = useState(initialArchived);
+	const [isArchived, setIsArchived] = useState(initialArchived);
 	const [isEditingCategory, setIsEditingCategory] = useState(false);
 	const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
 	const { data: categoriesWithServices } = useSuspenseQuery(
 		categoriesWithServicesQueryOptions(initialArchived),
 	);
 
-	const [createOpened, { open: openCreate, close: closeCreate }] =
+	const [isCreateOpened, { open: openCreate, close: closeCreate }] =
 		useDisclosure(false);
 
 	const {
@@ -88,9 +88,9 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 		updateCategoryMutation,
 		selectedIds,
 		setSelectedIds,
-		archived,
-		setArchived,
-		createOpened,
+		isArchived,
+		setIsArchived,
+		isCreateOpened,
 		openCreate,
 		closeCreate,
 		isEditingCategory,

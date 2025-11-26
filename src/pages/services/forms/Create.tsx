@@ -11,15 +11,20 @@ import {
 	useCombobox,
 } from '@mantine/core';
 import { IconCheck, IconEdit, IconPlus, IconX } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import z from 'zod/v4';
 import type { CreateService } from '@/app';
-import { blurOnError, filedsSchema, useAppForm } from '@/components';
+import {
+	blurOnError,
+	filedsSchema,
+	useAppForm,
+	useFieldContext,
+} from '@/components';
 import { useServices } from '../Provider';
 
 const schema = z.object({
 	title: filedsSchema.title,
-	category: z.string(),
+	category: z.string().min(1, 'Категория обязательна'),
 });
 
 const defaultValues: CreateService = {
@@ -29,10 +34,9 @@ const defaultValues: CreateService = {
 
 export const Create = () => {
 	const {
-		categories,
 		createMutation,
-		archived,
-		createOpened,
+		isArchived,
+		isCreateOpened,
 		openCreate,
 		closeCreate,
 		isEditingCategory,
@@ -51,7 +55,7 @@ export const Create = () => {
 				<form.SubscribeButton
 					label="Добавить"
 					ml="auto"
-					disabled={archived}
+					disabled={isArchived}
 					leftSection={<IconPlus size={20} />}
 					onClick={() => {
 						form.reset();
@@ -61,7 +65,7 @@ export const Create = () => {
 			</form.AppForm>
 
 			<Modal
-				opened={createOpened}
+				opened={isCreateOpened}
 				onClose={closeCreate}
 				closeOnEscape={!isEditingCategory}
 				centered
@@ -85,7 +89,7 @@ export const Create = () => {
 
 						<form.AppField
 							name="category"
-							children={(field) => <CreateNewService />}
+							children={() => <CreateNewService />}
 						/>
 
 						<Group ml="auto" mt="lg">
@@ -108,6 +112,7 @@ export const Create = () => {
 };
 
 const CreateNewService = () => {
+	const field = useFieldContext<string>();
 	const {
 		categories,
 		createCategoryMutation,
@@ -115,10 +120,6 @@ const CreateNewService = () => {
 		isEditingCategory,
 		setIsEditingCategory,
 	} = useServices();
-	const [creating, setCreating] = useState(false);
-	const [editingId, setEditingId] = useState<string | null>(null);
-	const [editingText, setEditingText] = useState('');
-	const [editingLoading, setEditingLoading] = useState(false);
 
 	const combobox = useCombobox({
 		onDropdownClose: () => combobox.resetSelectedOption(),
@@ -126,6 +127,10 @@ const CreateNewService = () => {
 
 	const [value, setValue] = useState<string | null>(null);
 	const [search, setSearch] = useState('');
+	const [creating, setCreating] = useState(false);
+	const [editingId, setEditingId] = useState<string | null>(null);
+	const [editingText, setEditingText] = useState('');
+	const [editingLoading, setEditingLoading] = useState(false);
 
 	const exactOptionMatch = categories.some((item) => item.title === search);
 	const filteredOptions = exactOptionMatch
@@ -134,13 +139,16 @@ const CreateNewService = () => {
 				item.title.toLowerCase().includes(search.toLowerCase().trim()),
 			);
 
-	const handleStartEdit = (item: { id: string; title: string }) => {
-		setEditingId(item.id);
-		setEditingText(item.title);
-		setIsEditingCategory(true);
-		setSearch(item.title);
-		combobox.closeDropdown();
-	};
+	const handleStartEdit = useCallback(
+		(item: { id: string; title: string }) => {
+			setEditingId(item.id);
+			setEditingText(item.title);
+			setIsEditingCategory(true);
+			setSearch(item.title);
+			combobox.closeDropdown();
+		},
+		[setIsEditingCategory, combobox],
+	);
 
 	const handleSaveEdit = async () => {
 		if (editingId && editingText.trim()) {
@@ -152,6 +160,11 @@ const CreateNewService = () => {
 			setEditingLoading(false);
 			setValue(editingText);
 			setSearch(editingText);
+			// Update form with category ID
+			const updatedCategory = categories.find((c) => c.id === editingId);
+			if (updatedCategory) {
+				field.handleChange(updatedCategory.id);
+			}
 		}
 		setEditingId(null);
 		setEditingText('');
@@ -159,14 +172,48 @@ const CreateNewService = () => {
 	};
 
 	const handleCancelEdit = () => {
-		const originalTitle =
-			categories.find((c) => c.id === editingId)?.title || '';
-		setValue(originalTitle);
-		setSearch(originalTitle);
+		const originalCategory = categories.find((c) => c.id === editingId);
+		if (originalCategory) {
+			setValue(originalCategory.title);
+			setSearch(originalCategory.title);
+			field.handleChange(originalCategory.id);
+		}
 		setEditingId(null);
 		setEditingText('');
 		setIsEditingCategory(false);
 	};
+
+	// Handle keyboard shortcuts for editing
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			// Only handle shortcuts when not already editing and dropdown is closed
+			if (!isEditingCategory && !combobox.dropdownOpened) {
+				if (
+					(e.key === 'F2' || (e.ctrlKey && e.key === 'Enter')) &&
+					exactOptionMatch
+				) {
+					e.preventDefault();
+					// Find the category that matches the current search
+					const categoryToEdit = categories.find((c) => c.title === search);
+					if (categoryToEdit) {
+						handleStartEdit(categoryToEdit);
+					}
+				}
+			}
+		};
+
+		document.addEventListener('keydown', handleKeyDown);
+		return () => {
+			document.removeEventListener('keydown', handleKeyDown);
+		};
+	}, [
+		isEditingCategory,
+		combobox.dropdownOpened,
+		categories,
+		search,
+		exactOptionMatch,
+		handleStartEdit,
+	]);
 
 	const options = filteredOptions.map((item) => (
 		<Combobox.Option value={item.title} key={item.id}>
@@ -176,12 +223,13 @@ const CreateNewService = () => {
 				</Text>
 				<ActionIcon
 					size="sm"
+					variant="default"
 					onClick={(e) => {
 						e.stopPropagation();
 						handleStartEdit(item);
 					}}
 				>
-					<IconEdit size={16} />
+					<IconEdit size={16} strokeWidth={1.5} />
 				</ActionIcon>
 			</Group>
 		</Combobox.Option>
@@ -196,10 +244,16 @@ const CreateNewService = () => {
 					setCreating(true);
 					await createCategoryMutation.mutateAsync({ title: search });
 					setValue(search);
+					field.handleChange(search);
 					setCreating(false);
 				} else {
-					setValue(val);
-					setSearch(val);
+					// Find category by title and set its ID
+					const selectedCategory = categories.find((c) => c.title === val);
+					if (selectedCategory) {
+						setValue(val);
+						setSearch(val);
+						field.handleChange(selectedCategory.id);
+					}
 				}
 
 				combobox.closeDropdown();
@@ -211,7 +265,7 @@ const CreateNewService = () => {
 						creating || editingLoading ? (
 							<Loader size="sm" />
 						) : isEditingCategory ? (
-							<Group gap={4} wrap="nowrap">
+							<Group gap={8} wrap="nowrap">
 								<ActionIcon size="sm" color="green" onClick={handleSaveEdit}>
 									<IconCheck size={16} />
 								</ActionIcon>
@@ -224,9 +278,13 @@ const CreateNewService = () => {
 						)
 					}
 					rightSectionWidth={
-						isEditingCategory && !editingLoading ? 64 : undefined
+						isEditingCategory && !editingLoading ? 68 : undefined
 					}
 					value={isEditingCategory ? editingText : search}
+					error={
+						field.state.meta.errors.map((err) => err.message).join(', ') ||
+						undefined
+					}
 					onChange={(event) => {
 						if (isEditingCategory) {
 							setEditingText(event.currentTarget.value);
@@ -256,7 +314,19 @@ const CreateNewService = () => {
 					onBlur={() => {
 						if (!isEditingCategory) {
 							combobox.closeDropdown();
-							setSearch(value || '');
+							if (exactOptionMatch) {
+								// If there's an exact match, update form field with category ID
+								const matchedCategory = categories.find(
+									(c) => c.title === search,
+								);
+								if (matchedCategory) {
+									field.handleChange(matchedCategory.id);
+								}
+								setSearch(value || search);
+							} else {
+								setSearch(value || '');
+								field.handleChange('');
+							}
 						}
 					}}
 					label="Категория"

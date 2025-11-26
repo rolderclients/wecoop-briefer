@@ -8,7 +8,7 @@ import { useServices } from './Provider';
 export const Panel = () => {
 	const navigate = useNavigate({ from: Route.fullPath });
 
-	const { setSelectedIds, archived, setArchived } = useServices();
+	const { setSelectedIds, isArchived, setIsArchived } = useServices();
 
 	return (
 		<Paper radius="md" withBorder py="sm" px="md">
@@ -16,9 +16,9 @@ export const Panel = () => {
 				<Group wrap="nowrap">
 					<Switch
 						label="Архив"
-						checked={archived}
+						checked={isArchived}
 						onChange={(e) => {
-							setArchived(e.currentTarget.checked);
+							setIsArchived(e.currentTarget.checked);
 							navigate({
 								search: () => ({ archived: e.currentTarget.checked }),
 							});
