@@ -3,7 +3,7 @@ import { IconCancel, IconCheck } from '@tabler/icons-react';
 
 export const ConfirmModal = ({
 	content = 'Уверены?',
-	label,
+	buttonLabel,
 	color,
 	opened,
 	onClose,
@@ -11,7 +11,7 @@ export const ConfirmModal = ({
 	loading,
 }: {
 	content?: string;
-	label: string;
+	buttonLabel: string;
 	color?: MantineColor;
 	opened: boolean;
 	onClose: () => void;
@@ -19,7 +19,7 @@ export const ConfirmModal = ({
 	loading?: boolean;
 }) => {
 	return (
-		<Modal opened={opened} onClose={onClose} centered withCloseButton={false}>
+		<Modal opened={opened} onClose={onClose} withCloseButton={false}>
 			<Group>
 				<Text>{content}</Text>
 
@@ -41,7 +41,7 @@ export const ConfirmModal = ({
 					leftSection={<IconCheck size={16} />}
 					loading={loading}
 				>
-					{label}
+					{buttonLabel}
 				</Button>
 			</Group>
 		</Modal>
