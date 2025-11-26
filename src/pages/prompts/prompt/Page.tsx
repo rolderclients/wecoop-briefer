@@ -4,7 +4,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import { promptQueryOptions, updatePromptFn } from '@/api';
 import type { UpdatePrompt } from '@/app';
-import { useMutaitionWithInvalidate } from '@/components';
+import { SimpleEditor, useMutaitionWithInvalidate } from '@/components';
 import { Route } from '@/routes/_authed/prompts/$promptId';
 
 export const PromptPage = () => {
@@ -25,11 +25,11 @@ export const PromptPage = () => {
 		<Stack pb="xl" pt="lg">
 			<Title>{prompt.title}</Title>
 
-			{/*<SimpleEditor
+			<SimpleEditor
 				initialContent={prompt.content}
 				onChange={debouncedUpdate}
 				saving={status === 'pending'}
-			/>*/}
+			/>
 		</Stack>
 	);
 };
