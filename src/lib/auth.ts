@@ -1,6 +1,5 @@
 import { betterAuth } from 'better-auth';
 import { admin, username as usernamePlugin } from 'better-auth/plugins';
-import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { getDB } from '@/api';
 import { roles } from '@/app/auth/better';
 import { surrealAdapter } from './authDbAdapter/adapter';
@@ -18,7 +17,6 @@ export const auth = betterAuth({
 				'Доступ к приложению заблокирован. Обратитесь к администратору.',
 		}),
 		usernamePlugin(),
-		tanstackStartCookies(),
 	],
 	database: surrealAdapter(db),
 	user: {

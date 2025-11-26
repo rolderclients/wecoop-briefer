@@ -5,7 +5,7 @@ import { roles } from './permissions';
 export const {
 	signIn,
 	signOut,
-	signUp,
+	admin,
 	useSession,
 	revokeSessions,
 	$ERROR_CODES,
