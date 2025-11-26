@@ -2,10 +2,10 @@ DEFINE NAMESPACE IF NOT EXISTS dev;
 DEFINE DATABASE IF NOT EXISTS data STRICT;
 
 // Tables
+DEFINE FUNCTION OVERWRITE fn::tableNames() { object::keys((INFO FOR DATABASE).tables) } PERMISSIONS FULL;
 
 // Category
-DEFINE TABLE OVERWRITE category TYPE NORMAL SCHEMAFULL PERMISSIONS
-	FOR select, create, update, delete WHERE $auth.role IN ['admin'];
+DEFINE TABLE OVERWRITE category TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
 DEFINE FIELD OVERWRITE title ON category TYPE string;
 DEFINE FIELD OVERWRITE services ON category COMPUTED <~service;
 DEFINE FIELD OVERWRITE time ON category TYPE object DEFAULT { created: datetime, updated: datetime };
@@ -13,15 +13,15 @@ DEFINE FIELD OVERWRITE time.created ON category TYPE datetime DEFAULT time::now(
 DEFINE FIELD OVERWRITE time.updated ON category TYPE datetime VALUE time::now();
 
 // Service
--- DEFINE TABLE OVERWRITE service TYPE NORMAL SCHEMAFULL;
--- DEFINE FIELD OVERWRITE title ON service TYPE string;
--- DEFINE FIELD OVERWRITE archived ON service TYPE bool DEFAULT false;
--- DEFINE FIELD OVERWRITE category ON service TYPE record<category> REFERENCE ON DELETE IGNORE;
--- DEFINE FIELD OVERWRITE prompts ON service COMPUTED <~prompt;
--- DEFINE FIELD OVERWRITE tasks ON service COMPUTED <~task;
--- DEFINE FIELD OVERWRITE time ON service TYPE object DEFAULT {  };
--- DEFINE FIELD OVERWRITE time.created ON service TYPE datetime DEFAULT time::now() READONLY;
--- DEFINE FIELD OVERWRITE time.updated ON service TYPE datetime VALUE time::now();
+DEFINE TABLE OVERWRITE service TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
+DEFINE FIELD OVERWRITE title ON service TYPE string;
+DEFINE FIELD OVERWRITE archived ON service TYPE bool DEFAULT false;
+DEFINE FIELD OVERWRITE category ON service TYPE record<category> REFERENCE ON DELETE IGNORE;
+DEFINE FIELD OVERWRITE prompts ON service COMPUTED <~prompt;
+DEFINE FIELD OVERWRITE tasks ON service COMPUTED <~task;
+DEFINE FIELD OVERWRITE time ON service TYPE object DEFAULT {  };
+DEFINE FIELD OVERWRITE time.created ON service TYPE datetime DEFAULT time::now() READONLY;
+DEFINE FIELD OVERWRITE time.updated ON service TYPE datetime VALUE time::now();
 
 // Model
 -- DEFINE TABLE OVERWRITE model TYPE NORMAL SCHEMAFULL;
@@ -67,9 +67,7 @@ DEFINE FIELD OVERWRITE time.updated ON category TYPE datetime VALUE time::now();
 
 // Better Auth
 // User
-DEFINE TABLE OVERWRITE user TYPE NORMAL SCHEMAFULL PERMISSIONS
-	FOR create WHERE $auth.role == 'admin'
-	FOR select, update, delete WHERE id = $auth.id OR $auth.role == 'admin';
+DEFINE TABLE OVERWRITE user TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
 DEFINE FIELD OVERWRITE name ON user TYPE string;
 DEFINE FIELD OVERWRITE email ON user TYPE string ASSERT string::is_email($value);
 DEFINE INDEX OVERWRITE userUserUnique ON user COLUMNS email UNIQUE;
@@ -89,8 +87,7 @@ DEFINE FIELD OVERWRITE displayUsername ON user TYPE string;
 DEFINE FIELD OVERWRITE accounts ON user COMPUTED <~account;
 
 -- // Session
-DEFINE TABLE OVERWRITE session TYPE NORMAL SCHEMAFULL PERMISSIONS
-	FOR select, create, update, delete WHERE $auth.role IN ['admin'];
+DEFINE TABLE OVERWRITE session TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
 DEFINE FIELD OVERWRITE expiresAt ON session TYPE datetime;
 DEFINE FIELD OVERWRITE token ON session TYPE string;
 DEFINE INDEX OVERWRITE sessionSessionUnique ON session COLUMNS token UNIQUE;
@@ -103,8 +100,7 @@ DEFINE FIELD OVERWRITE userId ON session TYPE record<user>;
 DEFINE FIELD OVERWRITE impersonatedBy ON user TYPE option<record<user>>;
 
 -- // Account
-DEFINE TABLE OVERWRITE account TYPE NORMAL SCHEMAFULL PERMISSIONS
-	FOR select, create, update, delete WHERE $auth.role IN ['admin'];
+DEFINE TABLE OVERWRITE account TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
 DEFINE FIELD OVERWRITE accountId ON account TYPE string;
 DEFINE FIELD OVERWRITE providerId ON account TYPE string;
 DEFINE FIELD OVERWRITE accessToken ON account TYPE option<string>;
@@ -121,27 +117,15 @@ DEFINE FIELD OVERWRITE updatedAt ON account TYPE datetime;
 DEFINE FIELD OVERWRITE userId ON account TYPE record<user> REFERENCE ON DELETE IGNORE;
 
 // Verification
-DEFINE TABLE OVERWRITE verification TYPE NORMAL SCHEMAFULL PERMISSIONS
-	FOR select, create, update, delete WHERE $auth.role IN ['admin'];
+DEFINE TABLE OVERWRITE verification TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
 DEFINE FIELD OVERWRITE identifier ON verification TYPE string;
 DEFINE FIELD OVERWRITE value ON verification TYPE string;
 DEFINE FIELD OVERWRITE expiresAt ON verification TYPE datetime;
 DEFINE FIELD OVERWRITE createdAt ON verification TYPE option<datetime>;
 DEFINE FIELD OVERWRITE updatedAt ON verification TYPE option<datetime>;
 
-// Access
-DEFINE ACCESS OVERWRITE user ON DATABASE TYPE RECORD
-	SIGNIN {
-        LET $user = SELECT *, accounts[WHERE providerId == 'credential'][0].password AS password
-            FROM ONLY user WHERE username = $username;
-        IF !$user { THROW 'INVALID_CREDENTIALS' };
-        LET $hash = $user.password;
-        IF !crypto::argon2::compare($hash, $password) { THROW 'INVALID_CREDENTIALS' }
-        ELSE { RETURN [$user] }
-    };
-
 // Root auth user
-UPSERT user:aJenQtYqu5tFZdRp86XETG2z1y69CrAE CONTENT {
+UPSERT user:root CONTENT {
     name: 'Системная учетная запись',
     role: 'admin',
     username: 'root'   ,
@@ -152,10 +136,10 @@ UPSERT user:aJenQtYqu5tFZdRp86XETG2z1y69CrAE CONTENT {
     createdAt: d'2025-11-22T23:18:28.472Z',
     updatedAt: d'2025-11-22T23:18:28.472Z'
 };
-UPSERT account:lixmyJWvexwKhKUcrsIIAwxhbNRC5gmr CONTENT {
-    accountId: 'aJenQtYqu5tFZdRp86XETG2z1y69CrAE',
-    userId: user:aJenQtYqu5tFZdRp86XETG2z1y69CrAE,
-    password: '$argon2id$v=19$m=19456,t=2,p=1$HT9GAQ8ynIEpN/H7KgaqLw$5fBNiaN7P2hGayKS+bfc5NAscakz7ON2bZxF8JvyLAg',
+UPSERT account:root CONTENT {
+    accountId: 'root',
+    userId: user:root,
+    password: '52c2da6bc1a525ee0f6a298e228a1314:c7ba714b9467d4582c5848947c2536340ff9f85ff6ca6c9ee022f68cd5eb60e227ba0cbadd3d46e9316c4562cef9d7551c957192809bf2a4b27f2a2b1365a08e',
     providerId: 'credential',
     createdAt: d'2025-11-22T23:18:29.159Z',
     updatedAt: d'2025-11-22T23:18:29.159Z'

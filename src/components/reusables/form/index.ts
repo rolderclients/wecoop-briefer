@@ -1,3 +1,3 @@
 export * from './blurOnError';
-export { useAppForm } from './context';
+export { useAppForm, useFieldContext } from './context';
 export * from './filedsSchema';

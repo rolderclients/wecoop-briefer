@@ -4,10 +4,16 @@ import {
 	createCategoryFn,
 	createServiceFn,
 	deleteServicesFn,
+	updateCategoryFn,
 	updateServiceFn,
 	updateServicesFn,
 } from '@/api';
-import type { CreateCategory, CreateService, UpdateService } from '@/app';
+import type {
+	CreateCategory,
+	CreateService,
+	UpdateCategory,
+	UpdateService,
+} from '@/app';
 
 export const useMutations = ({ closeCreate }: { closeCreate: () => void }) => {
 	const queryClient = useQueryClient();
@@ -35,40 +41,27 @@ export const useMutations = ({ closeCreate }: { closeCreate: () => void }) => {
 				queryClient
 					.invalidateQueries({ queryKey: ['categoriesWithServices'] })
 					.then(() => {
-						// notifications.show({
-						// 	message: `Учетная запись сотрудника "${vars.name}" добавлена`,
-						// 	color: 'green',
-						// });
+						notifications.show({
+							message: `Услуга "${vars.title}" обновлена`,
+							color: 'green',
+						});
 					});
 		},
 	});
 
 	const updateManyMutation = useMutation<void, Error, UpdateService[]>({
 		mutationFn: (data) => updateServicesFn({ data }),
-		onSettled: (_, error, vars) => {
+		onSettled: (_, error) => {
 			if (!error)
-				queryClient
-					.invalidateQueries({ queryKey: ['categoriesWithServices'] })
-					.then(() => {
-						// notifications.show({
-						// 	message: `Учетная запись сотрудника "${vars.name}" добавлена`,
-						// 	color: 'green',
-						// });
-					});
+				queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] });
 		},
 	});
 
 	const deleteManyMutation = useMutation<void, Error, string[]>({
 		mutationFn: (data) => deleteServicesFn({ data }),
-		onSettled: (_, error, vars) => {
+		onSettled: (_, error) => {
 			if (!error)
 				queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] });
-			// .then(() => {
-			// 	notifications.show({
-			// 		message: `Услуга "${vars.title}" удалена`,
-			// 		color: 'green',
-			// 	});
-			// });
 		},
 	});
 
@@ -85,11 +78,25 @@ export const useMutations = ({ closeCreate }: { closeCreate: () => void }) => {
 		},
 	});
 
+	const updateCategoryMutation = useMutation<void, Error, UpdateCategory>({
+		mutationFn: (data) => updateCategoryFn({ data }),
+		onSettled: (_, error, vars) => {
+			if (!error)
+				queryClient.invalidateQueries({ queryKey: ['categories'] }).then(() => {
+					notifications.show({
+						message: `Категория "${vars.title}" обновлена`,
+						color: 'green',
+					});
+				});
+		},
+	});
+
 	return {
 		createMutation,
 		updateMutation,
 		updateManyMutation,
 		deleteManyMutation,
 		createCategoryMutation,
+		updateCategoryMutation,
 	};
 };

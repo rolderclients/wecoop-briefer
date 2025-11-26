@@ -15,6 +15,7 @@ import type {
 	CreateCategory,
 	CreateService,
 	Service,
+	UpdateCategory,
 	UpdateService,
 } from '@/app';
 import { Route } from '@/routes/_authed/services';
@@ -34,27 +35,45 @@ interface ServicesContext {
 		CreateCategory,
 		unknown
 	>;
+	updateCategoryMutation: UseMutationResult<
+		void,
+		Error,
+		UpdateCategory,
+		unknown
+	>;
 	selectedIds: string[];
 	setSelectedIds: (ids: string[]) => void;
-	archived?: boolean;
-	setArchived: (archived: boolean) => void;
-	createOpened: boolean;
+	selectedService: Service | null;
+	setSelectedService: (service: Service | null) => void;
+	isArchived?: boolean;
+	setIsArchived: (archived: boolean) => void;
+	isCreateOpened: boolean;
 	openCreate: () => void;
 	closeCreate: () => void;
+	isEditingCategory: boolean;
+	setIsEditingCategory: (editing: boolean) => void;
+	isEditingOpened: boolean;
+	openEdit: () => void;
+	closeEdit: () => void;
 }
 
 const ServicesContext = createContext<ServicesContext | null>(null);
 
 export const ServicesProvider = ({ children }: { children: ReactNode }) => {
-	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const { archived: initialArchived } = useSearch({ from: Route.id });
-	const [archived, setArchived] = useState(initialArchived);
 	const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
 	const { data: categoriesWithServices } = useSuspenseQuery(
 		categoriesWithServicesQueryOptions(initialArchived),
 	);
 
-	const [createOpened, { open: openCreate, close: closeCreate }] =
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
+	const [selectedService, setSelectedService] = useState<Service | null>(null);
+	const [isArchived, setIsArchived] = useState(initialArchived);
+	const [isEditingCategory, setIsEditingCategory] = useState(false);
+
+	const [isCreateOpened, { open: openCreate, close: closeCreate }] =
+		useDisclosure(false);
+	const [isEditingOpened, { open: openEdit, close: closeEdit }] =
 		useDisclosure(false);
 
 	const {
@@ -63,6 +82,7 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 		updateManyMutation,
 		deleteManyMutation,
 		createCategoryMutation,
+		updateCategoryMutation,
 	} = useMutations({ closeCreate });
 
 	const value = {
@@ -74,13 +94,21 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 		updateManyMutation,
 		deleteManyMutation,
 		createCategoryMutation,
+		updateCategoryMutation,
 		selectedIds,
 		setSelectedIds,
-		archived,
-		setArchived,
-		createOpened,
+		selectedService,
+		setSelectedService,
+		isArchived,
+		setIsArchived,
+		isCreateOpened,
 		openCreate,
 		closeCreate,
+		isEditingCategory,
+		setIsEditingCategory,
+		isEditingOpened,
+		openEdit,
+		closeEdit,
 	};
 
 	return (

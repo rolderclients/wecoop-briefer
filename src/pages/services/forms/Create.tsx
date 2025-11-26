@@ -1,22 +1,15 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <> */
-import {
-	Combobox,
-	Group,
-	InputBase,
-	Modal,
-	Stack,
-	useCombobox,
-} from '@mantine/core';
+import { Group, Modal, Stack } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
-import { useState } from 'react';
 import z from 'zod/v4';
 import type { CreateService } from '@/app';
 import { blurOnError, filedsSchema, useAppForm } from '@/components';
-import { useServices } from '../Provider';
+import { useServices } from '../provider';
+import { CategoryField } from './CategoryField';
 
 const schema = z.object({
 	title: filedsSchema.title,
-	category: z.string(),
+	category: z.string().min(1, 'Категория обязательна'),
 });
 
 const defaultValues: CreateService = {
@@ -26,19 +19,21 @@ const defaultValues: CreateService = {
 
 export const Create = () => {
 	const {
-		categories,
 		createMutation,
-		archived,
-		createOpened,
+		isArchived,
+		isCreateOpened,
 		openCreate,
 		closeCreate,
+		isEditingCategory,
 	} = useServices();
 
 	const form = useAppForm({
 		defaultValues,
 		validators: { onSubmit: schema },
 		onSubmitInvalid: blurOnError,
-		onSubmit: ({ value }) => createMutation.mutateAsync(value),
+		onSubmit: async ({ value }) => {
+			await createMutation.mutateAsync(value);
+		},
 	});
 
 	return (
@@ -47,7 +42,7 @@ export const Create = () => {
 				<form.SubscribeButton
 					label="Добавить"
 					ml="auto"
-					disabled={archived}
+					disabled={isArchived}
 					leftSection={<IconPlus size={20} />}
 					onClick={() => {
 						form.reset();
@@ -57,11 +52,10 @@ export const Create = () => {
 			</form.AppForm>
 
 			<Modal
-				opened={createOpened}
+				opened={isCreateOpened}
 				onClose={closeCreate}
-				centered
+				closeOnEscape={!isEditingCategory}
 				title="Добавление услуги"
-				padding="lg"
 			>
 				<form
 					id="form"
@@ -74,14 +68,14 @@ export const Create = () => {
 						<form.AppField
 							name="title"
 							children={(field) => (
-								<field.TextField label="Имя" placeholder="Введите имя" />
+								<field.TextField
+									label="Название"
+									placeholder="Введите название"
+								/>
 							)}
 						/>
 
-						<form.AppField
-							name="category"
-							children={(field) => <CreateNewService />}
-						/>
+						<form.AppField name="category" children={() => <CategoryField />} />
 
 						<Group ml="auto" mt="lg">
 							<form.AppForm>
@@ -99,89 +93,5 @@ export const Create = () => {
 				</form>
 			</Modal>
 		</>
-	);
-};
-
-// const groceries = [
-// 	'🍎 Apples',
-// 	'🍌 Bananas',
-// 	'🥦 Broccoli',
-// 	'🥕 Carrots',
-// 	'🍫 Chocolate',
-// 	'🍇 Grapes',
-// ];
-
-const CreateNewService = () => {
-	const { categories, createCategoryMutation } = useServices();
-
-	const combobox = useCombobox({
-		onDropdownClose: () => combobox.resetSelectedOption(),
-	});
-
-	// const [data, setData] = useState(groceries);
-	const [value, setValue] = useState<string | null>(null);
-	const [search, setSearch] = useState('');
-
-	const exactOptionMatch = categories.some((item) => item.title === search);
-	const filteredOptions = exactOptionMatch
-		? categories
-		: categories.filter((item) =>
-				item.title.toLowerCase().includes(search.toLowerCase().trim()),
-			);
-
-	const options = filteredOptions.map((item) => (
-		<Combobox.Option value={item.title} key={item.id}>
-			{item.title}
-		</Combobox.Option>
-	));
-
-	return (
-		<Combobox
-			store={combobox}
-			withinPortal={true}
-			onOptionSubmit={async (val) => {
-				if (val === '$create') {
-					// setData((current) => [...current, search]);
-					await createCategoryMutation.mutateAsync({ title: search });
-					setValue(search);
-				} else {
-					setValue(val);
-					setSearch(val);
-				}
-
-				combobox.closeDropdown();
-			}}
-		>
-			<Combobox.Target>
-				<InputBase
-					rightSection={<Combobox.Chevron />}
-					value={search}
-					onChange={(event) => {
-						combobox.openDropdown();
-						combobox.updateSelectedOptionIndex();
-						setSearch(event.currentTarget.value);
-					}}
-					onClick={() => combobox.openDropdown()}
-					onFocus={() => combobox.openDropdown()}
-					onBlur={() => {
-						combobox.closeDropdown();
-						setSearch(value || '');
-					}}
-					placeholder="Search value"
-					rightSectionPointerEvents="none"
-				/>
-			</Combobox.Target>
-
-			<Combobox.Dropdown>
-				<Combobox.Options>
-					{options}
-					{!exactOptionMatch && search.trim().length > 0 && (
-						<Combobox.Option value="$create">
-							+ Создать {search}
-						</Combobox.Option>
-					)}
-				</Combobox.Options>
-			</Combobox.Dropdown>
-		</Combobox>
 	);
 };

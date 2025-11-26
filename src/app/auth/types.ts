@@ -33,4 +33,3 @@ export type CredentialsUser = {
 	role: User['role'];
 };
 export type BlockUser = { id: string; block: boolean };
-export type DeleteUser = { id: string };

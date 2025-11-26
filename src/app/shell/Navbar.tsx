@@ -21,9 +21,6 @@ import {
 import { Link } from '@tanstack/react-router';
 import { useAuth } from '../auth';
 
-// import { revokeSessions, useAuth } from './auth';
-// import { serverSignOutFn } from './auth/test';
-
 interface NavbarLinkProps {
 	label: string;
 	pathname: string;

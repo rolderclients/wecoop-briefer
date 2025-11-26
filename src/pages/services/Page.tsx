@@ -1,13 +1,15 @@
 import { Stack } from '@mantine/core';
-import { Panel } from './Panel';
-// import { Categories } from './Categories';
-import { ServicesProvider } from './Provider';
+import { Accordions, Panel } from './components';
+import { Edit } from './forms';
+import { ServicesProvider } from './provider';
 
 export const ServicesPage = () => (
 	<ServicesProvider>
 		<Stack py="xl">
 			<Panel />
-			{/*<Categories />*/}
+			<Accordions />
+
+			<Edit />
 		</Stack>
 	</ServicesProvider>
 );
