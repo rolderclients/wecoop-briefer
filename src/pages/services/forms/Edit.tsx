@@ -61,7 +61,7 @@ export const Edit = () => {
 			opened={isEditingOpened}
 			onClose={closeForm}
 			closeOnEscape={!isEditingCategory}
-			title={`Изменение услуги ${selectedService?.title}`}
+			title={`Изменение услуги "${selectedService?.title}"`}
 		>
 			<form
 				id="form"
