@@ -7,8 +7,10 @@ export const useMutaitionWithInvalidate = <T>(
 	const queryClient = useQueryClient();
 	return useMutation<void, Error, T>({
 		mutationFn: (data) => fn({ data }),
-		onSettled: (_, error) => {
-			if (!error) queryClient.invalidateQueries({ queryKey });
+		// Здесь важно ждать invalidateQueries, чтобы mutateAsync завершался по результату
+		// не только мутации, но и загрузки новых данных
+		onSettled: async (_, error) => {
+			if (!error) await queryClient.invalidateQueries({ queryKey });
 		},
 	});
 };

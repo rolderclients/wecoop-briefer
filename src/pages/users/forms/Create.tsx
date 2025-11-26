@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <> */
 import { Group, Modal, Stack } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { IconPlus } from '@tabler/icons-react';
 //@ts-expect-error
 import generatePassword from 'omgopass';
@@ -48,7 +49,14 @@ export const Create = () => {
 				),
 		},
 		onSubmitInvalid: blurOnError,
-		onSubmit: ({ value }) => createMutation.mutateAsync(value),
+		onSubmit: async ({ value }) => {
+			await createMutation.mutateAsync(value);
+			closeCreate();
+			notifications.show({
+				message: `Учетная запись сотрудника "${value.name}" добавлена`,
+				color: 'green',
+			});
+		},
 	});
 
 	return (

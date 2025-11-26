@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <> */
 import { Group, Modal, Stack } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { useEffect } from 'react';
 import z from 'zod/v4';
 import type { UpdateUser } from '@/app';
@@ -37,7 +38,14 @@ export const Edit = () => {
 			),
 		},
 		onSubmitInvalid: blurOnError,
-		onSubmit: ({ value }) => updateMutation.mutateAsync(value),
+		onSubmit: async ({ value }) => {
+			await updateMutation.mutateAsync(value);
+			closeEdit();
+			notifications.show({
+				message: `Запись сотрудника "${value.name}" обновлена`,
+				color: 'green',
+			});
+		},
 	});
 
 	useEffect(() => {

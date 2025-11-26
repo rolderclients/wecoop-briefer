@@ -1,3 +1,4 @@
+import { notifications } from '@mantine/notifications';
 import { ConfirmModal } from '@/components';
 import { useUsers } from '../provider';
 
@@ -13,7 +14,14 @@ export const Delete = () => {
 			onClose={closeDelete}
 			loading={deleteMutation.isPending}
 			onConfirm={async () => {
-				if (selectedUser?.id) deleteMutation.mutateAsync(selectedUser.id);
+				if (selectedUser?.id) {
+					await deleteMutation.mutateAsync(selectedUser.id);
+					closeDelete();
+					notifications.show({
+						message: `Учетная запись сотрудника "${selectedUser?.name}" удалена`,
+						color: 'orange',
+					});
+				}
 			}}
 		/>
 	);

@@ -1,10 +1,11 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <> */
 import { Group, Modal, Stack } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { useEffect } from 'react';
 import z from 'zod/v4';
 import type { UpdateService } from '@/app';
 import { blurOnError, filedsSchema, useAppForm } from '@/components';
-import { useServices } from '../provider';
+import { useServices } from '../Provider';
 import { CategoryField } from './CategoryField';
 
 const schema = z.object({
@@ -35,6 +36,10 @@ export const Edit = () => {
 		onSubmitInvalid: blurOnError,
 		onSubmit: async ({ value }) => {
 			await updateMutation.mutateAsync(value);
+			notifications.show({
+				message: `Услуга "${value.title}" обновлена`,
+				color: 'green',
+			});
 			closeForm();
 		},
 	});

@@ -1,4 +1,3 @@
-import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
 	type AuthError,
@@ -8,23 +7,10 @@ import {
 	type CreateUser,
 	type CredentialsUser,
 	type UpdateUser,
-	type User,
 	useAuth,
 } from '@/app';
 
-export const useMutations = ({
-	users,
-	closeCreate,
-	closeEdit,
-	closeEditCredentials,
-	closeDelete,
-}: {
-	users: User[];
-	closeCreate: () => void;
-	closeEdit: () => void;
-	closeEditCredentials: () => void;
-	closeDelete: () => void;
-}) => {
+export const useMutations = () => {
 	const queryClient = useQueryClient();
 	const { user: authedUser, refetch } = useAuth();
 
@@ -40,17 +26,9 @@ export const useMutations = ({
 					displayUsername: data.username,
 				},
 			}),
-		onSettled: (_, error, vars) => {
+		onSettled: async (_, error) => {
 			if (error) authErrorNotification(error);
-			else {
-				closeCreate(); // Перед загрузкой измененных данных, симпотичнее так.
-				queryClient.invalidateQueries({ queryKey: ['users'] }).then(() => {
-					notifications.show({
-						message: `Учетная запись сотрудника "${vars.name}" добавлена`,
-						color: 'green',
-					});
-				});
-			}
+			else await queryClient.invalidateQueries({ queryKey: ['users'] });
 		},
 	});
 
@@ -63,17 +41,11 @@ export const useMutations = ({
 					email: data.email,
 				},
 			}),
-		onSettled: (_, error, vars) => {
+		onSettled: async (_, error, vars) => {
 			if (error) authErrorNotification(error);
 			else {
 				if (authedUser?.id === vars.id) refetch();
-				closeEdit();
-				queryClient.invalidateQueries({ queryKey: ['users'] }).then(() => {
-					notifications.show({
-						message: `Запись сотрудника "${vars.name}" обновлена`,
-						color: 'green',
-					});
-				});
+				await queryClient.invalidateQueries({ queryKey: ['users'] });
 			}
 		},
 	});
@@ -94,19 +66,11 @@ export const useMutations = ({
 				newPassword: data.newPassword,
 			});
 		},
-		onSettled: (_, error, vars) => {
+		onSettled: async (_, error, vars) => {
 			if (error) authErrorNotification(error);
 			else {
 				if (authedUser?.id === vars.id) refetch();
-				closeEditCredentials();
-				queryClient.invalidateQueries({ queryKey: ['users'] }).then(() => {
-					const user = users.find((user) => user.id === vars.id);
-
-					notifications.show({
-						message: `Данные доступа учетной записи сотрудника "${user?.name}" изменены`,
-						color: 'green',
-					});
-				});
+				await queryClient.invalidateQueries({ queryKey: ['users'] });
 			}
 		},
 	});
@@ -116,36 +80,17 @@ export const useMutations = ({
 			if (data.block) await admin.banUser({ userId: data.id });
 			else await admin.unbanUser({ userId: data.id });
 		},
-		onSettled: (_, error, vars) => {
+		onSettled: async (_, error) => {
 			if (error) authErrorNotification(error);
-			else {
-				queryClient.invalidateQueries({ queryKey: ['users'] }).then(() => {
-					const user = users.find((user) => user.id === vars.id);
-
-					notifications.show({
-						message: `Учетная запись сотрудника "${user?.name}" ${vars.block ? 'заблокирована' : 'разблокирована'}`,
-						color: vars.block ? 'orange' : 'green',
-					});
-				});
-			}
+			else await queryClient.invalidateQueries({ queryKey: ['users'] });
 		},
 	});
 
 	const deleteMutation = useMutation<unknown, AuthError, string>({
 		mutationFn: (data) => admin.removeUser({ userId: data }),
-		onSettled: (_, error, vars) => {
+		onSettled: async (_, error) => {
 			if (error) authErrorNotification(error);
-			else {
-				closeDelete();
-				queryClient.invalidateQueries({ queryKey: ['users'] }).then(() => {
-					const user = users.find((u) => u.id === vars);
-
-					notifications.show({
-						message: `Учетная запись сотрудника "${user?.name}" удалена`,
-						color: 'orange',
-					});
-				});
-			}
+			else await queryClient.invalidateQueries({ queryKey: ['users'] });
 		},
 	});
 

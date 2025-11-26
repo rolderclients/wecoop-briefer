@@ -1,10 +1,11 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <> */
 import { Group, Modal, Stack } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { IconPlus } from '@tabler/icons-react';
 import z from 'zod/v4';
 import type { CreateService } from '@/app';
 import { blurOnError, filedsSchema, useAppForm } from '@/components';
-import { useServices } from '../provider';
+import { useServices } from '../Provider';
 import { CategoryField } from './CategoryField';
 
 const schema = z.object({
@@ -33,6 +34,10 @@ export const Create = () => {
 		onSubmitInvalid: blurOnError,
 		onSubmit: async ({ value }) => {
 			await createMutation.mutateAsync(value);
+			notifications.show({
+				message: `Услуга "${value.title}" создана`,
+				color: 'green',
+			});
 		},
 	});
 

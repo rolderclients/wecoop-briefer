@@ -1,7 +1,7 @@
 import { Stack } from '@mantine/core';
 import { Accordions, Panel } from './components';
 import { Edit } from './forms';
-import { ServicesProvider } from './provider';
+import { ServicesProvider } from './Provider';
 
 export const ServicesPage = () => (
 	<ServicesProvider>

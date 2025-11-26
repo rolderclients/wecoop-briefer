@@ -1,5 +1,5 @@
 import { Accordion, Grid, Space, Stack, Text } from '@mantine/core';
-import { useServices } from '../provider';
+import { useServices } from '../Provider';
 import { ServicesList } from './List';
 
 export const Accordions = () => {

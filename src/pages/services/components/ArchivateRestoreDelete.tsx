@@ -2,7 +2,7 @@ import { Button, Group, type MantineColor, Modal, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { type Icon, IconCancel } from '@tabler/icons-react';
-import { useServices } from '../provider';
+import { useServices } from '../Provider';
 
 export const ArchivateRestoreDelete = ({
 	type,

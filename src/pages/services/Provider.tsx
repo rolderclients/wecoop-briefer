@@ -8,6 +8,12 @@ import { createContext, type ReactNode, useContext, useState } from 'react';
 import {
 	categoriesQueryOptions,
 	categoriesWithServicesQueryOptions,
+	createCategoryFn,
+	createServiceFn,
+	deleteServicesFn,
+	updateCategoryFn,
+	updateServiceFn,
+	updateServicesFn,
 } from '@/api';
 import type {
 	Category,
@@ -18,8 +24,8 @@ import type {
 	UpdateCategory,
 	UpdateService,
 } from '@/app';
+import { useMutaitionWithInvalidate } from '@/components';
 import { Route } from '@/routes/_authed/services';
-import { useMutations } from './useMutations';
 
 interface ServicesContext {
 	categories: Category[];
@@ -66,6 +72,31 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 		categoriesWithServicesQueryOptions(initialArchived),
 	);
 
+	const createMutation = useMutaitionWithInvalidate<CreateService>(
+		createServiceFn,
+		['categoriesWithServices'],
+	);
+	const updateMutation = useMutaitionWithInvalidate<UpdateService>(
+		updateServiceFn,
+		['categoriesWithServices'],
+	);
+	const updateManyMutation = useMutaitionWithInvalidate<UpdateService[]>(
+		updateServicesFn,
+		['categoriesWithServices'],
+	);
+	const deleteManyMutation = useMutaitionWithInvalidate<string[]>(
+		deleteServicesFn,
+		['categoriesWithServices'],
+	);
+	const createCategoryMutation = useMutaitionWithInvalidate<CreateCategory>(
+		createCategoryFn,
+		['categories'],
+	);
+	const updateCategoryMutation = useMutaitionWithInvalidate<UpdateCategory>(
+		updateCategoryFn,
+		['categories'],
+	);
+
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [selectedService, setSelectedService] = useState<Service | null>(null);
 	const [isArchived, setIsArchived] = useState(initialArchived);
@@ -75,15 +106,6 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 		useDisclosure(false);
 	const [isEditingOpened, { open: openEdit, close: closeEdit }] =
 		useDisclosure(false);
-
-	const {
-		createMutation,
-		updateMutation,
-		updateManyMutation,
-		deleteManyMutation,
-		createCategoryMutation,
-		updateCategoryMutation,
-	} = useMutations({ closeCreate });
 
 	const value = {
 		categories,
