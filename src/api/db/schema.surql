@@ -53,7 +53,7 @@ DEFINE FIELD OVERWRITE company.title ON task TYPE option<string>;
 DEFINE FIELD OVERWRITE company.info ON task TYPE option<string>;
 DEFINE FIELD OVERWRITE archived ON task TYPE bool DEFAULT false;
 DEFINE FIELD OVERWRITE service ON task TYPE record<service> REFERENCE ON DELETE IGNORE;
-DEFINE FIELD OVERWRITE brief ON task TYPE option<record<brief>>;
+DEFINE FIELD OVERWRITE brief ON task TYPE record<brief> DEFAULT (CREATE ONLY brief).id;
 DEFINE FIELD OVERWRITE time ON task TYPE object DEFAULT { created: datetime, updated: datetime };
 DEFINE FIELD OVERWRITE time.created ON task TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON task TYPE datetime VALUE time::now();

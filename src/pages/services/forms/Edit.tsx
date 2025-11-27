@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <> */
 import { Group, Modal, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import z from 'zod/v4';
 import type { UpdateService } from '@/app';
 import { blurOnError, filedsSchema, useAppForm } from '@/components';
@@ -44,19 +44,20 @@ export const Edit = () => {
 		},
 	});
 
-	useEffect(() => {
+	const resetForm = useCallback(() => {
 		if (selectedService) {
-			form.reset();
 			form.setFieldValue('id', selectedService.id);
 			form.setFieldValue('title', selectedService.title);
 			form.setFieldValue('category', selectedService.category);
 		}
 	}, [form, selectedService]);
 
+	useEffect(() => {
+		resetForm();
+	}, [resetForm]);
+
 	const closeForm = () => {
-		form.reset(selectedService as UpdateService, {
-			keepDefaultValues: true,
-		});
+		resetForm();
 		setIsEditingCategory(false);
 		closeEdit();
 	};

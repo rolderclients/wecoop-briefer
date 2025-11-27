@@ -16,7 +16,7 @@ import { IconEdit, IconKey, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import { type User, useAuth } from '@/app';
 import classes from '@/app/styles.module.css';
-import { useUsers } from '../provider';
+import { useUsers } from './provider';
 
 const roles = {
 	admin: 'Администратор',

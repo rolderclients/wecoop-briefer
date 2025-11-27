@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <> */
 import { Group, Modal, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import z from 'zod/v4';
 import type { UpdatePrompt } from '@/app';
 import { blurOnError, filedsSchema, useAppForm } from '@/components';
@@ -48,18 +48,17 @@ export const Edit = () => {
 			if (enabled && serviceChanged && willDisabled) enabled = false;
 
 			await updateMutation.mutateAsync({ ...value, enabled });
-			closeForm();
 
 			notifications.show({
 				message: `Промт "${value.title}" обновлен${enabled && serviceChanged && willDisabled ? ' и выключен' : ''}`,
 				color: enabled && serviceChanged && willDisabled ? 'orange' : 'green',
 			});
+			closeForm();
 		},
 	});
 
-	useEffect(() => {
+	const resetForm = useCallback(() => {
 		if (selectedPrompt) {
-			form.reset();
 			form.setFieldValue('id', selectedPrompt.id);
 			form.setFieldValue('title', selectedPrompt.title);
 			form.setFieldValue('service', selectedPrompt.service);
@@ -67,13 +66,12 @@ export const Edit = () => {
 		}
 	}, [form, selectedPrompt]);
 
+	useEffect(() => {
+		resetForm();
+	}, [resetForm]);
+
 	const closeForm = () => {
-		form.reset(
-			{ ...selectedPrompt, model: selectedPrompt?.model.id } as UpdatePrompt,
-			{
-				keepDefaultValues: true,
-			},
-		);
+		resetForm();
 		closeEdit();
 	};
 
