@@ -4,7 +4,7 @@ import type { UpdateBrief } from '@/app';
 import { getDB } from '..';
 import { fromDTO } from '../utils';
 
-export const updateBrief = createServerFn({ method: 'POST' })
+export const updateBriefFn = createServerFn({ method: 'POST' })
 	.inputValidator((data: UpdateBrief) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();

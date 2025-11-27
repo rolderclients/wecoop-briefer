@@ -41,6 +41,36 @@ export const servicesWithPromptsQueryOptions = (archived?: boolean) =>
 		queryFn: () => getServicesWithPromptsFn({ data: { archived } }),
 	});
 
+const getServicesWithEnbledPromptsFn = createServerFn({
+	method: 'GET',
+}).handler(async () => {
+	const db = await getDB();
+
+	const [result] = await db
+		.query(surql`SELECT
+            id,
+            title,
+            (
+                SELECT *, model.{ id, name, title }
+                FROM id.prompts
+                WHERE enabled
+                ORDER BY title NUMERIC
+            ) AS prompts
+        FROM service
+        WHERE count(prompts[WHERE enabled]) > 0 AND archived == false
+        ORDER BY title NUMERIC;`)
+		.json()
+		.collect<[ServiceWithPrompts[]]>();
+
+	return result;
+});
+
+export const servicesWithEnbledPromptsQueryOptions = () =>
+	queryOptions<ServiceWithPrompts[]>({
+		queryKey: ['servicesWithEnbledPrompts'],
+		queryFn: () => getServicesWithEnbledPromptsFn(),
+	});
+
 export const getPromptWithModelFn = createServerFn({ method: 'POST' })
 	.inputValidator((data: string) => data)
 	.handler(async ({ data }) => {

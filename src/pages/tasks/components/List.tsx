@@ -10,6 +10,7 @@ import {
 } from '@mantine/core';
 import { useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
+import { Link } from '@tanstack/react-router';
 import type { Task } from '@/app';
 import classes from '@/app/styles.module.css';
 import { useTasks } from '../Provider';
@@ -44,49 +45,65 @@ const TaskPaper = ({ task }: { task: Task }) => {
 		useTasks();
 
 	return (
-		<Paper ref={ref} radius="md" withBorder>
-			<Grid px="md" py="xs" align="center">
-				<Grid.Col span="content">
-					<Checkbox
-						checked={selectedIds.includes(task.id)}
-						onChange={(e) => {
-							setSelectedIds(
-								e.currentTarget.checked
-									? [...selectedIds, task.id]
-									: selectedIds.filter((id) => id !== task.id),
-							);
-						}}
-					/>
-				</Grid.Col>
-				<Grid.Col span="auto">
-					<Text inline>{task.title}</Text>
-				</Grid.Col>
-				<Grid.Col span="auto">
-					<Text inline>{task.service.title}</Text>
-				</Grid.Col>
-				<Grid.Col span="auto">
-					<Text inline>{task.company.title}</Text>
-				</Grid.Col>
-
-				<Grid.Col span="content">
-					{isArchived ? (
-						<Box h={35.75} w={28} />
-					) : (
-						<ActionIcon
-							aria-label="Изменить"
-							className={classes.hoverActionIcon}
-							mod={{ hovered }}
-							onClick={() => {
-								setSelectedTask(task);
-								openEdit();
+		<Link
+			key={task.id}
+			to="/tasks/$taskId"
+			params={{ taskId: task.id }}
+			className={classes.routerLink}
+			disabled={isArchived}
+		>
+			<Paper
+				ref={ref}
+				radius="md"
+				withBorder
+				className={classes.hoverPaper}
+				mod={{ disabled: task.archived }}
+			>
+				<Grid px="md" py="xs" align="center">
+					<Grid.Col span="content">
+						<Checkbox
+							checked={selectedIds.includes(task.id)}
+							onClick={(e) => e.stopPropagation()}
+							onChange={(e) => {
+								setSelectedIds(
+									e.currentTarget.checked
+										? [...selectedIds, task.id]
+										: selectedIds.filter((id) => id !== task.id),
+								);
 							}}
-							mt={4}
-						>
-							<IconEdit size={20} />
-						</ActionIcon>
-					)}
-				</Grid.Col>
-			</Grid>
-		</Paper>
+						/>
+					</Grid.Col>
+					<Grid.Col span="auto">
+						<Text inline>{task.title}</Text>
+					</Grid.Col>
+					<Grid.Col span="auto">
+						<Text inline>{task.service.title}</Text>
+					</Grid.Col>
+					<Grid.Col span="auto">
+						<Text inline>{task.company.title}</Text>
+					</Grid.Col>
+
+					<Grid.Col span="content">
+						{isArchived ? (
+							<Box h={35.75} w={28} />
+						) : (
+							<ActionIcon
+								aria-label="Изменить"
+								className={classes.hoverActionIcon}
+								mod={{ hovered }}
+								onClick={(e) => {
+									e.preventDefault();
+									setSelectedTask(task);
+									openEdit();
+								}}
+								mt={4}
+							>
+								<IconEdit size={20} />
+							</ActionIcon>
+						)}
+					</Grid.Col>
+				</Grid>
+			</Paper>
+		</Link>
 	);
 };

@@ -1,13 +1,12 @@
-// import type { InferAgentUIMessage } from 'ai';
-// import type { output } from 'zod/v4';
-// import type { createAgent, schema } from './agent';
-
+import type { InferAgentUIMessage } from 'ai';
+import type { output } from 'zod/v4';
 import z from 'zod/v4';
+import type { createAgent, schema } from './agent';
 
-// export type StructuredTextPart = output<typeof schema>;
-// export type AgentUIMessage = InferAgentUIMessage<
-// 	ReturnType<typeof createAgent>
-// >;
+export type StructuredTextPart = output<typeof schema>;
+export type AgentUIMessage = InferAgentUIMessage<
+	ReturnType<typeof createAgent>
+>;
 
 export const modelNameSchema = z.enum([
 	'anthropic/claude-haiku-4.5',
