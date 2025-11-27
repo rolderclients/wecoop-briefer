@@ -2,16 +2,16 @@ import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import sanitizeHtml from 'sanitize-html';
 import { eq, surql } from 'surrealdb';
-import { getDB } from '../connection';
 import type {
-	NewPrompt,
+	CreatePrompt,
 	Prompt,
 	ServiceWithPrompts,
 	UpdatePrompt,
-} from '../types';
+} from '@/app';
+import { getDB } from '..';
 import { fromDTO, fromDTOs } from '../utils';
 
-const getServicesWithPrompts = createServerFn({ method: 'GET' })
+const getServicesWithPromptsFn = createServerFn({ method: 'GET' })
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
 		const db = await getDB();
@@ -38,15 +38,45 @@ const getServicesWithPrompts = createServerFn({ method: 'GET' })
 export const servicesWithPromptsQueryOptions = (archived?: boolean) =>
 	queryOptions<ServiceWithPrompts[]>({
 		queryKey: ['servicesWithPrompts', !!archived],
-		queryFn: () => getServicesWithPrompts({ data: { archived } }),
+		queryFn: () => getServicesWithPromptsFn({ data: { archived } }),
 	});
 
-export const getPrompt = createServerFn({ method: 'POST' })
-	.inputValidator((data: { promptId: string }) => data)
-	.handler(async ({ data: { promptId } }) => {
+const getServicesWithEnbledPromptsFn = createServerFn({
+	method: 'GET',
+}).handler(async () => {
+	const db = await getDB();
+
+	const [result] = await db
+		.query(surql`SELECT
+            id,
+            title,
+            (
+                SELECT *, model.{ id, name, title }
+                FROM id.prompts
+                WHERE enabled
+                ORDER BY title NUMERIC
+            ) AS prompts
+        FROM service
+        WHERE count(prompts[WHERE enabled]) > 0 AND archived == false
+        ORDER BY title NUMERIC;`)
+		.json()
+		.collect<[ServiceWithPrompts[]]>();
+
+	return result;
+});
+
+export const servicesWithEnbledPromptsQueryOptions = () =>
+	queryOptions<ServiceWithPrompts[]>({
+		queryKey: ['servicesWithEnbledPrompts'],
+		queryFn: () => getServicesWithEnbledPromptsFn(),
+	});
+
+export const getPromptWithModelFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: string) => data)
+	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		const id = await fromDTO(promptId);
+		const id = await fromDTO(data);
 		const [result] = await db
 			.query(surql`SELECT *, model.{ id, name, title } FROM ONLY ${id}`)
 			.json()
@@ -58,45 +88,44 @@ export const getPrompt = createServerFn({ method: 'POST' })
 export const promptQueryOptions = (promptId: string) =>
 	queryOptions<Prompt>({
 		queryKey: ['prompt'],
-		queryFn: () => getPrompt({ data: { promptId } }),
+		queryFn: () => getPromptWithModelFn({ data: promptId }),
 	});
 
-export const createPrompt = createServerFn({ method: 'POST' })
-	.inputValidator((data: { promptData: NewPrompt }) => data)
-	.handler(async ({ data: { promptData } }) => {
+export const createPromptFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: CreatePrompt) => data)
+	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		const data = await fromDTO(promptData);
-		await db.query(surql`CREATE prompt CONTENT ${data}`);
+		const content = await fromDTO(data);
+		await db.query(surql`CREATE prompt CONTENT ${content}`);
 	});
 
-export const updatePrompt = createServerFn({ method: 'POST' })
-	.inputValidator((data: { promptData: UpdatePrompt }) => data)
-	.handler(async ({ data: { promptData } }) => {
+export const updatePromptFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: UpdatePrompt) => data)
+	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		if (promptData.content)
-			promptData.content = sanitizeHtml(promptData.content);
-		const item = await fromDTO(promptData);
-		await db.query(surql`UPDATE ${item.id} MERGE ${item}`);
+		if (data.content) data.content = sanitizeHtml(data.content);
+		const item = await fromDTO(data);
+		await db.update(item.id).merge(item);
 	});
 
-export const updatePrompts = createServerFn({ method: 'POST' })
-	.inputValidator((data: { promptsData: UpdatePrompt[] }) => data)
-	.handler(async ({ data: { promptsData } }) => {
+export const updatePromptsFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: UpdatePrompt[]) => data)
+	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		const items = await fromDTOs(promptsData);
+		const items = await fromDTOs(data);
 		await db.query(
 			surql`FOR $item IN ${items} { UPDATE $item.id MERGE $item };`,
 		);
 	});
 
-export const deletePrompts = createServerFn({ method: 'POST' })
-	.inputValidator((data: { ids: string[] }) => data)
+export const deletePromptsFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: string[]) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		const ids = await fromDTOs(data.ids);
+		const ids = await fromDTOs(data);
 		await db.query(surql`FOR $id IN ${ids} { DELETE $id };`);
 	});

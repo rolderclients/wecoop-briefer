@@ -1,9 +1,10 @@
-import { AppShell, ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { HeadContent, Outlet, Scripts } from '@tanstack/react-router';
+import { HeadContent, Scripts } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { ScrollArea } from '@/kit';
-import { Navbar } from './Navbar';
+import { AuthProvider } from './auth';
+import { Shell } from './shell';
+import { theme } from './theme';
 
 const SetTimeZoneCookie = () => {
 	useEffect(() => {
@@ -22,28 +23,15 @@ export const App = () => {
 				<ColorSchemeScript defaultColorScheme="auto" />
 			</head>
 			<body>
-				<MantineProvider defaultColorScheme="auto">
+				<MantineProvider defaultColorScheme="auto" theme={theme}>
 					<Notifications />
 
-					<AppShell
-						navbar={{
-							width: 160,
-							breakpoint: 0,
-						}}
-					>
-						<Navbar />
-
-						<AppShell.Main>
-							<ScrollArea h="100vh" px="xl">
-								<Outlet />
-								<ScrollArea.ScrollButton />
-							</ScrollArea>
-						</AppShell.Main>
-					</AppShell>
+					<AuthProvider>
+						<Shell />
+					</AuthProvider>
 				</MantineProvider>
 
 				<SetTimeZoneCookie />
-
 				<Scripts />
 			</body>
 		</html>

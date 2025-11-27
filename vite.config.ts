@@ -19,7 +19,7 @@ const config = defineConfig({
     }),
   },
   ssr: {
-    noExternal: ['streamdown','@rolder/streamdown', '@rolder/ui-kit-react'],
+    noExternal: ['streamdown'],
   },
 })
 

@@ -1,16 +1,16 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { eq, surql } from 'surrealdb';
-import { getDB } from '../connection';
 import type {
 	CategoryWithServices,
-	NewService,
+	CreateService,
 	Service,
 	UpdateService,
-} from '../types';
+} from '@/app';
+import { getDB } from '..';
 import { fromDTO, fromDTOs } from '../utils';
 
-const getServices = createServerFn({ method: 'GET' })
+const getServicesFn = createServerFn({ method: 'GET' })
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
 		const db = await getDB();
@@ -29,10 +29,10 @@ const getServices = createServerFn({ method: 'GET' })
 export const servicesQueryOptions = (archived?: boolean) =>
 	queryOptions<Service[]>({
 		queryKey: ['services', archived],
-		queryFn: () => getServices({ data: { archived } }),
+		queryFn: () => getServicesFn({ data: { archived } }),
 	});
 
-const getCategoriesWithServices = createServerFn({ method: 'GET' })
+const getCategoriesWithServicesFn = createServerFn({ method: 'GET' })
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
 		const db = await getDB();
@@ -59,43 +59,43 @@ const getCategoriesWithServices = createServerFn({ method: 'GET' })
 export const categoriesWithServicesQueryOptions = (archived?: boolean) =>
 	queryOptions<CategoryWithServices[]>({
 		queryKey: ['categoriesWithServices', archived],
-		queryFn: () => getCategoriesWithServices({ data: { archived } }),
+		queryFn: () => getCategoriesWithServicesFn({ data: { archived } }),
 	});
 
-export const createService = createServerFn({ method: 'POST' })
-	.inputValidator((data: { serviceData: NewService }) => data)
-	.handler(async ({ data: { serviceData } }) => {
+export const createServiceFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: CreateService) => data)
+	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		const data = await fromDTO(serviceData);
-		await db.query(surql`CREATE service CONTENT ${data};`);
+		const content = await fromDTO(data);
+		await db.query(surql`CREATE service CONTENT ${content};`);
 	});
 
-export const updateService = createServerFn({ method: 'POST' })
-	.inputValidator((data: { serviceData: UpdateService }) => data)
-	.handler(async ({ data: { serviceData } }) => {
+export const updateServiceFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: UpdateService) => data)
+	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		const item = await fromDTO(serviceData);
-		await db.query(surql`UPDATE ${item.id} MERGE ${item};`);
+		const item = await fromDTO(data);
+		await db.update(item.id).merge(item);
 	});
 
-export const updateServices = createServerFn({ method: 'POST' })
-	.inputValidator((data: { servicesData: UpdateService[] }) => data)
-	.handler(async ({ data: { servicesData } }) => {
+export const updateServicesFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: UpdateService[]) => data)
+	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		const items = await fromDTOs(servicesData);
+		const items = await fromDTOs(data);
 		await db.query(
 			surql`FOR $item IN ${items} { UPDATE $item.id MERGE $item };`,
 		);
 	});
 
-export const deleteServices = createServerFn({ method: 'POST' })
-	.inputValidator((data: { ids: string[] }) => data)
+export const deleteServicesFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: string[]) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		const ids = await fromDTOs(data.ids);
+		const ids = await fromDTOs(data);
 		await db.query(surql`FOR $id IN ${ids} { DELETE $id };`);
 	});

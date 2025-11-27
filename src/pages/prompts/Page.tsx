@@ -1,13 +1,17 @@
 import { Stack } from '@mantine/core';
-import { Panel } from './Panel';
+import { Accordions, Panel } from './components';
+import { Edit } from './forms';
 import { PromptsProvider } from './Provider';
-import { Services } from './Services';
 
-export const PromptsPage = () => (
-	<PromptsProvider>
-		<Stack py="xl">
-			<Panel />
-			<Services />
-		</Stack>
-	</PromptsProvider>
-);
+export const PromptsPage = () => {
+	return (
+		<PromptsProvider>
+			<Stack py="xl">
+				<Panel />
+				<Accordions />
+
+				<Edit />
+			</Stack>
+		</PromptsProvider>
+	);
+};

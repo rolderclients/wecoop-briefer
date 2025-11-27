@@ -1,11 +1,11 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { eq, surql } from 'surrealdb';
-import { getDB } from '../connection';
-import type { Task, TaskWithBrief } from '../types';
-import { fromDTO } from '../utils';
+import type { CreateTask, Task, TaskWithBrief, UpdateTask } from '@/app';
+import { getDB } from '..';
+import { fromDTO, fromDTOs } from '../utils';
 
-const getTasks = createServerFn({ method: 'GET' })
+const getTasksFn = createServerFn({ method: 'GET' })
 	.inputValidator((data: { archived?: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
 		const db = await getDB();
@@ -26,15 +26,15 @@ const getTasks = createServerFn({ method: 'GET' })
 export const tasksQueryOptions = (archived?: boolean) =>
 	queryOptions<Task[]>({
 		queryKey: ['tasks', archived],
-		queryFn: () => getTasks({ data: { archived } }),
+		queryFn: () => getTasksFn({ data: { archived } }),
 	});
 
-export const getTask = createServerFn({ method: 'POST' })
-	.inputValidator((data: { taskId: string }) => data)
-	.handler(async ({ data: { taskId } }) => {
+export const getTaskWithBriefFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: string) => data)
+	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		const id = await fromDTO(taskId);
+		const id = await fromDTO(data);
 		const [result] = await db
 			.query(surql`SELECT
           *,
@@ -60,5 +60,43 @@ export const getTask = createServerFn({ method: 'POST' })
 export const taskWithBriefQueryOptions = (taskId: string) =>
 	queryOptions<TaskWithBrief>({
 		queryKey: ['taskWithBrief'],
-		queryFn: () => getTask({ data: { taskId } }),
+		queryFn: () => getTaskWithBriefFn({ data: taskId }),
+	});
+
+export const createTaskFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: CreateTask) => data)
+	.handler(async ({ data }) => {
+		const db = await getDB();
+
+		const content = await fromDTO(data);
+		await db.query(surql`CREATE task CONTENT ${content};`);
+	});
+
+export const updateTaskFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: UpdateTask) => data)
+	.handler(async ({ data }) => {
+		const db = await getDB();
+
+		const item = await fromDTO(data);
+		await db.update(item.id).merge(item);
+	});
+
+export const updateTasksFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: UpdateTask[]) => data)
+	.handler(async ({ data }) => {
+		const db = await getDB();
+
+		const items = await fromDTOs(data);
+		await db.query(
+			surql`FOR $item IN ${items} { UPDATE $item.id MERGE $item };`,
+		);
+	});
+
+export const deleteTasksFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: string[]) => data)
+	.handler(async ({ data }) => {
+		const db = await getDB();
+
+		const ids = await fromDTOs(data);
+		await db.query(surql`FOR $id IN ${ids} { DELETE $id };`);
 	});

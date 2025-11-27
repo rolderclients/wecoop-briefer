@@ -1,2 +1,2 @@
-export { PromptsPage } from './Page';
+export * from './Page';
 export * from './prompt';

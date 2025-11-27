@@ -1,10 +1,10 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { surql } from 'surrealdb';
-import { getDB } from '../connection';
-import type { Model } from '../types';
+import type { Model } from '@/app';
+import { getDB } from '..';
 
-const getModels = createServerFn({ method: 'GET' }).handler(async () => {
+const getModelsFn = createServerFn({ method: 'GET' }).handler(async () => {
 	const db = await getDB();
 
 	const [result] = await db
@@ -18,5 +18,5 @@ const getModels = createServerFn({ method: 'GET' }).handler(async () => {
 export const modelsQueryOptions = () =>
 	queryOptions<Model[]>({
 		queryKey: ['models'],
-		queryFn: getModels,
+		queryFn: getModelsFn,
 	});

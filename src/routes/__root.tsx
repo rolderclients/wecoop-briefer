@@ -1,12 +1,15 @@
-import mantineNotificationsCss from '@mantine/notifications/styles.css?url';
 import type { QueryClient } from '@tanstack/react-query';
 import { createRootRouteWithContext } from '@tanstack/react-router';
-import { App } from '@/app';
+import { App, getUserFn } from '@/app';
 import appCss from '../styles.css?url';
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
 }>()({
+	beforeLoad: async () => {
+		const user = await getUserFn();
+		return { user };
+	},
 	head: () => ({
 		meta: [
 			{
@@ -28,10 +31,6 @@ export const Route = createRootRouteWithContext<{
 			{
 				rel: 'stylesheet',
 				href: appCss,
-			},
-			{
-				rel: 'stylesheet',
-				href: mantineNotificationsCss,
 			},
 		],
 	}),

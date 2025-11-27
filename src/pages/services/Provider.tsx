@@ -1,90 +1,136 @@
+import { useDisclosure } from '@mantine/hooks';
 import {
-	useMutation,
-	useQueryClient,
+	type UseMutationResult,
 	useSuspenseQuery,
 } from '@tanstack/react-query';
 import { useSearch } from '@tanstack/react-router';
 import { createContext, type ReactNode, useContext, useState } from 'react';
 import {
-	type Category,
-	type CategoryWithServices,
 	categoriesQueryOptions,
 	categoriesWithServicesQueryOptions,
-	createService,
-	deleteServices,
-	type NewService,
-	type Service,
-	type UpdateService,
-	updateService,
-	updateServices,
+	createCategoryFn,
+	createServiceFn,
+	deleteServicesFn,
+	updateCategoryFn,
+	updateServiceFn,
+	updateServicesFn,
 } from '@/api';
+import type {
+	Category,
+	CategoryWithServices,
+	CreateCategory,
+	CreateService,
+	Service,
+	UpdateCategory,
+	UpdateService,
+} from '@/app';
+import { useMutaitionWithInvalidate } from '@/components';
+import { Route } from '@/routes/_authed/services';
 
 interface ServicesContext {
 	categories: Category[];
 	categoriesWithServices: CategoryWithServices[];
 	services: Service[];
-	createService: (serviceData: NewService) => void;
-	updateService: (serviceData: UpdateService) => void;
-	updateServices: (servicesData: UpdateService[]) => void;
-	deleteServices: (ids: string[]) => void;
+	createMutation: UseMutationResult<void, Error, CreateService, unknown>;
+	updateMutation: UseMutationResult<void, Error, UpdateService, unknown>;
+	updateManyMutation: UseMutationResult<void, Error, UpdateService[], unknown>;
+	deleteManyMutation: UseMutationResult<void, Error, string[], unknown>;
+	createCategoryMutation: UseMutationResult<
+		void,
+		Error,
+		CreateCategory,
+		unknown
+	>;
+	updateCategoryMutation: UseMutationResult<
+		void,
+		Error,
+		UpdateCategory,
+		unknown
+	>;
 	selectedIds: string[];
 	setSelectedIds: (ids: string[]) => void;
-	archived?: boolean;
-	setArchived: (archived: boolean) => void;
+	selectedService: Service | null;
+	setSelectedService: (service: Service | null) => void;
+	isArchived?: boolean;
+	setIsArchived: (archived: boolean) => void;
+	isCreateOpened: boolean;
+	openCreate: () => void;
+	closeCreate: () => void;
+	isEditingCategory: boolean;
+	setIsEditingCategory: (editing: boolean) => void;
+	isEditingOpened: boolean;
+	openEdit: () => void;
+	closeEdit: () => void;
 }
 
 const ServicesContext = createContext<ServicesContext | null>(null);
 
 export const ServicesProvider = ({ children }: { children: ReactNode }) => {
-	const queryClient = useQueryClient();
-
-	const [selectedIds, setSelectedIds] = useState<string[]>([]);
-	const { archived: initialArchived } = useSearch({ from: '/services' });
-	const [archived, setArchived] = useState(initialArchived);
+	const { archived: initialArchived } = useSearch({ from: Route.id });
 	const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
 	const { data: categoriesWithServices } = useSuspenseQuery(
 		categoriesWithServicesQueryOptions(initialArchived),
 	);
 
-	const createServiceMutation = useMutation({
-		mutationFn: (serviceData: NewService) =>
-			createService({ data: { serviceData } }),
-		onSettled: () =>
-			queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] }),
-	});
+	const createMutation = useMutaitionWithInvalidate<CreateService>(
+		createServiceFn,
+		['categoriesWithServices'],
+	);
+	const updateMutation = useMutaitionWithInvalidate<UpdateService>(
+		updateServiceFn,
+		['categoriesWithServices'],
+	);
+	const updateManyMutation = useMutaitionWithInvalidate<UpdateService[]>(
+		updateServicesFn,
+		['categoriesWithServices'],
+	);
+	const deleteManyMutation = useMutaitionWithInvalidate<string[]>(
+		deleteServicesFn,
+		['categoriesWithServices'],
+	);
+	const createCategoryMutation = useMutaitionWithInvalidate<CreateCategory>(
+		createCategoryFn,
+		['categories'],
+	);
+	const updateCategoryMutation = useMutaitionWithInvalidate<UpdateCategory>(
+		updateCategoryFn,
+		['categories'],
+	);
 
-	const updateServiceMutation = useMutation({
-		mutationFn: (serviceData: UpdateService) =>
-			updateService({ data: { serviceData } }),
-		onSettled: () =>
-			queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] }),
-	});
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
+	const [selectedService, setSelectedService] = useState<Service | null>(null);
+	const [isArchived, setIsArchived] = useState(initialArchived);
+	const [isEditingCategory, setIsEditingCategory] = useState(false);
 
-	const updateServicesMutation = useMutation({
-		mutationFn: (servicesData: UpdateService[]) =>
-			updateServices({ data: { servicesData } }),
-		onSettled: () =>
-			queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] }),
-	});
-
-	const deleteServicesMutation = useMutation({
-		mutationFn: (ids: string[]) => deleteServices({ data: { ids } }),
-		onSettled: () =>
-			queryClient.invalidateQueries({ queryKey: ['categoriesWithServices'] }),
-	});
+	const [isCreateOpened, { open: openCreate, close: closeCreate }] =
+		useDisclosure(false);
+	const [isEditingOpened, { open: openEdit, close: closeEdit }] =
+		useDisclosure(false);
 
 	const value = {
 		categories,
 		categoriesWithServices,
 		services: categoriesWithServices.flatMap((i) => i.services),
-		createService: createServiceMutation.mutate,
-		updateService: updateServiceMutation.mutate,
-		updateServices: updateServicesMutation.mutate,
-		deleteServices: deleteServicesMutation.mutate,
+		createMutation,
+		updateMutation,
+		updateManyMutation,
+		deleteManyMutation,
+		createCategoryMutation,
+		updateCategoryMutation,
 		selectedIds,
 		setSelectedIds,
-		archived,
-		setArchived,
+		selectedService,
+		setSelectedService,
+		isArchived,
+		setIsArchived,
+		isCreateOpened,
+		openCreate,
+		closeCreate,
+		isEditingCategory,
+		setIsEditingCategory,
+		isEditingOpened,
+		openEdit,
+		closeEdit,
 	};
 
 	return (

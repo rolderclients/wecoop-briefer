@@ -1,10 +1,11 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { surql } from 'surrealdb';
-import { getDB } from '../connection';
-import type { Category } from '../types';
+import type { Category, CreateCategory, UpdateCategory } from '@/app';
+import { getDB } from '..';
+import { fromDTO } from '../utils';
 
-const getCategories = createServerFn({ method: 'GET' }).handler(async () => {
+const getCategoriesFn = createServerFn({ method: 'GET' }).handler(async () => {
 	const db = await getDB();
 
 	const [result] = await db
@@ -18,5 +19,22 @@ const getCategories = createServerFn({ method: 'GET' }).handler(async () => {
 export const categoriesQueryOptions = () =>
 	queryOptions<Category[]>({
 		queryKey: ['categories'],
-		queryFn: getCategories,
+		queryFn: getCategoriesFn,
+	});
+
+export const createCategoryFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: CreateCategory) => data)
+	.handler(async ({ data }) => {
+		const db = await getDB();
+
+		await db.query(surql`CREATE category CONTENT ${data};`);
+	});
+
+export const updateCategoryFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: UpdateCategory) => data)
+	.handler(async ({ data }) => {
+		const db = await getDB();
+
+		const item = await fromDTO(data);
+		await db.update(item.id).merge(item);
 	});

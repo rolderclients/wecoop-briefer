@@ -4,14 +4,14 @@ import { DateTime, Surreal } from 'surrealdb';
 
 let db: Surreal | null = null;
 
-export const getDB = createServerOnlyFn(async (): Promise<Surreal> => {
+export const getDBFn = createServerOnlyFn(async (): Promise<Surreal> => {
 	if (db?.isConnected) return db;
 
 	// Нужно чтобы был в корне для получения контекста запроса серверной функции
 	const locale = getCookie('locale') || 'ru-RU';
 	const timeZone = getCookie('tz') || 'UTC';
 
-	db = new Surreal({
+	const instance = new Surreal({
 		codecOptions: {
 			valueDecodeVisitor(value) {
 				if (value instanceof DateTime) {
@@ -21,7 +21,6 @@ export const getDB = createServerOnlyFn(async (): Promise<Surreal> => {
 						timeZone,
 					});
 				}
-
 				return value;
 			},
 		},
@@ -31,30 +30,25 @@ export const getDB = createServerOnlyFn(async (): Promise<Surreal> => {
 		const url = process.env.SURREALDB_URL;
 		const namespace = process.env.SURREALDB_NAMESPACE;
 		const database = process.env.SURREALDB_DATABASE;
-		const username = process.env.SURREALDB_USER;
+		const username = process.env.SURREALDB_USERNAME;
 		const password = process.env.SURREALDB_PASSWORD;
 
 		if (!url || !namespace || !database || !username || !password) {
 			throw new Error('Missing required SurrealDB environment variables');
 		}
 
-		// Connect to the database
-		await db.connect(url, { reconnect: true });
+		await instance.connect(url, { authentication: { username, password } });
 
-		// Select a specific namespace / database
-		await db.use({
+		await instance.use({
 			namespace,
 			database,
 		});
 
-		// Signin as root user
-		await db.signin({
-			username,
-			password,
-		});
+		db = instance;
 
 		console.log('Connected to SurrealDB');
-		return db;
+
+		return instance;
 	} catch (error) {
 		console.error('Failed to connect to SurrealDB:', error);
 		db = null;

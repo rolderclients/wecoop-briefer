@@ -1,15 +1,17 @@
-import { Grid, Stack } from '@mantine/core';
-import { TasksList } from './List';
+import { Stack } from '@mantine/core';
+import { TasksList } from './components';
+import { Panel } from './components/Panel';
+import { Edit } from './forms';
 import { TasksProvider } from './Provider';
 
 export const TasksPage = () => (
 	<TasksProvider>
 		<Stack py="xl">
-			<Grid px="md" c="dimmed">
-				<Grid.Col span="auto">Название</Grid.Col>
-			</Grid>
+			<Panel />
 
 			<TasksList />
+
+			<Edit />
 		</Stack>
 	</TasksProvider>
 );

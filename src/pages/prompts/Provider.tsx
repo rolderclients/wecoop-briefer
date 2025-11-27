@@ -1,97 +1,110 @@
+import { useDisclosure } from '@mantine/hooks';
 import {
-	useMutation,
-	useQueryClient,
+	type UseMutationResult,
 	useSuspenseQuery,
 } from '@tanstack/react-query';
 import { useSearch } from '@tanstack/react-router';
 import { createContext, type ReactNode, useContext, useState } from 'react';
+import {
+	createPromptFn,
+	deletePromptsFn,
+	modelsQueryOptions,
+	servicesQueryOptions,
+	servicesWithPromptsQueryOptions,
+	updatePromptFn,
+	updatePromptsFn,
+} from '@/api';
 import type {
+	CreatePrompt,
 	Model,
-	NewPrompt,
 	Prompt,
 	Service,
 	ServiceWithPrompts,
 	UpdatePrompt,
-} from '@/api';
-import {
-	createPrompt,
-	deletePrompts,
-	modelsQueryOptions,
-	servicesQueryOptions,
-	servicesWithPromptsQueryOptions,
-	updatePrompt,
-	updatePrompts,
-} from '@/api';
+} from '@/app';
+import { useMutaitionWithInvalidate } from '@/components';
+import { Route } from '@/routes/_authed/prompts';
 
 interface PromptsContext {
 	services: Service[];
 	models: Model[];
 	servicesWithPrompts: ServiceWithPrompts[];
 	prompts: Prompt[];
-	createPrompt: (promptData: NewPrompt) => void;
-	updatePrompt: (promptData: UpdatePrompt) => void;
-	updatePrompts: (promptData: UpdatePrompt[]) => void;
-	deletePrompts: (ids: string[]) => void;
+	createMutation: UseMutationResult<void, Error, CreatePrompt, unknown>;
+	updateMutation: UseMutationResult<void, Error, UpdatePrompt, unknown>;
+	updateManyMutation: UseMutationResult<void, Error, UpdatePrompt[], unknown>;
+	deleteManyMutation: UseMutationResult<void, Error, string[], unknown>;
 	selectedIds: string[];
 	setSelectedIds: (ids: string[]) => void;
-	archived?: boolean;
-	setArchived: (archived: boolean) => void;
+	isArchived?: boolean;
+	setIsArchived: (archived: boolean) => void;
+	selectedPrompt: Prompt | null;
+	setSelectedPrompt: (prompt: Prompt | null) => void;
+	isCreateOpened: boolean;
+	openCreate: () => void;
+	closeCreate: () => void;
+	isEditingOpened: boolean;
+	openEdit: () => void;
+	closeEdit: () => void;
 }
 
 const PromptsContext = createContext<PromptsContext | null>(null);
 
 export const PromptsProvider = ({ children }: { children: ReactNode }) => {
-	const queryClient = useQueryClient();
-
-	const [selectedIds, setSelectedIds] = useState<string[]>([]);
-	const { archived: initialArchived } = useSearch({ from: '/prompts/' });
-	const [archived, setArchived] = useState(initialArchived);
+	const { archived: initialArchived } = useSearch({ from: Route.id });
 	const { data: services } = useSuspenseQuery(servicesQueryOptions());
 	const { data: models } = useSuspenseQuery(modelsQueryOptions());
 	const { data: servicesWithPrompts } = useSuspenseQuery(
 		servicesWithPromptsQueryOptions(initialArchived),
 	);
 
-	const createPromptMutation = useMutation({
-		mutationFn: (promptData: NewPrompt) =>
-			createPrompt({ data: { promptData } }),
-		onSettled: () =>
-			queryClient.invalidateQueries({ queryKey: ['servicesWithPrompts'] }),
-	});
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
+	const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
+	const [isArchived, setIsArchived] = useState(initialArchived);
 
-	const updatePromptMutation = useMutation({
-		mutationFn: (promptData: UpdatePrompt) =>
-			updatePrompt({ data: { promptData } }),
-		onSettled: () =>
-			queryClient.invalidateQueries({ queryKey: ['servicesWithPrompts'] }),
-	});
+	const [isCreateOpened, { open: openCreate, close: closeCreate }] =
+		useDisclosure(false);
+	const [isEditingOpened, { open: openEdit, close: closeEdit }] =
+		useDisclosure(false);
 
-	const updatePromptsMutation = useMutation({
-		mutationFn: (promptsData: UpdatePrompt[]) =>
-			updatePrompts({ data: { promptsData } }),
-		onSettled: () =>
-			queryClient.invalidateQueries({ queryKey: ['servicesWithPrompts'] }),
-	});
-
-	const deletePromptsMutation = useMutation({
-		mutationFn: (ids: string[]) => deletePrompts({ data: { ids } }),
-		onSettled: () =>
-			queryClient.invalidateQueries({ queryKey: ['servicesWithPrompts'] }),
-	});
+	const createMutation = useMutaitionWithInvalidate<CreatePrompt>(
+		createPromptFn,
+		['servicesWithPrompts'],
+	);
+	const updateMutation = useMutaitionWithInvalidate<UpdatePrompt>(
+		updatePromptFn,
+		['servicesWithPrompts'],
+	);
+	const updateManyMutation = useMutaitionWithInvalidate<UpdatePrompt[]>(
+		updatePromptsFn,
+		['servicesWithPrompts'],
+	);
+	const deleteManyMutation = useMutaitionWithInvalidate<string[]>(
+		deletePromptsFn,
+		['servicesWithPrompts'],
+	);
 
 	const value = {
 		services,
 		models,
 		servicesWithPrompts,
 		prompts: servicesWithPrompts.flatMap((i) => i.prompts),
-		createPrompt: createPromptMutation.mutate,
-		updatePrompt: updatePromptMutation.mutate,
-		updatePrompts: updatePromptsMutation.mutate,
-		deletePrompts: deletePromptsMutation.mutate,
+		createMutation,
+		updateMutation,
+		updateManyMutation,
+		deleteManyMutation,
 		selectedIds,
 		setSelectedIds,
-		archived,
-		setArchived,
+		selectedPrompt,
+		setSelectedPrompt,
+		isArchived,
+		setIsArchived,
+		isCreateOpened,
+		openCreate,
+		closeCreate,
+		isEditingOpened,
+		openEdit,
+		closeEdit,
 	};
 
 	return (

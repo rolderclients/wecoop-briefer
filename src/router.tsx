@@ -1,33 +1,28 @@
-import { Button } from '@mantine/core';
-import { Default404Page } from '@rolder/ui-kit-react';
 import { QueryClient } from '@tanstack/react-query';
-import { createRouter, Link } from '@tanstack/react-router';
+import { createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
-import { DefaultCatchBoundary } from './app';
+import {
+	DefaultErrorComponent,
+	DefaultNotFoundComponent,
+	defaultErrorNotification,
+} from './app';
 import { routeTree } from './routeTree.gen';
 
-export const getRouter = () => {
-	const queryClient = new QueryClient();
+export const getRouter = async () => {
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			mutations: {
+				onError: (error) => defaultErrorNotification(error),
+			},
+		},
+	});
 
 	const router = createRouter({
 		routeTree,
-		scrollRestoration: true,
-		defaultPreloadStaleTime: 0,
 		context: { queryClient },
 		defaultPreload: 'intent',
-		defaultErrorComponent: DefaultCatchBoundary,
-		defaultNotFoundComponent: () => (
-			<Default404Page
-				h="100%"
-				gotoHomeComponent={
-					<Link to="/">
-						<Button mt="xl" component="div" size="lg" radius="md">
-							На главную
-						</Button>
-					</Link>
-				}
-			/>
-		),
+		defaultErrorComponent: DefaultErrorComponent,
+		defaultNotFoundComponent: DefaultNotFoundComponent,
 	});
 
 	setupRouterSsrQueryIntegration({
