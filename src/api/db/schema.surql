@@ -8,7 +8,7 @@ DEFINE FUNCTION OVERWRITE fn::tableNames() { object::keys((INFO FOR DATABASE).ta
 DEFINE TABLE OVERWRITE category TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
 DEFINE FIELD OVERWRITE title ON category TYPE string;
 DEFINE FIELD OVERWRITE services ON category COMPUTED <~service;
-DEFINE FIELD OVERWRITE time ON category TYPE option<object>;
+DEFINE FIELD OVERWRITE time ON category TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON category TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON category TYPE datetime VALUE time::now();
 
@@ -19,7 +19,7 @@ DEFINE FIELD OVERWRITE archived ON service TYPE bool DEFAULT false;
 DEFINE FIELD OVERWRITE category ON service TYPE record<category> REFERENCE ON DELETE IGNORE;
 DEFINE FIELD OVERWRITE prompts ON service COMPUTED <~prompt;
 DEFINE FIELD OVERWRITE tasks ON service COMPUTED <~task;
-DEFINE FIELD OVERWRITE time ON service TYPE option<object>;
+DEFINE FIELD OVERWRITE time ON service TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON service TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON service TYPE datetime VALUE time::now();
 
@@ -28,7 +28,7 @@ DEFINE TABLE OVERWRITE model TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
 DEFINE FIELD OVERWRITE title ON model TYPE string;
 DEFINE FIELD OVERWRITE name ON model TYPE string;
 DEFINE FIELD OVERWRITE prompts ON model COMPUTED <~prompt;
-DEFINE FIELD OVERWRITE time ON model TYPE option<object>;
+DEFINE FIELD OVERWRITE time ON model TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON model TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON model TYPE datetime VALUE time::now();
 
@@ -40,7 +40,7 @@ DEFINE FIELD OVERWRITE enabled ON prompt TYPE bool DEFAULT false;
 DEFINE FIELD OVERWRITE archived ON prompt TYPE bool DEFAULT false;
 DEFINE FIELD OVERWRITE service ON prompt TYPE record<service> REFERENCE ON DELETE IGNORE;
 DEFINE FIELD OVERWRITE model ON prompt TYPE record<model> REFERENCE ON DELETE IGNORE;
-DEFINE FIELD OVERWRITE time ON prompt TYPE option<object>;
+DEFINE FIELD OVERWRITE time ON prompt TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON prompt TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON prompt TYPE datetime VALUE time::now();
 
@@ -54,14 +54,14 @@ DEFINE FIELD OVERWRITE company.info ON task TYPE option<string>;
 DEFINE FIELD OVERWRITE archived ON task TYPE bool DEFAULT false;
 DEFINE FIELD OVERWRITE service ON task TYPE record<service> REFERENCE ON DELETE IGNORE;
 DEFINE FIELD OVERWRITE brief ON task TYPE record<brief> DEFAULT (CREATE ONLY brief).id;
-DEFINE FIELD OVERWRITE time ON task TYPE option<object>;
+DEFINE FIELD OVERWRITE time ON task TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON task TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON task TYPE datetime VALUE time::now();
 
 -- // Brief
 DEFINE TABLE OVERWRITE brief TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
 DEFINE FIELD OVERWRITE content ON brief TYPE option<string>;
-DEFINE FIELD OVERWRITE time ON brief TYPE option<object>;
+DEFINE FIELD OVERWRITE time ON brief TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON brief TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON brief TYPE datetime VALUE time::now();
 
