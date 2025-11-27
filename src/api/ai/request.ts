@@ -6,16 +6,16 @@ export const aiRequest = async ({ request }: { request: Request }) => {
 	const {
 		messages,
 		model,
-		userPrompt,
+		prompt,
 	}: {
 		messages: UIMessage[];
 		model?: ModelName;
-		userPrompt?: string;
+		prompt?: string;
 	} = await request.json();
 
 	try {
 		return createAgentUIStreamResponse({
-			agent: createAgent(model, userPrompt),
+			agent: createAgent(model, prompt),
 			messages,
 		});
 	} catch (error) {

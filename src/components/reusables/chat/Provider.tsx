@@ -55,7 +55,10 @@ export const Provider = ({
 		setPrompt,
 		messages: messages.filter((message) => message.role !== 'system'),
 		hasMessages: messages.length > 0,
-		sendMessage,
+		sendMessage: async (data) => {
+			const { text, ...body } = data;
+			await sendMessage({ text }, { body });
+		},
 		setMessages,
 		chatStatus: status,
 		error,
