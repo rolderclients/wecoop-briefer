@@ -1,4 +1,4 @@
-import type { Session } from '@/lib';
+import type { Session } from '@/lib/auth';
 
 export type User = Omit<Session['user'], 'username' | 'role'> & {
 	username: string;

@@ -20,6 +20,8 @@ import { Route as AuthedTasksIndexRouteImport } from './routes/_authed/tasks/ind
 import { Route as AuthedPromptsIndexRouteImport } from './routes/_authed/prompts/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthedPromptsPromptIdRouteImport } from './routes/_authed/prompts/$promptId'
+import { Route as AuthedTasksTaskIdIndexRouteImport } from './routes/_authed/tasks/$taskId/index'
+import { Route as AuthedTasksTaskIdBriefRouteImport } from './routes/_authed/tasks/$taskId/brief'
 
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
@@ -75,6 +77,16 @@ const AuthedPromptsPromptIdRoute = AuthedPromptsPromptIdRouteImport.update({
   path: '/prompts/$promptId',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedTasksTaskIdIndexRoute = AuthedTasksTaskIdIndexRouteImport.update({
+  id: '/tasks/$taskId/',
+  path: '/tasks/$taskId/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedTasksTaskIdBriefRoute = AuthedTasksTaskIdBriefRouteImport.update({
+  id: '/tasks/$taskId/brief',
+  path: '/tasks/$taskId/brief',
+  getParentRoute: () => AuthedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -87,6 +99,8 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/prompts': typeof AuthedPromptsIndexRoute
   '/tasks': typeof AuthedTasksIndexRoute
+  '/tasks/$taskId/brief': typeof AuthedTasksTaskIdBriefRoute
+  '/tasks/$taskId': typeof AuthedTasksTaskIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -99,6 +113,8 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/prompts': typeof AuthedPromptsIndexRoute
   '/tasks': typeof AuthedTasksIndexRoute
+  '/tasks/$taskId/brief': typeof AuthedTasksTaskIdBriefRoute
+  '/tasks/$taskId': typeof AuthedTasksTaskIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -113,6 +129,8 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authed/prompts/': typeof AuthedPromptsIndexRoute
   '/_authed/tasks/': typeof AuthedTasksIndexRoute
+  '/_authed/tasks/$taskId/brief': typeof AuthedTasksTaskIdBriefRoute
+  '/_authed/tasks/$taskId/': typeof AuthedTasksTaskIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -127,6 +145,8 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/prompts'
     | '/tasks'
+    | '/tasks/$taskId/brief'
+    | '/tasks/$taskId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -139,6 +159,8 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/prompts'
     | '/tasks'
+    | '/tasks/$taskId/brief'
+    | '/tasks/$taskId'
   id:
     | '__root__'
     | '/'
@@ -152,6 +174,8 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/_authed/prompts/'
     | '/_authed/tasks/'
+    | '/_authed/tasks/$taskId/brief'
+    | '/_authed/tasks/$taskId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -242,6 +266,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedPromptsPromptIdRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/tasks/$taskId/': {
+      id: '/_authed/tasks/$taskId/'
+      path: '/tasks/$taskId'
+      fullPath: '/tasks/$taskId'
+      preLoaderRoute: typeof AuthedTasksTaskIdIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/tasks/$taskId/brief': {
+      id: '/_authed/tasks/$taskId/brief'
+      path: '/tasks/$taskId/brief'
+      fullPath: '/tasks/$taskId/brief'
+      preLoaderRoute: typeof AuthedTasksTaskIdBriefRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
@@ -251,6 +289,8 @@ interface AuthedRouteChildren {
   AuthedPromptsPromptIdRoute: typeof AuthedPromptsPromptIdRoute
   AuthedPromptsIndexRoute: typeof AuthedPromptsIndexRoute
   AuthedTasksIndexRoute: typeof AuthedTasksIndexRoute
+  AuthedTasksTaskIdBriefRoute: typeof AuthedTasksTaskIdBriefRoute
+  AuthedTasksTaskIdIndexRoute: typeof AuthedTasksTaskIdIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
@@ -259,6 +299,8 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedPromptsPromptIdRoute: AuthedPromptsPromptIdRoute,
   AuthedPromptsIndexRoute: AuthedPromptsIndexRoute,
   AuthedTasksIndexRoute: AuthedTasksIndexRoute,
+  AuthedTasksTaskIdBriefRoute: AuthedTasksTaskIdBriefRoute,
+  AuthedTasksTaskIdIndexRoute: AuthedTasksTaskIdIndexRoute,
 }
 
 const AuthedRouteWithChildren =

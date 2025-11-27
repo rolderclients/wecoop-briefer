@@ -8,18 +8,18 @@ import { createContext, type ReactNode, useContext, useState } from 'react';
 import {
 	createTaskFn,
 	deleteTasksFn,
-	servicesQueryOptions,
+	servicesWithEnbledPromptsQueryOptions,
 	tasksQueryOptions,
 	updateTaskFn,
 	updateTasksFn,
 } from '@/api';
-import type { CreateTask, Service, Task, UpdateTask } from '@/app';
+import type { CreateTask, ServiceWithPrompts, Task, UpdateTask } from '@/app';
 import { useMutaitionWithInvalidate } from '@/components';
 import { Route } from '@/routes/_authed/tasks';
 
 interface TasksContext {
 	tasks: Task[];
-	services: Service[];
+	services: ServiceWithPrompts[];
 	createMutation: UseMutationResult<void, Error, CreateTask, unknown>;
 	updateMutation: UseMutationResult<void, Error, UpdateTask, unknown>;
 	updateManyMutation: UseMutationResult<void, Error, UpdateTask[], unknown>;
@@ -43,7 +43,9 @@ const TasksContext = createContext<TasksContext | null>(null);
 export const TasksProvider = ({ children }: { children: ReactNode }) => {
 	const { archived: initialArchived } = useSearch({ from: Route.id });
 	const { data: tasks } = useSuspenseQuery(tasksQueryOptions(initialArchived));
-	const { data: services } = useSuspenseQuery(servicesQueryOptions());
+	const { data: services } = useSuspenseQuery(
+		servicesWithEnbledPromptsQueryOptions(),
+	);
 
 	const createMutation = useMutaitionWithInvalidate<CreateTask>(createTaskFn, [
 		'tasks',

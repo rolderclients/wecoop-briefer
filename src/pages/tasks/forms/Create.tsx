@@ -120,7 +120,7 @@ export const Create = () => {
 							name="service"
 							children={(field) => (
 								<field.SelectField
-									label="Услуга"
+									label="Услуга (показаны только со включенными промтами)"
 									placeholder="Выберите услугу"
 									data={services.map((i) => ({ label: i.title, value: i.id }))}
 									searchable
