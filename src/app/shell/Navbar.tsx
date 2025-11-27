@@ -29,14 +29,14 @@ interface NavbarLinkProps {
 }
 
 export const menu: NavbarLinkProps[] = [
-	{ label: 'Услуги', pathname: '/services', icon: IconList, access: ['admin'] },
-	{ label: 'Промты', pathname: '/prompts', icon: IconAi, access: ['admin'] },
 	{
 		label: 'Задачи',
 		pathname: '/tasks',
 		icon: IconChecklist,
 		access: ['admin', 'manager'],
 	},
+	{ label: 'Промты', pathname: '/prompts', icon: IconAi, access: ['admin'] },
+	{ label: 'Услуги', pathname: '/services', icon: IconList, access: ['admin'] },
 	{
 		label: 'Сотрудники',
 		pathname: '/users',

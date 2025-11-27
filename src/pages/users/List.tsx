@@ -11,11 +11,12 @@ import {
 	Tooltip,
 } from '@mantine/core';
 import { useHover } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import { IconEdit, IconKey, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import { type User, useAuth } from '@/app';
 import classes from '@/app/styles.module.css';
-import { useUsers } from '../provider';
+import { useUsers } from './provider';
 
 const roles = {
 	admin: 'Администратор',
@@ -89,11 +90,13 @@ const UserPaper = ({ user }: { user: User }) => {
 								color="red"
 								checked={blocked}
 								disabled={authUser?.id === user.id}
-								onChange={(event) => {
+								onChange={async (event) => {
+									const block = event.currentTarget.checked;
 									setBlocked(event.currentTarget.checked);
-									updateBlockMutation.mutate({
-										id: user.id,
-										block: event.currentTarget.checked,
+									await updateBlockMutation.mutateAsync({ id: user.id, block });
+									notifications.show({
+										message: `Учетная запись сотрудника "${user?.name}" ${block ? 'заблокирована' : 'разблокирована'}`,
+										color: block ? 'orange' : 'green',
 									});
 								}}
 							/>

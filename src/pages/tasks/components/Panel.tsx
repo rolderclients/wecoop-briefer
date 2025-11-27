@@ -1,15 +1,15 @@
 import { Group, Paper, Switch } from '@mantine/core';
 import { IconArchive, IconRestore, IconTrash } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
-import { Route } from '@/routes/_authed/services';
+import { Route } from '@/routes/_authed/tasks';
 import { Create } from '../forms';
-import { useServices } from '../Provider';
+import { useTasks } from '../Provider';
 import { ArchivateRestoreDelete } from './ArchivateRestoreDelete';
 
 export const Panel = () => {
 	const navigate = useNavigate({ from: Route.fullPath });
 
-	const { setSelectedIds, isArchived, setIsArchived } = useServices();
+	const { setSelectedIds, isArchived, setIsArchived } = useTasks();
 
 	return (
 		<Paper radius="md" withBorder py="sm" px="md">

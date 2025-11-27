@@ -71,13 +71,7 @@ export const UsersProvider = ({ children }: { children: ReactNode }) => {
 		updateCredentialsMutation,
 		updateBlockMutation,
 		deleteMutation,
-	} = useMutations({
-		users,
-		closeCreate,
-		closeEdit,
-		closeEditCredentials,
-		closeDelete,
-	});
+	} = useMutations();
 
 	const value = {
 		users,

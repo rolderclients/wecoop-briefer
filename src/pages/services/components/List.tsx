@@ -3,7 +3,7 @@ import { useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
 import type { Service } from '@/app';
 import classes from '@/app/styles.module.css';
-import { useServices } from '../provider';
+import { useServices } from '../Provider';
 
 export const ServicesList = ({ services }: { services: Service[] }) =>
 	services.map((service) => (

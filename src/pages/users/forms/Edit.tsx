@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <> */
 import { Group, Modal, Stack } from '@mantine/core';
-import { useEffect } from 'react';
+import { notifications } from '@mantine/notifications';
+import { useCallback, useEffect } from 'react';
 import z from 'zod/v4';
 import type { UpdateUser } from '@/app';
 import { blurOnError, filedsSchema, useAppForm } from '@/components';
@@ -37,22 +38,37 @@ export const Edit = () => {
 			),
 		},
 		onSubmitInvalid: blurOnError,
-		onSubmit: ({ value }) => updateMutation.mutateAsync(value),
+		onSubmit: async ({ value }) => {
+			await updateMutation.mutateAsync(value);
+			notifications.show({
+				message: `Запись сотрудника "${value.name}" обновлена`,
+				color: 'green',
+			});
+			closeForm();
+		},
 	});
 
-	useEffect(() => {
+	const resetForm = useCallback(() => {
 		if (selectedUser) {
-			form.reset();
 			form.setFieldValue('id', selectedUser.id);
 			form.setFieldValue('name', selectedUser.name);
 			form.setFieldValue('email', selectedUser.email);
 		}
 	}, [form, selectedUser]);
 
+	useEffect(() => {
+		resetForm();
+	}, [resetForm]);
+
+	const closeForm = () => {
+		resetForm();
+		closeEdit();
+	};
+
 	return (
 		<Modal
 			opened={editOpened}
-			onClose={closeEdit}
+			onClose={closeForm}
 			title={`Изменение учетной записи сотрудника "${selectedUser?.name}"`}
 		>
 			<form
@@ -79,7 +95,7 @@ export const Edit = () => {
 
 					<Group ml="auto" mt="lg">
 						<form.AppForm>
-							<form.CancelButton onClick={closeEdit} />
+							<form.CancelButton onClick={closeForm} />
 						</form.AppForm>
 
 						<form.AppForm>

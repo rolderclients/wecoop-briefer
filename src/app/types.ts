@@ -87,3 +87,57 @@ export interface UpdatePrompt {
 	enabled?: boolean;
 	archived?: boolean;
 }
+
+// Brief
+
+export interface Brief extends Item {
+	content: string;
+}
+
+export interface UpdateBrief {
+	id: string;
+	content: string;
+}
+
+// Task
+
+export interface Task extends Item {
+	title: string;
+	content?: string;
+	brief: string;
+	company: {
+		title?: string;
+		info?: string;
+	};
+	service: Pick<Service, 'id' | 'title'>;
+	prompt: Pick<Prompt, 'id' | 'title' | 'content'> & {
+		model: Pick<Model, 'id' | 'name' | 'title'>;
+	};
+	archived: boolean;
+}
+
+export interface TaskWithBrief extends Omit<Task, 'brief'> {
+	brief: Brief;
+}
+
+export interface CreateTask {
+	title: string;
+	content?: string;
+	company?: {
+		title?: string;
+		info?: string;
+	};
+	service: string;
+}
+
+export interface UpdateTask {
+	id: string;
+	title?: string;
+	content?: string;
+	company?: {
+		title?: string;
+		info?: string;
+	};
+	service?: string;
+	archived?: boolean;
+}

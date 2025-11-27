@@ -2,7 +2,7 @@ import { Button, Group, type MantineColor, Modal, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { type Icon, IconCancel } from '@tabler/icons-react';
-import { useServices } from '../Provider';
+import { useTasks } from '../Provider';
 
 export const ArchivateRestoreDelete = ({
 	type,
@@ -16,12 +16,12 @@ export const ArchivateRestoreDelete = ({
 	color?: MantineColor;
 }) => {
 	const {
-		services,
+		tasks,
 		updateManyMutation,
 		deleteManyMutation,
 		selectedIds,
 		setSelectedIds,
-	} = useServices();
+	} = useTasks();
 	const [opened, { open, close }] = useDisclosure(false);
 
 	return (
@@ -60,9 +60,7 @@ export const ArchivateRestoreDelete = ({
 						rightSection={selectedIds.length}
 						loading={updateManyMutation.isPending}
 						onClick={async () => {
-							const selected = services.filter((i) =>
-								selectedIds.includes(i.id),
-							);
+							const selected = tasks.filter((i) => selectedIds.includes(i.id));
 
 							switch (type) {
 								case 'archivate':
@@ -73,8 +71,8 @@ export const ArchivateRestoreDelete = ({
 										notifications.show({
 											message:
 												selected.length === 1
-													? `Услуга архивирована`
-													: `Услуги архивированы`,
+													? `Задача архивирована`
+													: `Задачи архивированы`,
 											color: 'green',
 										});
 									}
@@ -87,8 +85,8 @@ export const ArchivateRestoreDelete = ({
 										notifications.show({
 											message:
 												selected.length === 1
-													? `Услуга восстановлена`
-													: `Услуги восстановлены`,
+													? `Задача восстановлена`
+													: `Задачи восстановлены`,
 											color: 'green',
 										});
 									}
@@ -99,8 +97,8 @@ export const ArchivateRestoreDelete = ({
 										notifications.show({
 											message:
 												selected.length === 1
-													? `Услуга удалена`
-													: `Услуги удалены`,
+													? `Задача удалена`
+													: `Задачи удалены`,
 											color: 'green',
 										});
 									}

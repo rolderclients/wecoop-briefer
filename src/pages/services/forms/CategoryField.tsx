@@ -7,10 +7,11 @@ import {
 	Text,
 	useCombobox,
 } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { IconCheck, IconEdit, IconPlus, IconX } from '@tabler/icons-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useFieldContext } from '@/components';
-import { useServices } from '../provider';
+import { useServices } from '../Provider';
 
 export const CategoryField = () => {
 	const field = useFieldContext<string>();
@@ -70,6 +71,10 @@ export const CategoryField = () => {
 			await updateCategoryMutation.mutateAsync({
 				id: editingId,
 				title: editingText,
+			});
+			notifications.show({
+				message: `Категория "${editingText}" обновлена`,
+				color: 'green',
 			});
 			setEditingLoading(false);
 			setValue(editingText);
@@ -174,6 +179,10 @@ export const CategoryField = () => {
 				if (val === '$create') {
 					setCreating(true);
 					await createCategoryMutation.mutateAsync({ title: search });
+					notifications.show({
+						message: `Категория "${search}" создана`,
+						color: 'green',
+					});
 					setValue(search);
 					field.handleChange(search);
 					setCreating(false);

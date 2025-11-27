@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <> */
 import { Group, Modal, Stack } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 //@ts-expect-error
 import generatePassword from 'omgopass';
 import { useEffect } from 'react';
@@ -49,7 +50,14 @@ export const EditCredentials = () => {
 			),
 		},
 		onSubmitInvalid: blurOnError,
-		onSubmit: ({ value }) => updateCredentialsMutation.mutateAsync(value),
+		onSubmit: async ({ value }) => {
+			await updateCredentialsMutation.mutateAsync(value);
+			closeEditCredentials();
+			notifications.show({
+				message: `Данные доступа учетной записи сотрудника "${selectedUser?.name}" изменены`,
+				color: 'green',
+			});
+		},
 	});
 
 	useEffect(() => {

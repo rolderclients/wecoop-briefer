@@ -41,7 +41,7 @@ export const servicesWithPromptsQueryOptions = (archived?: boolean) =>
 		queryFn: () => getServicesWithPromptsFn({ data: { archived } }),
 	});
 
-export const getPromptFn = createServerFn({ method: 'POST' })
+export const getPromptWithModelFn = createServerFn({ method: 'POST' })
 	.inputValidator((data: string) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
@@ -58,7 +58,7 @@ export const getPromptFn = createServerFn({ method: 'POST' })
 export const promptQueryOptions = (promptId: string) =>
 	queryOptions<Prompt>({
 		queryKey: ['prompt'],
-		queryFn: () => getPromptFn({ data: promptId }),
+		queryFn: () => getPromptWithModelFn({ data: promptId }),
 	});
 
 export const createPromptFn = createServerFn({ method: 'POST' })

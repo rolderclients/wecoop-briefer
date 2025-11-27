@@ -1,6 +1,6 @@
 import { Stack } from '@mantine/core';
-import { UsersList } from './components/List';
 import { Create, Delete, Edit, EditCredentials } from './forms';
+import { UsersList } from './List';
 import { UsersProvider } from './provider';
 
 export const UsersPage = () => (
