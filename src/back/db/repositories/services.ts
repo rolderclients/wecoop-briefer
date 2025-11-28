@@ -28,7 +28,7 @@ const getServicesFn = createServerFn({ method: 'GET' })
 
 export const servicesQueryOptions = (archived?: boolean) =>
 	queryOptions<Service[]>({
-		queryKey: ['services', archived],
+		queryKey: ['services', !!archived],
 		queryFn: () => getServicesFn({ data: { archived } }),
 	});
 
@@ -58,7 +58,7 @@ const getCategoriesWithServicesFn = createServerFn({ method: 'GET' })
 
 export const categoriesWithServicesQueryOptions = (archived?: boolean) =>
 	queryOptions<CategoryWithServices[]>({
-		queryKey: ['categoriesWithServices', archived],
+		queryKey: ['categoriesWithServices', !!archived],
 		queryFn: () => getCategoriesWithServicesFn({ data: { archived } }),
 	});
 

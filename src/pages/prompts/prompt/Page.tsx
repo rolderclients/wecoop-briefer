@@ -13,7 +13,7 @@ export const PromptPage = () => {
 	const { data: prompt } = useSuspenseQuery(promptQueryOptions(promptId));
 	const { mutate, status } = useMutaitionWithInvalidate<UpdatePrompt>(
 		updatePromptFn,
-		['prompt'],
+		['prompt', promptId],
 	);
 
 	const debouncedUpdate = useDebouncedCallback(
