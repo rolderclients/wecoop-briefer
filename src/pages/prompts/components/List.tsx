@@ -11,8 +11,8 @@ import { useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import type { Prompt } from '@/app';
-import classes from '@/app/styles.module.css';
+import classes from '@/front/styles.module.css';
+import type { Prompt } from '@/types';
 import { usePrompts } from '../Provider';
 
 export const PromptsList = ({ prompts }: { prompts: Prompt[] }) => {

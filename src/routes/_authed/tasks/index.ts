@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import {
 	servicesWithEnbledPromptsQueryOptions,
 	tasksQueryOptions,
-} from '@/api';
+} from '@/back';
 import { TasksPage } from '@/pages';
 
 export const Route = createFileRoute('/_authed/tasks/')({

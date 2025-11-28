@@ -19,7 +19,7 @@ import {
 	IconUser,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
-import { useAuth } from '../auth';
+import { useAuth } from '@/front';
 
 interface NavbarLinkProps {
 	label: string;

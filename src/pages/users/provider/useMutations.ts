@@ -8,7 +8,7 @@ import {
 	type CredentialsUser,
 	type UpdateUser,
 	useAuth,
-} from '@/app';
+} from '@/front';
 
 export const useMutations = () => {
 	const queryClient = useQueryClient();

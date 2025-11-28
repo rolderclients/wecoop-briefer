@@ -11,8 +11,8 @@ import {
 import { useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
-import type { Task } from '@/app';
-import classes from '@/app/styles.module.css';
+import classes from '@/front/styles.module.css';
+import type { Task } from '@/types';
 import { useTasks } from '../Provider';
 
 export const TasksList = () => {

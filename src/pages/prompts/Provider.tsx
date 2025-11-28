@@ -13,7 +13,9 @@ import {
 	servicesWithPromptsQueryOptions,
 	updatePromptFn,
 	updatePromptsFn,
-} from '@/api';
+} from '@/back';
+import { useMutaitionWithInvalidate } from '@/front';
+import { Route } from '@/routes/_authed/prompts';
 import type {
 	CreatePrompt,
 	Model,
@@ -21,9 +23,7 @@ import type {
 	Service,
 	ServiceWithPrompts,
 	UpdatePrompt,
-} from '@/app';
-import { useMutaitionWithInvalidate } from '@/components';
-import { Route } from '@/routes/_authed/prompts';
+} from '@/types';
 
 interface PromptsContext {
 	services: Service[];

@@ -5,8 +5,8 @@ import { IconPlus } from '@tabler/icons-react';
 //@ts-expect-error
 import generatePassword from 'omgopass';
 import z from 'zod/v4';
-import type { CreateUser } from '@/app';
-import { blurOnError, filedsSchema, useAppForm } from '@/components';
+import type { CreateUser } from '@/front';
+import { blurOnError, filedsSchema, useAppForm } from '~/ui';
 import { useUsers } from '../provider';
 
 const schema = z.object({

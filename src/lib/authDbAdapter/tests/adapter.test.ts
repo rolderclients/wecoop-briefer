@@ -15,7 +15,7 @@ describe('SurrealDB Adapter', async () => {
 		},
 	});
 
-	await runAdapterTest({
+	runAdapterTest({
 		getAdapter: async (betterAuthOptions = {}) => {
 			return adapter(betterAuthOptions);
 		},

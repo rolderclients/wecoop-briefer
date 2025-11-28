@@ -3,8 +3,8 @@ import { Group, Modal, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPlus } from '@tabler/icons-react';
 import z from 'zod/v4';
-import type { CreateService } from '@/app';
-import { blurOnError, filedsSchema, useAppForm } from '@/components';
+import type { CreateService } from '@/types';
+import { blurOnError, filedsSchema, useAppForm } from '~/ui';
 import { useServices } from '../Provider';
 import { CategoryField } from './CategoryField';
 

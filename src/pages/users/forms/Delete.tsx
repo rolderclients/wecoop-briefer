@@ -1,5 +1,5 @@
 import { notifications } from '@mantine/notifications';
-import { ConfirmModal } from '@/components';
+import { ConfirmModal } from '@/front';
 import { useUsers } from '../provider';
 
 export const Delete = () => {

@@ -3,7 +3,7 @@ import {
 	modelsQueryOptions,
 	servicesQueryOptions,
 	servicesWithPromptsQueryOptions,
-} from '@/api';
+} from '@/back';
 import { PromptsPage } from '@/pages';
 
 export const Route = createFileRoute('/_authed/prompts/')({

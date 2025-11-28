@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import {
 	categoriesQueryOptions,
 	categoriesWithServicesQueryOptions,
-} from '@/api';
+} from '@/back';
 import { ServicesPage } from '@/pages';
 
 export const Route = createFileRoute('/_authed/services')({

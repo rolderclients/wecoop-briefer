@@ -3,8 +3,8 @@ import { Group, Modal, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useCallback, useEffect } from 'react';
 import z from 'zod/v4';
-import type { UpdatePrompt } from '@/app';
-import { blurOnError, filedsSchema, useAppForm } from '@/components';
+import type { UpdatePrompt } from '@/types';
+import { blurOnError, filedsSchema, useAppForm } from '~/ui';
 import { usePrompts } from '../Provider';
 
 const schema = z.object({

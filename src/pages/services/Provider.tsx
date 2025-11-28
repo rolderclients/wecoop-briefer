@@ -14,7 +14,9 @@ import {
 	updateCategoryFn,
 	updateServiceFn,
 	updateServicesFn,
-} from '@/api';
+} from '@/back';
+import { useMutaitionWithInvalidate } from '@/front';
+import { Route } from '@/routes/_authed/services';
 import type {
 	Category,
 	CategoryWithServices,
@@ -23,9 +25,7 @@ import type {
 	Service,
 	UpdateCategory,
 	UpdateService,
-} from '@/app';
-import { useMutaitionWithInvalidate } from '@/components';
-import { Route } from '@/routes/_authed/services';
+} from '@/types';
 
 interface ServicesContext {
 	categories: Category[];

@@ -3,8 +3,8 @@ import { Group, Modal, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPlus } from '@tabler/icons-react';
 import z from 'zod/v4';
-import type { CreatePrompt } from '@/app';
-import { blurOnError, filedsSchema, useAppForm } from '@/components';
+import type { CreatePrompt } from '@/types';
+import { blurOnError, filedsSchema, useAppForm } from '~/ui';
 import { usePrompts } from '../Provider';
 
 const schema = z.object({
