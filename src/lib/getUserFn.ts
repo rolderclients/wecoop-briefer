@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import type { User } from '@/front';
-import { auth } from '@/lib/auth';
+import { auth } from './auth';
 
 export const getUserFn = createServerFn({ method: 'GET' }).handler(async () => {
 	try {

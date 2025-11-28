@@ -1,8 +1,7 @@
-import { ActionIcon, Box, Checkbox, Grid, Paper, Text } from '@mantine/core';
-import { useHover } from '@mantine/hooks';
+import { Box, Checkbox, Grid, Text } from '@mantine/core';
 import { IconEdit } from '@tabler/icons-react';
-import classes from '@/front/styles.module.css';
 import type { Service } from '@/types';
+import { HoverActionIcon, HoverPaper, usePaperHover } from '~/ui';
 import { useServices } from '../Provider';
 
 export const ServicesList = ({ services }: { services: Service[] }) =>
@@ -11,7 +10,7 @@ export const ServicesList = ({ services }: { services: Service[] }) =>
 	));
 
 const ServicePaper = ({ service }: { service: Service }) => {
-	const { hovered, ref } = useHover();
+	const { paperHovered, paperRef } = usePaperHover();
 	const {
 		selectedIds,
 		setSelectedIds,
@@ -21,7 +20,7 @@ const ServicePaper = ({ service }: { service: Service }) => {
 	} = useServices();
 
 	return (
-		<Paper ref={ref} radius="md" withBorder>
+		<HoverPaper ref={paperRef} radius="md" withBorder>
 			<Grid px="md" py="xs" align="center">
 				<Grid.Col span="content">
 					<Checkbox
@@ -43,10 +42,9 @@ const ServicePaper = ({ service }: { service: Service }) => {
 					{isArchived ? (
 						<Box h={35} />
 					) : (
-						<ActionIcon
+						<HoverActionIcon
 							aria-label="Изменить"
-							className={classes.hoverActionIcon}
-							mod={{ hovered }}
+							hovered={paperHovered}
 							onClick={() => {
 								setSelectedService(service);
 								openEdit();
@@ -54,10 +52,10 @@ const ServicePaper = ({ service }: { service: Service }) => {
 							mt={4}
 						>
 							<IconEdit size={20} />
-						</ActionIcon>
+						</HoverActionIcon>
 					)}
 				</Grid.Col>
 			</Grid>
-		</Paper>
+		</HoverPaper>
 	);
 };
