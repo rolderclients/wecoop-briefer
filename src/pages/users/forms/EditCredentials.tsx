@@ -5,8 +5,8 @@ import { notifications } from '@mantine/notifications';
 import generatePassword from 'omgopass';
 import { useEffect } from 'react';
 import z from 'zod/v4';
-import type { CredentialsUser } from '@/app';
-import { blurOnError, filedsSchema, useAppForm } from '@/components';
+import type { CredentialsUser } from '@/front';
+import { blurOnError, filedsSchema, useAppForm } from '~/ui';
 import { useUsers } from '../provider';
 
 const schema = z.object({

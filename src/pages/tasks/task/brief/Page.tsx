@@ -2,10 +2,11 @@ import { Grid, Group, Stack, Text, Title } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
-import { taskWithBriefQueryOptions, updateBriefFn } from '@/api';
-import type { UpdateBrief } from '@/app';
-import { Chat, Editor, useMutaitionWithInvalidate } from '@/components';
+import { taskWithBriefQueryOptions, updateBriefFn } from '@/back';
+import { Chat, useMutaitionWithInvalidate } from '@/front';
 import { Route } from '@/routes/_authed/tasks/$taskId/brief';
+import type { UpdateBrief } from '@/types';
+import { Editor } from '~/ui';
 import { BriefChat, BriefEditor } from './components';
 
 export const BriefPage = () => {

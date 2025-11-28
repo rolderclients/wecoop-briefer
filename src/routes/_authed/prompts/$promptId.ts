@@ -1,6 +1,6 @@
 import tiptapCss from '@mantine/tiptap/styles.css?url';
 import { createFileRoute } from '@tanstack/react-router';
-import { promptQueryOptions } from '@/api';
+import { promptQueryOptions } from '@/back';
 import { PromptPage } from '@/pages';
 
 export const Route = createFileRoute('/_authed/prompts/$promptId')({

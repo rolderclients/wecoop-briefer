@@ -1,8 +1,8 @@
 import { ActionIcon, Box, Checkbox, Grid, Paper, Text } from '@mantine/core';
 import { useHover } from '@mantine/hooks';
 import { IconEdit } from '@tabler/icons-react';
-import type { Service } from '@/app';
-import classes from '@/app/styles.module.css';
+import classes from '@/front/styles.module.css';
+import type { Service } from '@/types';
 import { useServices } from '../Provider';
 
 export const ServicesList = ({ services }: { services: Service[] }) =>

@@ -10,7 +10,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconEdit, IconPlus, IconX } from '@tabler/icons-react';
 import { useCallback, useEffect, useState } from 'react';
-import { useFieldContext } from '@/components';
+import { useFieldContext } from '~/ui';
 import { useServices } from '../Provider';
 
 export const CategoryField = () => {

@@ -1,7 +1,7 @@
 import { AppShell } from '@mantine/core';
 import { Outlet } from '@tanstack/react-router';
-import { ScrollArea } from '@/components';
-import { useAuth } from '../auth';
+import { useAuth } from '@/front';
+import { ScrollArea } from '~/ui';
 import { Navbar } from './Navbar';
 
 export const Shell = () => {

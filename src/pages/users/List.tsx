@@ -14,8 +14,8 @@ import { useHover } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconEdit, IconKey, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
-import { type User, useAuth } from '@/app';
-import classes from '@/app/styles.module.css';
+import { type User, useAuth } from '@/front';
+import classes from '@/front/styles.module.css';
 import { useUsers } from './provider';
 
 const roles = {

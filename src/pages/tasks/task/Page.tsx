@@ -11,9 +11,10 @@ import {
 import { IconEdit } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
-import { taskWithBriefQueryOptions } from '@/api';
-import { ScrollArea, SimpleEditor } from '@/components';
+import { taskWithBriefQueryOptions } from '@/back';
+import { SimpleEditor } from '@/front';
 import { Route } from '@/routes/_authed/tasks/$taskId';
+import { ScrollArea } from '~/ui';
 
 export const TaskPage = () => {
 	const { taskId } = useParams({ from: Route.id });

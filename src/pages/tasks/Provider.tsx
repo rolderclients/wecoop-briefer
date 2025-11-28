@@ -12,10 +12,10 @@ import {
 	tasksQueryOptions,
 	updateTaskFn,
 	updateTasksFn,
-} from '@/api';
-import type { CreateTask, ServiceWithPrompts, Task, UpdateTask } from '@/app';
-import { useMutaitionWithInvalidate } from '@/components';
+} from '@/back';
+import { useMutaitionWithInvalidate } from '@/front';
 import { Route } from '@/routes/_authed/tasks';
+import type { CreateTask, ServiceWithPrompts, Task, UpdateTask } from '@/types';
 
 interface TasksContext {
 	tasks: Task[];

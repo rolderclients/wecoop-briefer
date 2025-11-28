@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { SignIn } from '@/app';
+import { SignIn } from '@/front';
 
 export const Route = createFileRoute('/auth/signin')({
 	loaderDeps: ({ search: { redirectPath } }) => ({ redirectPath }),

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { AgentUIMessage } from '@/api';
-import { parsePart } from '@/app';
+import type { AgentUIMessage } from '@/back';
+import { parsePart } from '@/front';
 
 export const useDocument = (messages: AgentUIMessage[]) => {
 	const [parsedDocument, setParsedDocument] = useState('');

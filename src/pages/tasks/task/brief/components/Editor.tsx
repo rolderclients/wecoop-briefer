@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Editor, useChat, useEditor } from '@/components';
+import { useChat } from '@/front';
+import { Editor, useEditor } from '~/ui';
 import { useDocument } from './useDocument';
 
 export const BriefEditor = ({
