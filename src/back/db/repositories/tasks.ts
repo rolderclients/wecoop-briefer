@@ -25,11 +25,11 @@ const getTasksFn = createServerFn({ method: 'GET' })
 
 export const tasksQueryOptions = (archived?: boolean) =>
 	queryOptions<Task[]>({
-		queryKey: ['tasks', archived],
+		queryKey: ['tasks', !!archived],
 		queryFn: () => getTasksFn({ data: { archived } }),
 	});
 
-export const getTaskWithBriefFn = createServerFn({ method: 'POST' })
+const getTaskWithBriefFn = createServerFn({ method: 'POST' })
 	.inputValidator((data: string) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
@@ -59,7 +59,7 @@ export const getTaskWithBriefFn = createServerFn({ method: 'POST' })
 
 export const taskWithBriefQueryOptions = (taskId: string) =>
 	queryOptions<TaskWithBrief>({
-		queryKey: ['taskWithBrief'],
+		queryKey: ['taskWithBrief', taskId],
 		queryFn: () => getTaskWithBriefFn({ data: taskId }),
 	});
 

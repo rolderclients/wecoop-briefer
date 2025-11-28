@@ -21,6 +21,7 @@ export const getRouter = async () => {
 		routeTree,
 		context: { queryClient },
 		defaultPreload: 'intent',
+		defaultViewTransition: true,
 		defaultErrorComponent: DefaultErrorComponent,
 		defaultNotFoundComponent: DefaultNotFoundComponent,
 	});

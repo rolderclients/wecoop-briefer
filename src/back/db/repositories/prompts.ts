@@ -71,7 +71,7 @@ export const servicesWithEnbledPromptsQueryOptions = () =>
 		queryFn: () => getServicesWithEnbledPromptsFn(),
 	});
 
-export const getPromptWithModelFn = createServerFn({ method: 'POST' })
+const getPromptWithModelFn = createServerFn({ method: 'POST' })
 	.inputValidator((data: string) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
@@ -87,7 +87,7 @@ export const getPromptWithModelFn = createServerFn({ method: 'POST' })
 
 export const promptQueryOptions = (promptId: string) =>
 	queryOptions<Prompt>({
-		queryKey: ['prompt'],
+		queryKey: ['prompt', promptId],
 		queryFn: () => getPromptWithModelFn({ data: promptId }),
 	});
 
