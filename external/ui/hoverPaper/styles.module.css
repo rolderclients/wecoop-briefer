@@ -1,13 +1,4 @@
-.hoverActionIcon {
-	transition: opacity 0.2s ease-in-out;
-	opacity: 0;
-	&[data-hovered] {
-		opacity: 1;
-		transition: opacity 0.2s ease-in-out;
-	}
-}
-
-.hoverPaper {
+.root {
 	transition: background-color 0.2s ease-in-out;
 	&:hover {
 		background-color: var(--mantine-color-default-hover);
@@ -18,9 +9,4 @@
 		background-color: unset;
 		cursor: default;
 	}
-}
-
-.routerLink {
-	text-decoration: none;
-	color: inherit;
 }

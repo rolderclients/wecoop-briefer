@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { usersQueryOptions } from '@/back';
+import { usersQueryOptions } from '@/lib/usersQueryOptions';
 import { UsersPage } from '@/pages';
 
 export const Route = createFileRoute('/_authed/users')({

@@ -1,0 +1,8 @@
+.root {
+	transition: opacity 0.2s ease-in-out;
+	opacity: 0;
+	&[data-hovered] {
+		opacity: 1;
+		transition: opacity 0.2s ease-in-out;
+	}
+}

@@ -18,8 +18,8 @@ import {
 	IconLogout,
 	IconUser,
 } from '@tabler/icons-react';
-import { Link } from '@tanstack/react-router';
 import { useAuth } from '@/front';
+import { Link } from '~/ui';
 
 interface NavbarLinkProps {
 	label: string;
@@ -61,11 +61,7 @@ export const Navbar = () => {
 					{menu
 						.filter(({ access }) => user?.role && access.includes(user?.role))
 						.map(({ label, pathname, icon: Icon }) => (
-							<Link
-								key={label}
-								to={pathname}
-								style={{ textDecoration: 'none', color: 'inherit' }}
-							>
+							<Link key={label} to={pathname}>
 								{({ isActive }: { isActive: boolean }) => {
 									return (
 										<NavLink

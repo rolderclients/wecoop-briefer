@@ -1,5 +1,5 @@
 import { Button, Stack, Text, Title } from '@mantine/core';
-import { Link } from '@tanstack/react-router';
+import { Link } from '~/ui';
 
 export const DefaultNotFoundComponent = () => (
 	<Stack align="center" justify="center" gap={0} ta="center" h="100vh">

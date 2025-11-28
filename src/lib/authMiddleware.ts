@@ -1,5 +1,5 @@
 import { createMiddleware } from '@tanstack/react-start';
-import { getUserFn } from '../functions';
+import { getUserFn } from './getUserFn';
 
 export const authMiddleware = createMiddleware().server(async ({ next }) => {
 	const user = await getUserFn();

@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import type { User } from '@/front';
-import { auth } from '@/lib/auth';
+import { auth } from './auth';
 
 const getUsersFn = createServerFn({ method: 'GET' }).handler(async () => {
 	const headers = getRequestHeaders();
