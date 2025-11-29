@@ -1,15 +1,11 @@
 import { Group, Paper, Switch } from '@mantine/core';
 import { IconArchive, IconRestore, IconTrash } from '@tabler/icons-react';
-import { useNavigate } from '@tanstack/react-router';
-import { Route } from '@/routes/_authed/prompts';
 import { Create } from '../forms';
 import { usePrompts } from '../Provider';
 import { ArchivateRestoreDelete } from './ArchivateRestoreDelete';
 
 export const Panel = () => {
-	const navigate = useNavigate({ from: Route.fullPath });
-
-	const { setSelectedIds, isArchived, setIsArchived } = usePrompts();
+	const { isArchived, setIsArchived } = usePrompts();
 
 	return (
 		<Paper radius="md" withBorder py="sm" px="md">
@@ -18,13 +14,7 @@ export const Panel = () => {
 					<Switch
 						label="Архив"
 						checked={isArchived}
-						onChange={(e) => {
-							setIsArchived(e.currentTarget.checked);
-							navigate({
-								search: () => ({ archived: e.currentTarget.checked }),
-							});
-							setSelectedIds([]);
-						}}
+						onChange={(e) => setIsArchived(e.currentTarget.checked)}
 					/>
 
 					{isArchived ? (

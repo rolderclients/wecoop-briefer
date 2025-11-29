@@ -3,7 +3,7 @@ import {
 	type UseMutationResult,
 	useSuspenseQuery,
 } from '@tanstack/react-query';
-import { useSearch } from '@tanstack/react-router';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import {
 	createContext,
 	type ReactNode,
@@ -72,10 +72,15 @@ interface ServicesContext {
 const ServicesContext = createContext<ServicesContext | null>(null);
 
 export const ServicesProvider = ({ children }: { children: ReactNode }) => {
-	const { archived: initialArchived } = useSearch({ from: Route.id });
+	const navigate = useNavigate({ from: Route.fullPath });
+	const isArchived = useSearch({
+		from: Route.id,
+		select: (data) => !!data.archived,
+	});
+
 	const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
 	const { data: categoriesWithServices } = useSuspenseQuery(
-		categoriesWithServicesQueryOptions(initialArchived),
+		categoriesWithServicesQueryOptions(isArchived),
 	);
 
 	const createMutation = useMutaitionWithInvalidate<CreateService>(
@@ -105,12 +110,14 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [selectedService, setSelectedService] = useState<Service | null>(null);
-	const [isArchived, setIsArchived] = useState(initialArchived || false);
 	const [isEditingCategory, setIsEditingCategory] = useState(false);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <>
 	useEffect(() => {
-		setIsArchived(initialArchived || false);
-	}, [initialArchived]);
+		setSelectedIds([]);
+		setSelectedService(null);
+		setIsEditingCategory(false);
+	}, [isArchived]);
 
 	const [isCreateOpened, { open: openCreate, close: closeCreate }] =
 		useDisclosure(false);
@@ -132,7 +139,8 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 		selectedService,
 		setSelectedService,
 		isArchived,
-		setIsArchived,
+		setIsArchived: (archived: boolean) =>
+			navigate({ search: () => ({ archived }) }),
 		isCreateOpened,
 		openCreate,
 		closeCreate,

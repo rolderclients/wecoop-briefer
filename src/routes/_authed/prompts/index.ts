@@ -7,9 +7,9 @@ import {
 import { PromptsPage } from '@/pages';
 
 export const Route = createFileRoute('/_authed/prompts/')({
-	loaderDeps: ({ search: { archived } }) => ({ archived }),
+	loaderDeps: ({ search: { archived } }) => ({ archived: !!archived }),
 	loader: async ({ context, deps: { archived } }) => {
-		await context.queryClient.ensureQueryData(servicesQueryOptions());
+		await context.queryClient.ensureQueryData(servicesQueryOptions(archived));
 		await context.queryClient.ensureQueryData(modelsQueryOptions());
 		await context.queryClient.ensureQueryData(
 			servicesWithPromptsQueryOptions(archived),
