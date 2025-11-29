@@ -6,7 +6,7 @@ import {
 import { TasksPage } from '@/pages';
 
 export const Route = createFileRoute('/_authed/tasks/')({
-	loaderDeps: ({ search: { archived } }) => ({ archived }),
+	loaderDeps: ({ search: { archived } }) => ({ archived: !!archived }),
 	loader: async ({ context, deps: { archived } }) => {
 		await context.queryClient.ensureQueryData(tasksQueryOptions(archived));
 		await context.queryClient.ensureQueryData(

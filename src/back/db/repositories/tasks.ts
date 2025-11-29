@@ -11,7 +11,7 @@ import { getDB } from '..';
 import { fromDTO, fromDTOs } from '../utils';
 
 const getTasksFn = createServerFn({ method: 'GET' })
-	.inputValidator((data: { archived?: boolean }) => data)
+	.inputValidator((data: { archived: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
 		const db = await getDB();
 
@@ -28,9 +28,9 @@ const getTasksFn = createServerFn({ method: 'GET' })
 		return result;
 	});
 
-export const tasksQueryOptions = (archived?: boolean) =>
+export const tasksQueryOptions = (archived: boolean) =>
 	queryOptions<Task[]>({
-		queryKey: ['tasks', !!archived],
+		queryKey: ['tasks', archived],
 		queryFn: () => getTasksFn({ data: { archived } }),
 	});
 
