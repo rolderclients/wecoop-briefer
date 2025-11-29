@@ -1,4 +1,4 @@
-import type { ModelName } from '@/back';
+import type { AgentUIMessage, ModelName } from '@/back';
 
 export interface Item {
 	id: string;
@@ -99,12 +99,24 @@ export interface UpdateBrief {
 	content: string;
 }
 
+// Chat
+
+export interface Chat extends Item {
+	messages: AgentUIMessage[];
+}
+
+export interface AddChatMessage {
+	id: string;
+	message: AgentUIMessage;
+}
+
 // Task
 
 export interface Task extends Item {
 	title: string;
 	content?: string;
 	brief: string;
+	chat: string;
 	company: {
 		title?: string;
 		info?: string;
@@ -116,8 +128,9 @@ export interface Task extends Item {
 	archived: boolean;
 }
 
-export interface TaskWithBrief extends Omit<Task, 'brief'> {
+export interface TaskWithBriefAndChat extends Omit<Task, 'brief' | 'chat'> {
 	brief: Brief;
+	chat: Chat;
 }
 
 export interface CreateTask {

@@ -4,7 +4,13 @@ import {
 	useSuspenseQuery,
 } from '@tanstack/react-query';
 import { useSearch } from '@tanstack/react-router';
-import { createContext, type ReactNode, useContext, useState } from 'react';
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useEffect,
+	useState,
+} from 'react';
 import {
 	createTaskFn,
 	deleteTasksFn,
@@ -28,7 +34,7 @@ interface TasksContext {
 	setSelectedIds: (ids: string[]) => void;
 	selectedTask: Task | null;
 	setSelectedTask: (task: Task | null) => void;
-	isArchived?: boolean;
+	isArchived: boolean;
 	setIsArchived: (archived: boolean) => void;
 	isCreateOpened: boolean;
 	openCreate: () => void;
@@ -64,7 +70,11 @@ export const TasksProvider = ({ children }: { children: ReactNode }) => {
 
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-	const [isArchived, setIsArchived] = useState(initialArchived);
+	const [isArchived, setIsArchived] = useState(initialArchived || false);
+
+	useEffect(() => {
+		setIsArchived(initialArchived || false);
+	}, [initialArchived]);
 
 	const [isCreateOpened, { open: openCreate, close: closeCreate }] =
 		useDisclosure(false);

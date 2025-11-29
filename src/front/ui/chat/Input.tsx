@@ -16,7 +16,7 @@ export const Input = ({
 }: Omit<PromptInputProps, 'onSubmit'> & {
 	onSubmit?: PromptInputProps['onSubmit'];
 }) => {
-	const { sendMessage, chatStatus, model, prompt } = useChat();
+	const { sendMessage, chatStatus } = useChat();
 
 	return (
 		<PromptInput
@@ -28,7 +28,7 @@ export const Input = ({
 
 				if (message && 'text' in message) {
 					const text = message.text as string;
-					if (text.trim()) sendMessage({ text: text.trim(), model, prompt });
+					if (text.trim()) sendMessage(text.trim());
 				}
 			}}
 			className={cn('relative *:ring-0!', className)}
