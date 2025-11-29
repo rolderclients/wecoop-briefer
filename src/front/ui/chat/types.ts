@@ -1,9 +1,11 @@
-import type { AgentUIMessage, ModelName } from '@/back';
+import type { AgentUIMessage } from '@/back';
+import type { Model } from '@/types';
 
 export interface ChatProps {
 	children: React.ReactNode;
 	chatId: string;
-	initialModel: ModelName;
+	initialModel?: Model;
 	initialPrompt?: string;
 	initialMessages?: AgentUIMessage[];
+	initialDisabled?: boolean;
 }

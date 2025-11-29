@@ -1,3 +1,4 @@
+import { Text, Tooltip } from '@mantine/core';
 import {
 	PromptInput,
 	PromptInputBody,
@@ -16,37 +17,47 @@ export const Input = ({
 }: Omit<PromptInputProps, 'onSubmit'> & {
 	onSubmit?: PromptInputProps['onSubmit'];
 }) => {
-	const { sendMessage, chatStatus } = useChat();
+	const { sendMessage, chatStatus, disabled, model } = useChat();
 
 	return (
-		<PromptInput
-			onSubmit={(message, event) => {
-				if (onSubmit) {
-					onSubmit(message, event);
-					return;
-				}
-
-				if (message && 'text' in message) {
-					const text = message.text as string;
-					if (text.trim()) sendMessage(text.trim());
-				}
-			}}
-			className={cn('relative *:ring-0!', className)}
-			{...props}
+		<Tooltip
+			label="Услуга этого брифа не имеет активного промта"
+			disabled={!disabled}
 		>
-			<PromptInputBody>
-				<PromptInputTextarea
-					placeholder="Напишите сообщение"
-					className="min-h-[85px] max-h-[85px]"
-				/>
-			</PromptInputBody>
-			<PromptInputFooter className="pt-0">
-				<PromptInputSubmit
-					className="ml-auto"
-					disabled={chatStatus !== 'ready'}
-					status={chatStatus}
-				/>
-			</PromptInputFooter>
-		</PromptInput>
+			<PromptInput
+				onSubmit={(message, event) => {
+					if (onSubmit) {
+						onSubmit(message, event);
+						return;
+					}
+
+					if (message && 'text' in message) {
+						const text = message.text as string;
+						if (text.trim()) sendMessage(text.trim());
+					}
+				}}
+				className={cn('relative *:ring-0!', className)}
+				{...props}
+			>
+				<PromptInputBody>
+					<PromptInputTextarea
+						disabled={chatStatus !== 'ready' || disabled}
+						placeholder="Напишите сообщение"
+						className="min-h-[85px] max-h-[85px]"
+					/>
+				</PromptInputBody>
+
+				<PromptInputFooter className="pt-0 items-center">
+					<Text size="sm" c={model ? undefined : 'red'}>
+						{model?.title || 'Модель ИИ не выбрана'}
+					</Text>
+					<PromptInputSubmit
+						className="ml-auto"
+						disabled={chatStatus !== 'ready' || disabled}
+						status={chatStatus}
+					/>
+				</PromptInputFooter>
+			</PromptInput>
+		</Tooltip>
 	);
 };

@@ -123,14 +123,18 @@ export interface Task extends Item {
 	};
 	service: Pick<Service, 'id' | 'title'>;
 	prompt: Pick<Prompt, 'id' | 'title' | 'content'> & {
-		model: Pick<Model, 'id' | 'name' | 'title'>;
+		model: Model;
 	};
 	archived: boolean;
 }
 
-export interface TaskWithBriefAndChat extends Omit<Task, 'brief' | 'chat'> {
+export interface TaskWithBriefAndChat
+	extends Omit<Task, 'brief' | 'chat' | 'prompt'> {
 	brief: Brief;
 	chat: Chat;
+	prompt?: Pick<Prompt, 'id' | 'title' | 'content'> & {
+		model: Model;
+	};
 }
 
 export interface CreateTask {

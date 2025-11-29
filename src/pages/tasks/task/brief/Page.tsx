@@ -27,9 +27,10 @@ export const BriefPage = () => {
 	return (
 		<Chat.Provider
 			chatId={task.chat.id}
-			initialModel={task.prompt.model.name}
-			initialPrompt={task.prompt.content}
+			initialModel={task.prompt?.model}
+			initialPrompt={task.prompt?.content}
 			initialMessages={task.chat.messages}
+			initialDisabled={!task.prompt}
 		>
 			<Editor.Provider
 				initialContent={task.brief.content}

@@ -3,6 +3,7 @@ import { notifications } from '@mantine/notifications';
 import type { ChatStatus } from 'ai';
 import { createContext, useContext } from 'react';
 import type { AgentUIMessage } from '@/back';
+import type { Model } from '@/types';
 import type { ChatProps } from './types';
 
 type SendMessage = (text: string) => Promise<void>;
@@ -14,7 +15,9 @@ interface ChatContext {
 	sendMessage: SendMessage;
 	setMessages: SetMessages;
 	chatStatus: ChatStatus;
+	model?: Model;
 	error?: Error;
+	disabled: boolean;
 }
 
 const ChatContext = createContext<ChatContext | null>(null);
@@ -25,6 +28,7 @@ export const Provider = ({
 	initialModel,
 	initialPrompt,
 	initialMessages,
+	initialDisabled,
 }: ChatProps) => {
 	const { messages, sendMessage, setMessages, status, error } =
 		useSdkChat<AgentUIMessage>({
@@ -45,12 +49,14 @@ export const Provider = ({
 		sendMessage: async (text) => {
 			await sendMessage(
 				{ text },
-				{ body: { chatId, model: initialModel, prompt: initialPrompt } },
+				{ body: { chatId, model: initialModel?.name, prompt: initialPrompt } },
 			);
 		},
 		setMessages,
 		chatStatus: status,
+		model: initialModel,
 		error,
+		disabled: initialDisabled || false,
 	};
 
 	return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
