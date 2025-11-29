@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { aiRequest } from '@/api';
-import { authMiddleware } from '@/app/auth/better/middleware';
+import { aiRequest } from '@/back';
+import { authMiddleware } from '@/lib/authMiddleware';
 
 export const Route = createFileRoute('/api/chat')({
 	server: {

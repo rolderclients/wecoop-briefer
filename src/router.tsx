@@ -5,7 +5,7 @@ import {
 	DefaultErrorComponent,
 	DefaultNotFoundComponent,
 	defaultErrorNotification,
-} from './app';
+} from './front';
 import { routeTree } from './routeTree.gen';
 
 export const getRouter = async () => {
@@ -21,6 +21,7 @@ export const getRouter = async () => {
 		routeTree,
 		context: { queryClient },
 		defaultPreload: 'intent',
+		defaultViewTransition: true,
 		defaultErrorComponent: DefaultErrorComponent,
 		defaultNotFoundComponent: DefaultNotFoundComponent,
 	});

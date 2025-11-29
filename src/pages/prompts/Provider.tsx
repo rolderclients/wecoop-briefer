@@ -4,7 +4,13 @@ import {
 	useSuspenseQuery,
 } from '@tanstack/react-query';
 import { useSearch } from '@tanstack/react-router';
-import { createContext, type ReactNode, useContext, useState } from 'react';
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useEffect,
+	useState,
+} from 'react';
 import {
 	createPromptFn,
 	deletePromptsFn,
@@ -13,7 +19,9 @@ import {
 	servicesWithPromptsQueryOptions,
 	updatePromptFn,
 	updatePromptsFn,
-} from '@/api';
+} from '@/back';
+import { useMutaitionWithInvalidate } from '@/front';
+import { Route } from '@/routes/_authed/prompts';
 import type {
 	CreatePrompt,
 	Model,
@@ -21,9 +29,7 @@ import type {
 	Service,
 	ServiceWithPrompts,
 	UpdatePrompt,
-} from '@/app';
-import { useMutaitionWithInvalidate } from '@/components';
-import { Route } from '@/routes/_authed/prompts';
+} from '@/types';
 
 interface PromptsContext {
 	services: Service[];
@@ -36,7 +42,7 @@ interface PromptsContext {
 	deleteManyMutation: UseMutationResult<void, Error, string[], unknown>;
 	selectedIds: string[];
 	setSelectedIds: (ids: string[]) => void;
-	isArchived?: boolean;
+	isArchived: boolean;
 	setIsArchived: (archived: boolean) => void;
 	selectedPrompt: Prompt | null;
 	setSelectedPrompt: (prompt: Prompt | null) => void;
@@ -60,7 +66,11 @@ export const PromptsProvider = ({ children }: { children: ReactNode }) => {
 
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
-	const [isArchived, setIsArchived] = useState(initialArchived);
+	const [isArchived, setIsArchived] = useState(initialArchived || false);
+
+	useEffect(() => {
+		setIsArchived(initialArchived || false);
+	}, [initialArchived]);
 
 	const [isCreateOpened, { open: openCreate, close: closeCreate }] =
 		useDisclosure(false);

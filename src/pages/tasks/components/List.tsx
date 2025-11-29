@@ -1,18 +1,7 @@
-import {
-	ActionIcon,
-	Box,
-	Checkbox,
-	Grid,
-	Paper,
-	Space,
-	Stack,
-	Text,
-} from '@mantine/core';
-import { useHover } from '@mantine/hooks';
+import { Box, Checkbox, Grid, Space, Stack, Text } from '@mantine/core';
 import { IconEdit } from '@tabler/icons-react';
-import { Link } from '@tanstack/react-router';
-import type { Task } from '@/app';
-import classes from '@/app/styles.module.css';
+import type { Task } from '@/types';
+import { HoverActionIcon, HoverPaper, Link, usePaperHover } from '~/ui';
 import { useTasks } from '../Provider';
 
 export const TasksList = () => {
@@ -40,7 +29,7 @@ export const TasksList = () => {
 };
 
 const TaskPaper = ({ task }: { task: Task }) => {
-	const { hovered, ref } = useHover();
+	const { paperHovered, paperRef } = usePaperHover();
 	const { selectedIds, setSelectedIds, isArchived, openEdit, setSelectedTask } =
 		useTasks();
 
@@ -49,15 +38,13 @@ const TaskPaper = ({ task }: { task: Task }) => {
 			key={task.id}
 			to="/tasks/$taskId"
 			params={{ taskId: task.id }}
-			className={classes.routerLink}
 			disabled={isArchived}
 		>
-			<Paper
-				ref={ref}
+			<HoverPaper
+				ref={paperRef}
 				radius="md"
 				withBorder
-				className={classes.hoverPaper}
-				mod={{ disabled: task.archived }}
+				disabled={task.archived}
 			>
 				<Grid px="md" py="xs" align="center">
 					<Grid.Col span="content">
@@ -87,10 +74,9 @@ const TaskPaper = ({ task }: { task: Task }) => {
 						{isArchived ? (
 							<Box h={35.75} w={28} />
 						) : (
-							<ActionIcon
+							<HoverActionIcon
 								aria-label="Изменить"
-								className={classes.hoverActionIcon}
-								mod={{ hovered }}
+								hovered={paperHovered}
 								onClick={(e) => {
 									e.preventDefault();
 									setSelectedTask(task);
@@ -99,11 +85,11 @@ const TaskPaper = ({ task }: { task: Task }) => {
 								mt={4}
 							>
 								<IconEdit size={20} />
-							</ActionIcon>
+							</HoverActionIcon>
 						)}
 					</Grid.Col>
 				</Grid>
-			</Paper>
+			</HoverPaper>
 		</Link>
 	);
 };

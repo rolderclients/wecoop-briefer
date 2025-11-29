@@ -1,18 +1,8 @@
-import {
-	ActionIcon,
-	Box,
-	Checkbox,
-	Chip,
-	Grid,
-	Paper,
-	Text,
-} from '@mantine/core';
-import { useHover } from '@mantine/hooks';
+import { Box, Checkbox, Chip, Grid, Text } from '@mantine/core';
 import { IconEdit } from '@tabler/icons-react';
-import { Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import type { Prompt } from '@/app';
-import classes from '@/app/styles.module.css';
+import type { Prompt } from '@/types';
+import { HoverActionIcon, HoverPaper, Link, usePaperHover } from '~/ui';
 import { usePrompts } from '../Provider';
 
 export const PromptsList = ({ prompts }: { prompts: Prompt[] }) => {
@@ -53,7 +43,7 @@ const PromptPaper = ({
 	enabledPromptId: string | null;
 	setEnabledPromptId: (promptId: string | null) => void;
 }) => {
-	const { hovered, ref } = useHover();
+	const { paperHovered, paperRef } = usePaperHover();
 	const {
 		prompts,
 		selectedIds,
@@ -68,15 +58,13 @@ const PromptPaper = ({
 		<Link
 			to="/prompts/$promptId"
 			params={{ promptId: prompt.id }}
-			className={classes.routerLink}
 			disabled={prompt.archived}
 		>
-			<Paper
-				ref={ref}
+			<HoverPaper
+				ref={paperRef}
 				radius="md"
 				withBorder
-				className={classes.hoverPaper}
-				mod={{ disabled: prompt.archived }}
+				disabled={prompt.archived}
 			>
 				<Grid px="md" py="xs" align="center">
 					<Grid.Col span="content">
@@ -127,10 +115,9 @@ const PromptPaper = ({
 						{isArchived ? (
 							<Box w={28} h={35} />
 						) : (
-							<ActionIcon
+							<HoverActionIcon
 								aria-label="Изменить"
-								className={classes.hoverActionIcon}
-								mod={{ hovered }}
+								hovered={paperHovered}
 								onClick={(e) => {
 									e.preventDefault();
 									setSelectedPrompt(prompt);
@@ -139,11 +126,11 @@ const PromptPaper = ({
 								mt={4}
 							>
 								<IconEdit size={20} />
-							</ActionIcon>
+							</HoverActionIcon>
 						)}
 					</Grid.Col>
 				</Grid>
-			</Paper>
+			</HoverPaper>
 		</Link>
 	);
 };

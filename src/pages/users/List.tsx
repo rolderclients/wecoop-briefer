@@ -1,21 +1,18 @@
 import {
-	ActionIcon,
 	Box,
 	Grid,
 	Group,
-	Paper,
 	Space,
 	Stack,
 	Switch,
 	Text,
 	Tooltip,
 } from '@mantine/core';
-import { useHover } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconEdit, IconKey, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
-import { type User, useAuth } from '@/app';
-import classes from '@/app/styles.module.css';
+import { type User, useAuth } from '@/front';
+import { HoverActionIcon, HoverPaper, usePaperHover } from '~/ui';
 import { useUsers } from './provider';
 
 const roles = {
@@ -49,7 +46,7 @@ export const UsersList = () => {
 };
 
 const UserPaper = ({ user }: { user: User }) => {
-	const { hovered, ref } = useHover();
+	const { paperHovered, paperRef } = usePaperHover();
 	const {
 		setSelectedUser,
 		openEdit,
@@ -62,7 +59,7 @@ const UserPaper = ({ user }: { user: User }) => {
 	const [blocked, setBlocked] = useState(Boolean(user.banned));
 
 	return (
-		<Paper ref={ref} radius="md" withBorder>
+		<HoverPaper ref={paperRef} radius="md" withBorder>
 			<Grid px="md" py="xs" align="center">
 				<Grid.Col span="auto">
 					<Text inline>{user.name}</Text>
@@ -112,11 +109,10 @@ const UserPaper = ({ user }: { user: User }) => {
 							w={210}
 							disabled={authUser?.id !== user.id}
 						>
-							<ActionIcon
+							<HoverActionIcon
 								aria-label="Удалить"
 								color="red"
-								className={classes.hoverActionIcon}
-								mod={{ hovered }}
+								hovered={paperHovered}
 								onClick={() => {
 									setSelectedUser(user.id);
 									openDelete();
@@ -125,13 +121,12 @@ const UserPaper = ({ user }: { user: User }) => {
 								mt={4}
 							>
 								<IconTrash size={20} />
-							</ActionIcon>
+							</HoverActionIcon>
 						</Tooltip>
 
-						<ActionIcon
+						<HoverActionIcon
 							aria-label="Изменить данные доступа"
-							className={classes.hoverActionIcon}
-							mod={{ hovered }}
+							hovered={paperHovered}
 							onClick={() => {
 								setSelectedUser(user.id);
 								openEditCredentials();
@@ -140,12 +135,11 @@ const UserPaper = ({ user }: { user: User }) => {
 							color="yellow"
 						>
 							<IconKey size={20} />
-						</ActionIcon>
+						</HoverActionIcon>
 
-						<ActionIcon
+						<HoverActionIcon
 							aria-label="Изменить"
-							className={classes.hoverActionIcon}
-							mod={{ hovered }}
+							hovered={paperHovered}
 							onClick={() => {
 								setSelectedUser(user.id);
 								openEdit();
@@ -153,10 +147,10 @@ const UserPaper = ({ user }: { user: User }) => {
 							mt={4}
 						>
 							<IconEdit size={20} />
-						</ActionIcon>
+						</HoverActionIcon>
 					</Group>
 				</Grid.Col>
 			</Grid>
-		</Paper>
+		</HoverPaper>
 	);
 };

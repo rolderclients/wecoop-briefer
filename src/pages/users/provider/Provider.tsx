@@ -4,7 +4,6 @@ import {
 	useSuspenseQuery,
 } from '@tanstack/react-query';
 import { createContext, type ReactNode, useContext, useState } from 'react';
-import { usersQueryOptions } from '@/api';
 import type {
 	AuthError,
 	BlockUser,
@@ -12,7 +11,8 @@ import type {
 	CredentialsUser,
 	UpdateUser,
 	User,
-} from '@/app';
+} from '@/front';
+import { usersQueryOptions } from '@/lib/usersQueryOptions';
 import { useMutations } from './useMutations';
 
 interface UsersContext {

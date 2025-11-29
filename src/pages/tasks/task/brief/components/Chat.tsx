@@ -1,8 +1,9 @@
 import { nanoid } from 'nanoid';
-import { Chat, useChat, useEditor } from '@/components';
+import { Chat, useChat } from '@/front';
+import { useEditor } from '~/ui';
 
 export const BriefChat = ({ height }: { height: string }) => {
-	const { messages, sendMessage, setMessages, model, prompt } = useChat();
+	const { messages, sendMessage, setMessages } = useChat();
 	const { editor, editedByUser, setEditedByUser } = useEditor();
 
 	return (
@@ -35,7 +36,7 @@ ${editor?.getHTML()}
 								setEditedByUser(false);
 							}
 
-							sendMessage({ text, model, prompt });
+							sendMessage(text);
 						}
 					}
 				}}

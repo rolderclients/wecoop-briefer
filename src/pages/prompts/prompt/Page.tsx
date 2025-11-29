@@ -2,10 +2,10 @@ import { Stack, Title } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
-import { promptQueryOptions, updatePromptFn } from '@/api';
-import type { UpdatePrompt } from '@/app';
-import { SimpleEditor, useMutaitionWithInvalidate } from '@/components';
+import { promptQueryOptions, updatePromptFn } from '@/back';
+import { SimpleEditor, useMutaitionWithInvalidate } from '@/front';
 import { Route } from '@/routes/_authed/prompts/$promptId';
+import type { UpdatePrompt } from '@/types';
 
 export const PromptPage = () => {
 	const { promptId } = useParams({ from: Route.id });
@@ -13,7 +13,7 @@ export const PromptPage = () => {
 	const { data: prompt } = useSuspenseQuery(promptQueryOptions(promptId));
 	const { mutate, status } = useMutaitionWithInvalidate<UpdatePrompt>(
 		updatePromptFn,
-		['prompt'],
+		['prompt', promptId],
 	);
 
 	const debouncedUpdate = useDebouncedCallback(

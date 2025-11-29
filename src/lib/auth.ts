@@ -1,7 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { admin, username as usernamePlugin } from 'better-auth/plugins';
-import { getDB } from '@/api';
-import { roles } from '@/app/auth/better';
+import { getDB } from '@/back';
+import { roles } from '@/front';
 import { surrealAdapter } from './authDbAdapter/adapter';
 
 const db = await getDB();

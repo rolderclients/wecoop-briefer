@@ -4,7 +4,13 @@ import {
 	useSuspenseQuery,
 } from '@tanstack/react-query';
 import { useSearch } from '@tanstack/react-router';
-import { createContext, type ReactNode, useContext, useState } from 'react';
+import {
+	createContext,
+	type ReactNode,
+	useContext,
+	useEffect,
+	useState,
+} from 'react';
 import {
 	categoriesQueryOptions,
 	categoriesWithServicesQueryOptions,
@@ -14,7 +20,9 @@ import {
 	updateCategoryFn,
 	updateServiceFn,
 	updateServicesFn,
-} from '@/api';
+} from '@/back';
+import { useMutaitionWithInvalidate } from '@/front';
+import { Route } from '@/routes/_authed/services';
 import type {
 	Category,
 	CategoryWithServices,
@@ -23,9 +31,7 @@ import type {
 	Service,
 	UpdateCategory,
 	UpdateService,
-} from '@/app';
-import { useMutaitionWithInvalidate } from '@/components';
-import { Route } from '@/routes/_authed/services';
+} from '@/types';
 
 interface ServicesContext {
 	categories: Category[];
@@ -51,7 +57,7 @@ interface ServicesContext {
 	setSelectedIds: (ids: string[]) => void;
 	selectedService: Service | null;
 	setSelectedService: (service: Service | null) => void;
-	isArchived?: boolean;
+	isArchived: boolean;
 	setIsArchived: (archived: boolean) => void;
 	isCreateOpened: boolean;
 	openCreate: () => void;
@@ -99,8 +105,12 @@ export const ServicesProvider = ({ children }: { children: ReactNode }) => {
 
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [selectedService, setSelectedService] = useState<Service | null>(null);
-	const [isArchived, setIsArchived] = useState(initialArchived);
+	const [isArchived, setIsArchived] = useState(initialArchived || false);
 	const [isEditingCategory, setIsEditingCategory] = useState(false);
+
+	useEffect(() => {
+		setIsArchived(initialArchived || false);
+	}, [initialArchived]);
 
 	const [isCreateOpened, { open: openCreate, close: closeCreate }] =
 		useDisclosure(false);
