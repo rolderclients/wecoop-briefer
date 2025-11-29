@@ -2,7 +2,7 @@ import { Grid, Group, Stack, Text, Title } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
-import { taskWithBriefQueryOptions, updateBriefFn } from '@/back';
+import { taskWithBriefAndChatQueryOptions, updateBriefFn } from '@/back';
 import { Chat, useMutaitionWithInvalidate } from '@/front';
 import { Route } from '@/routes/_authed/tasks/$taskId/brief';
 import type { UpdateBrief } from '@/types';
@@ -11,11 +11,13 @@ import { BriefChat, BriefEditor } from './components';
 
 export const BriefPage = () => {
 	const { taskId } = useParams({ from: Route.id });
-	const { data: task } = useSuspenseQuery(taskWithBriefQueryOptions(taskId));
+	const { data: task } = useSuspenseQuery(
+		taskWithBriefAndChatQueryOptions(taskId),
+	);
 
 	const { mutate, status } = useMutaitionWithInvalidate<UpdateBrief>(
 		updateBriefFn,
-		['taskWithBrief'],
+		['taskWithBriefAndChat', taskId],
 	);
 
 	const debouncedUpdate = useDebouncedCallback(async (content: string) => {
@@ -24,8 +26,10 @@ export const BriefPage = () => {
 
 	return (
 		<Chat.Provider
+			chatId={task.chat.id}
 			initialModel={task.prompt.model.name}
 			initialPrompt={task.prompt.content}
+			initialMessages={task.chat.messages}
 		>
 			<Editor.Provider
 				initialContent={task.brief.content}

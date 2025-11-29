@@ -54,9 +54,13 @@ DEFINE FIELD OVERWRITE company.info ON task TYPE option<string>;
 DEFINE FIELD OVERWRITE archived ON task TYPE bool DEFAULT false;
 DEFINE FIELD OVERWRITE service ON task TYPE record<service> REFERENCE ON DELETE IGNORE;
 DEFINE FIELD OVERWRITE brief ON task TYPE record<brief> DEFAULT (CREATE ONLY brief).id;
+DEFINE FIELD OVERWRITE chat ON task TYPE record<chat> DEFAULT (CREATE ONLY chat).id;
 DEFINE FIELD OVERWRITE time ON task TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON task TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON task TYPE datetime VALUE time::now();
+
+// Delete brief on task deletion
+DEFINE EVENT OVERWRITE task_deleted ON task WHEN $event = 'DELETE' THEN DELETE $before.brief.id;
 
 // Brief
 DEFINE TABLE OVERWRITE brief TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
@@ -67,19 +71,21 @@ DEFINE FIELD OVERWRITE time.updated ON brief TYPE datetime VALUE time::now();
 
 // Chat
 DEFINE TABLE OVERWRITE chat TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
-DEFINE FIELD OVERWRITE content ON chat TYPE option<string>;
+DEFINE FIELD OVERWRITE messages ON chat TYPE array<object> DEFAULT [];
+DEFINE FIELD OVERWRITE messages.* ON chat TYPE object FLEXIBLE;
 DEFINE FIELD OVERWRITE time ON chat TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON chat TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON chat TYPE datetime VALUE time::now();
 
 // Data
 LET $models = [
-    { id: model:claudeHaiku_4_5,name: 'anthropic/claude-haiku-4.5', title: 'Anthropic Claude Haiku 4.5' },
+    { id: model:claudeHaiku_4_5, name: 'anthropic/claude-haiku-4.5', title: 'Anthropic Claude Haiku 4.5' },
     { id: model:claudeSonnet_4_5, name: 'anthropic/claude-sonnet-4.5', title: 'Anthropic Claude Sonnet 4.5' },
     { id: model:geminiFlash_2_5, name: 'google/gemini-2.5-flash', title: 'Google Gemini 2.5 Flash' },
     { id: model:geminiPro_2_5, name: 'google/gemini-2.5-pro', title: 'Google Gemini 2.5 Pro' }
 ];
-FOR $model IN $models { UPSERT $model.id CONTENT $model };
+DELETE model;
+FOR $model IN $models { CREATE $model.id CONTENT $model };
 
 // Better Auth
 // User

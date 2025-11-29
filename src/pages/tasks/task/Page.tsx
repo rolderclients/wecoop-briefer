@@ -11,14 +11,16 @@ import {
 import { IconEdit } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
-import { taskWithBriefQueryOptions } from '@/back';
+import { taskWithBriefAndChatQueryOptions } from '@/back';
 import { SimpleEditor } from '@/front';
 import { Route } from '@/routes/_authed/tasks/$taskId';
 import { ScrollArea } from '~/ui';
 
 export const TaskPage = () => {
 	const { taskId } = useParams({ from: Route.id });
-	const { data: task } = useSuspenseQuery(taskWithBriefQueryOptions(taskId));
+	const { data: task } = useSuspenseQuery(
+		taskWithBriefAndChatQueryOptions(taskId),
+	);
 
 	return (
 		<Stack pb="xl" pt="sm">

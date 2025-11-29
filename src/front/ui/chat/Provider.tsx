@@ -1,23 +1,14 @@
 import { useChat as useSdkChat } from '@ai-sdk/react';
 import { notifications } from '@mantine/notifications';
 import type { ChatStatus } from 'ai';
-import { createContext, useContext, useState } from 'react';
-import type { AgentUIMessage, ModelName } from '@/back';
+import { createContext, useContext } from 'react';
+import type { AgentUIMessage } from '@/back';
 import type { ChatProps } from './types';
 
-type SendMessage = (params: {
-	text: string;
-	model: ModelName;
-	prompt?: string;
-}) => Promise<void>;
-
+type SendMessage = (text: string) => Promise<void>;
 type SetMessages = (messages: AgentUIMessage[]) => void;
 
 interface ChatContext {
-	model: ModelName;
-	setModel: (model: ModelName) => void;
-	prompt?: string;
-	setPrompt: (prompt: string | undefined) => void;
 	messages: AgentUIMessage[];
 	hasMessages: boolean;
 	sendMessage: SendMessage;
@@ -30,14 +21,14 @@ const ChatContext = createContext<ChatContext | null>(null);
 
 export const Provider = ({
 	children,
+	chatId,
 	initialModel,
 	initialPrompt,
+	initialMessages,
 }: ChatProps) => {
-	const [model, setModel] = useState<ModelName>(initialModel);
-	const [prompt, setPrompt] = useState<string | undefined>(initialPrompt);
-
 	const { messages, sendMessage, setMessages, status, error } =
 		useSdkChat<AgentUIMessage>({
+			messages: initialMessages,
 			onError: (e) => {
 				notifications.show({
 					title: 'Ошибка сервера ИИ',
@@ -49,15 +40,13 @@ export const Provider = ({
 		});
 
 	const value: ChatContext = {
-		model,
-		setModel,
-		prompt,
-		setPrompt,
 		messages: messages.filter((message) => message.role !== 'system'),
 		hasMessages: messages.length > 0,
-		sendMessage: async (data) => {
-			const { text, ...body } = data;
-			await sendMessage({ text }, { body });
+		sendMessage: async (text) => {
+			await sendMessage(
+				{ text },
+				{ body: { chatId, model: initialModel, prompt: initialPrompt } },
+			);
 		},
 		setMessages,
 		chatStatus: status,

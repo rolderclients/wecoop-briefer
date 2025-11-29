@@ -1,7 +1,12 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
 import { eq, surql } from 'surrealdb';
-import type { CreateTask, Task, TaskWithBrief, UpdateTask } from '@/types';
+import type {
+	CreateTask,
+	Task,
+	TaskWithBriefAndChat,
+	UpdateTask,
+} from '@/types';
 import { getDB } from '..';
 import { fromDTO, fromDTOs } from '../utils';
 
@@ -29,7 +34,7 @@ export const tasksQueryOptions = (archived?: boolean) =>
 		queryFn: () => getTasksFn({ data: { archived } }),
 	});
 
-const getTaskWithBriefFn = createServerFn({ method: 'POST' })
+const getTaskWithBriefAndChatFn = createServerFn({ method: 'POST' })
 	.inputValidator((data: string) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
@@ -40,6 +45,7 @@ const getTaskWithBriefFn = createServerFn({ method: 'POST' })
           *,
           service.{ id, title },
           brief.{ id, content },
+          chat.{ id, messages },
           service.prompts[WHERE enabled == true]?[0].{
             id,
             title,
@@ -52,15 +58,15 @@ const getTaskWithBriefFn = createServerFn({ method: 'POST' })
           } as prompt
         FROM ONLY ${id}`)
 			.json()
-			.collect<[TaskWithBrief]>();
+			.collect<[TaskWithBriefAndChat]>();
 
 		return result;
 	});
 
-export const taskWithBriefQueryOptions = (taskId: string) =>
-	queryOptions<TaskWithBrief>({
-		queryKey: ['taskWithBrief', taskId],
-		queryFn: () => getTaskWithBriefFn({ data: taskId }),
+export const taskWithBriefAndChatQueryOptions = (taskId: string) =>
+	queryOptions<TaskWithBriefAndChat>({
+		queryKey: ['taskWithBriefAndChat', taskId],
+		queryFn: () => getTaskWithBriefAndChatFn({ data: taskId }),
 	});
 
 export const createTaskFn = createServerFn({ method: 'POST' })

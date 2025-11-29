@@ -37,7 +37,7 @@ await db.use({
 	database,
 });
 
-const schemaPath = path.resolve('src/api/db/schema.surql');
+const schemaPath = path.resolve('src/back/db/schema.surql');
 const schemaFile = Bun.file(schemaPath);
 const schema = await schemaFile.text();
 
