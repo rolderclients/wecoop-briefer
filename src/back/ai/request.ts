@@ -17,6 +17,12 @@ export const aiRequest = async ({ request }: { request: Request }) => {
 		chatId?: string;
 	} = await request.json();
 
+	if (!model || !prompt)
+		throw new Response('model and prompt are required', {
+			status: 500,
+			headers: { 'Content-Type': 'application/json' },
+		});
+
 	if (!chatId)
 		throw new Response('chatId is required', {
 			status: 500,

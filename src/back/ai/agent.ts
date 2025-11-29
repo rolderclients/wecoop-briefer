@@ -8,10 +8,7 @@ export const schema = object({
 	chat: string().describe('Сообщения в чат для пользователя.'),
 });
 
-export const createAgent = (
-	model: ModelName = 'anthropic/claude-haiku-4.5',
-	userPrompt?: string,
-) =>
+export const createAgent = (model: ModelName, userPrompt: string) =>
 	new ToolLoopAgent({
 		model,
 		providerOptions,
