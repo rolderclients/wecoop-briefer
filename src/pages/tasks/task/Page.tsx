@@ -74,7 +74,10 @@ export const TaskPage = () => {
                   color="green"
                   leftSection={<IconFileTypePdf size={16} />}
                   onClick={() => {
-                    downloadPDFFromServer(task.brief, "brief.pdf");
+                    downloadPDFFromServer(
+                      task.brief?.content || "",
+                      "brief.pdf",
+                    );
                   }}
                 >
                   Скачать PDF
