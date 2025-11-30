@@ -1,6 +1,9 @@
 import { createServerOnlyFn } from '@tanstack/react-start';
 import { getCookie } from '@tanstack/react-start/server';
+import { Resource } from 'sst';
 import { DateTime, Surreal } from 'surrealdb';
+
+console.log(Resource.SURREALDB_PASSWORD);
 
 let db: Surreal | null = null;
 

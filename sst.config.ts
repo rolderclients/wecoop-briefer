@@ -1,7 +1,6 @@
 /// <reference path="./.sst/platform/config.d.ts" />
 const projectName = 'wecoop';
 const appName = 'briefer';
-
 export default $config({
 	app(input) {
 		return {
@@ -9,7 +8,11 @@ export default $config({
 			removal: input?.stage === 'production' ? 'retain' : 'remove',
 			protect: ['production'].includes(input?.stage),
 			home: 'cloudflare',
-			providers: { render: '1.3.6', cloudflare: '6.11.0' },
+			providers: {
+				render: '1.3.6',
+				cloudflare: '6.11.0',
+				kubernetes: '4.24.1',
+			},
 		};
 	},
 	async run() {
@@ -27,6 +30,10 @@ export default $config({
 						});
 
 			if ($app.stage !== 'init') {
+				const password = new sst.Secret('SURREALDB_PASSWORD');
+				const suthSecret = new sst.Secret('BETTER_AUTH_SECRET');
+				const aiGatewayApiKey = new sst.Secret('AI_GATEWAY_API_KEY');
+
 				const service = new render.WebService(appName, {
 					name: `${appName}-${$app.stage}`,
 					environmentId: renderProject.environments.apply(
@@ -45,15 +52,15 @@ export default $config({
 						SURREALDB_NAMESPACE: { value: $app.stage },
 						SURREALDB_DATABASE: { value: 'data' },
 						SURREALDB_USERNAME: { value: 'root' },
-						SURREALDB_PASSWORD: { value: process.env.SURREALDB_PASSWORD },
+						SURREALDB_PASSWORD: { value: password.value },
 						BETTER_AUTH_URL: {
 							value:
 								$app.stage === 'prod'
 									? `https://${appName}.${projectName}.rolder.dev`
 									: `https://${$app.stage}.${appName}.${projectName}.rolder.dev`,
 						},
-						BETTER_AUTH_SECRET: { value: process.env.BETTER_AUTH_SECRET },
-						AI_GATEWAY_API_KEY: { value: process.env.AI_GATEWAY_API_KEY },
+						BETTER_AUTH_SECRET: { value: suthSecret.value },
+						AI_GATEWAY_API_KEY: { value: aiGatewayApiKey.value },
 					},
 					customDomains: [
 						{
@@ -74,13 +81,10 @@ export default $config({
 					},
 				});
 
-				const zoneId = process.env.CLOUDFLARE_ZONE_ID;
-				if (!zoneId) {
-					throw new Error('CLOUDFLARE_ZONE_ID environment variable is not set');
-				}
+				const zoneId = new sst.Secret('CLOUDFLARE_ZONE_ID');
 
 				const dns = new cloudflare.DnsRecord(`${projectName}-${appName}`, {
-					zoneId,
+					zoneId: zoneId.value,
 					name:
 						$app.stage === 'prod'
 							? `${appName}.${projectName}`
