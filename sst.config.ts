@@ -10,60 +10,6 @@ export default $config({
 		};
 	},
 	async run() {
-		const username = new sst.Secret('SURREALDB_USERNAME');
-		const password = new sst.Secret('SURREALDB_PASSWORD');
-		const aiGatewayApiKey = new sst.Secret('AI_GATEWAY_API_KEY');
-		const authSessionSecret = new sst.Secret('BETTER_AUTH_SECRET');
-		const project = new sst.Linkable('Project', {
-			properties: {
-				db: {
-					url:
-						$dev || $app.stage === 'test'
-							? 'wss://dt.db.wecoop.rolder.dev'
-							: $app.stage === 'prod'
-								? 'wss://dt.db.wecoop.rolder.prod'
-								: 'wss://db.wecoop.rolder.dev',
-					namespace: $dev ? 'dev' : $app.stage,
-					database: 'data',
-					username: username.value,
-					password: password.value,
-				},
-				ai: {
-					gatewayApiKey: aiGatewayApiKey.value,
-				},
-				auth: {
-					url: $dev
-						? 'http://localhost:3000'
-						: $app.stage === 'prod'
-							? 'https://briefer.wecoop.rolder.dev'
-							: `https://${$app.stage}.briefer.wecoop.rolder.dev`,
-					sessionSecret: authSessionSecret.value,
-				},
-			},
-		});
-		if ($dev) {
-			new sst.x.DevCommand('Dev', {
-				link: [project],
-				dev: {
-					autostart: true,
-					command: 'vite dev',
-				},
-				environment: { PORT: '3000' },
-			});
-			new sst.x.DevCommand('Preview', {
-				link: [project],
-				dev: {
-					autostart: false,
-					command: 'bun server.ts',
-				},
-				environment: { PORT: '8080' },
-			});
-		}
-
-		sst.Linkable.wrap(render.WebService, () => ({
-			properties: project.properties,
-		}));
-
 		if (['dev', 'test', 'prod'].includes($app.stage)) {
 			const renderProject = new render.Project('wecoop', {
 				name: 'Wecoop',
@@ -73,6 +19,7 @@ export default $config({
 					prod: { name: 'prod', protectedStatus: 'protected' },
 				},
 			});
+
 			const service = new render.WebService('briefer', {
 				name: `briefer-${$app.stage}`,
 				environmentId: renderProject.environments.apply(
@@ -81,14 +28,34 @@ export default $config({
 				plan: 'starter',
 				region: 'frankfurt',
 				startCommand: 'bun run start',
-				// customDomains: [
-				// 	{
-				// 		name:
-				// 			$app.stage === 'prod'
-				// 				? 'https://briefer.wecoop.rolder.dev'
-				// 				: `https://${$app.stage}.briefer.wecoop.rolder.dev`,
-				// 	},
-				// ],
+				envVars: {
+					SURREALDB_URL: {
+						value:
+							$app.stage === 'prod'
+								? 'wss://db.wecoop.rolder.dev'
+								: 'wss://dt.db.wecoop.rolder.dev',
+					},
+					SURREALDB_NAMESPACE: { value: $app.stage },
+					SURREALDB_DATABASE: { value: 'data' },
+					SURREALDB_USERNAME: { value: 'root' },
+					SURREALDB_PASSWORD: { value: process.env.SURREALDB_PASSWORD },
+					BETTER_AUTH_URL: {
+						value:
+							$app.stage === 'prod'
+								? 'wss://wecoop.rolder.dev'
+								: `https://${$app.stage}.briefer.wecoop.rolder.dev`,
+					},
+					BETTER_AUTH_SECRET: { value: process.env.BETTER_AUTH_SECRET },
+					AI_GATEWAY_API_KEY: { value: process.env.AI_GATEWAY_API_KEY },
+				},
+				customDomains: [
+					{
+						name:
+							$app.stage === 'prod'
+								? 'https://briefer.wecoop.rolder.dev'
+								: `https://${$app.stage}.briefer.wecoop.rolder.dev`,
+					},
+				],
 				runtimeSource: {
 					nativeRuntime: {
 						autoDeploy: true,
@@ -99,6 +66,7 @@ export default $config({
 					},
 				},
 			});
+
 			return { url: service.url };
 		}
 	},

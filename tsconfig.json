@@ -25,6 +25,6 @@
       "~/*": ["./external/*"],
     }
   },
-  "include": ["src", "external", "sst-env.d.ts"],
+  "include": ["src", "external"],
   "exclude": ["node_modules"]
 }
