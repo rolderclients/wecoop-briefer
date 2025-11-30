@@ -74,7 +74,7 @@ export default $config({
 			});
 
 			const service = new render.WebService('briefer', {
-				name: 'briefer',
+				name: `briefer-${$app.stage}`,
 				environmentId: renderProject.environments.apply(
 					(envs) => envs[$app.stage].id,
 				),
