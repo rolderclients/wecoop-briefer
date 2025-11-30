@@ -18,6 +18,7 @@ export default $config({
 				render: '1.3.6',
 				cloudflare: '6.11.0',
 				kubernetes: '4.24.1',
+				yandex: '0.13.0',
 			},
 		};
 	},
