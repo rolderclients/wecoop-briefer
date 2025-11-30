@@ -5,39 +5,6 @@
 
 declare module "sst" {
   export interface Resource {
-    "AI_GATEWAY_API_KEY": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "BETTER_AUTH_SECRET": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "Project": {
-      "ai": {
-        "gatewayApiKey": string
-      }
-      "auth": {
-        "sessionSecret": string
-        "url": string
-      }
-      "db": {
-        "database": string
-        "namespace": string
-        "password": string
-        "url": string
-        "username": string
-      }
-      "type": "sst.sst.Linkable"
-    }
-    "SURREALDB_PASSWORD": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "SURREALDB_USERNAME": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
   }
 }
 /// <reference path="sst-env.d.ts" />

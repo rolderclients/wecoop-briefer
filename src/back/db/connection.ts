@@ -1,6 +1,5 @@
 import { createServerOnlyFn } from '@tanstack/react-start';
 import { getCookie } from '@tanstack/react-start/server';
-import { Resource } from 'sst';
 import { DateTime, Surreal } from 'surrealdb';
 
 let db: Surreal | null = null;
@@ -28,10 +27,15 @@ export const getDBFn = createServerOnlyFn(async (): Promise<Surreal> => {
 	});
 
 	try {
-		const {
-			db: { url, namespace, database, username, password },
-		} = Resource.Project;
+		const url = process.env.SURREALDB_URL;
+		const namespace = process.env.SURREALDB_NAMESPACE;
+		const database = process.env.SURREALDB_DATABASE;
+		const username = process.env.SURREALDB_USERNAME;
+		const password = process.env.SURREALDB_PASSWORD;
 
+		if (!url || !namespace || !database || !username || !password) {
+			throw new Error('Missing required SurrealDB environment variables');
+		}
 		if (!url || !namespace || !database || !username || !password) {
 			throw new Error('Missing required SurrealDB environment variables');
 		}
