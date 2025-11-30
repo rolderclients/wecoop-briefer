@@ -1,12 +1,14 @@
 /// <reference path="./.sst/platform/config.d.ts" />
 
 // ###################################################
-const projectName = 'wecoop';
-const appName = 'briefer';
+const projectName = process.env.PROJECT_NAME;
+const appName = process.env.APP_NAME;
 // ###################################################
 
 export default $config({
 	app(input) {
+		if (!appName) throw new Error('APP_NAME environment variable is not set');
+
 		return {
 			name: appName,
 			removal: input?.stage === 'production' ? 'retain' : 'remove',
@@ -20,6 +22,10 @@ export default $config({
 		};
 	},
 	async run() {
+		if (!projectName)
+			throw new Error('PROJECT_NAME environment variable is not set');
+		if (!appName) throw new Error('APP_NAME environment variable is not set');
+
 		if (['init', 'dev', 'test', 'prod'].includes($app.stage)) {
 			const renderProject =
 				$app.stage !== 'init'
@@ -35,12 +41,14 @@ export default $config({
 
 			if ($app.stage !== 'init') {
 				const password = process.env.SURREALDB_PASSWORD;
+				if (!password)
+					throw new Error('SURREALDB_PASSWORD environment variable is not set');
 				const suthSecret = process.env.BETTER_AUTH_SECRET;
+				if (!suthSecret)
+					throw new Error('BETTER_AUTH_SECRET environment variable is not set');
 				const aiGatewayApiKey = process.env.AI_GATEWAY_API_KEY;
-
-				if (!password || !suthSecret || !aiGatewayApiKey) {
-					throw new Error('Missing environment variables');
-				}
+				if (!aiGatewayApiKey)
+					throw new Error('AI_GATEWAY_API_KEY environment variable is not set');
 
 				const service = new render.WebService(appName, {
 					name: `${appName}-${$app.stage}`,
