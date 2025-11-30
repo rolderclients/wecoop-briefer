@@ -19,9 +19,9 @@ const config = defineConfig({
     }),
   },
   ssr: {
-    noExternal: ['streamdown', 'sst'],
+    noExternal: ['streamdown'],
   },
-  server: { port: process.env.PORT ? parseInt(process.env.PORT) : undefined }
+  server: { port: 3000 }
 })
 
 export default config

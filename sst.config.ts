@@ -1,8 +1,14 @@
 /// <reference path="./.sst/platform/config.d.ts" />
-const projectName = 'wecoop';
-const appName = 'briefer';
+
+// ###################################################
+const projectName = process.env.PROJECT_NAME;
+const appName = process.env.APP_NAME;
+// ###################################################
+
 export default $config({
 	app(input) {
+		if (!appName) throw new Error('APP_NAME environment variable is not set');
+
 		return {
 			name: appName,
 			removal: input?.stage === 'production' ? 'retain' : 'remove',
@@ -12,10 +18,15 @@ export default $config({
 				render: '1.3.6',
 				cloudflare: '6.11.0',
 				kubernetes: '4.24.1',
+				yandex: '0.13.0',
 			},
 		};
 	},
 	async run() {
+		if (!projectName)
+			throw new Error('PROJECT_NAME environment variable is not set');
+		if (!appName) throw new Error('APP_NAME environment variable is not set');
+
 		if (['init', 'dev', 'test', 'prod'].includes($app.stage)) {
 			const renderProject =
 				$app.stage !== 'init'
@@ -30,9 +41,15 @@ export default $config({
 						});
 
 			if ($app.stage !== 'init') {
-				const password = new sst.Secret('SURREALDB_PASSWORD');
-				const suthSecret = new sst.Secret('BETTER_AUTH_SECRET');
-				const aiGatewayApiKey = new sst.Secret('AI_GATEWAY_API_KEY');
+				const password = process.env.SURREALDB_PASSWORD;
+				if (!password)
+					throw new Error('SURREALDB_PASSWORD environment variable is not set');
+				const suthSecret = process.env.BETTER_AUTH_SECRET;
+				if (!suthSecret)
+					throw new Error('BETTER_AUTH_SECRET environment variable is not set');
+				const aiGatewayApiKey = process.env.AI_GATEWAY_API_KEY;
+				if (!aiGatewayApiKey)
+					throw new Error('AI_GATEWAY_API_KEY environment variable is not set');
 
 				const service = new render.WebService(appName, {
 					name: `${appName}-${$app.stage}`,
@@ -52,15 +69,15 @@ export default $config({
 						SURREALDB_NAMESPACE: { value: $app.stage },
 						SURREALDB_DATABASE: { value: 'data' },
 						SURREALDB_USERNAME: { value: 'root' },
-						SURREALDB_PASSWORD: { value: password.value },
+						SURREALDB_PASSWORD: { value: password },
 						BETTER_AUTH_URL: {
 							value:
 								$app.stage === 'prod'
 									? `https://${appName}.${projectName}.rolder.dev`
 									: `https://${$app.stage}.${appName}.${projectName}.rolder.dev`,
 						},
-						BETTER_AUTH_SECRET: { value: suthSecret.value },
-						AI_GATEWAY_API_KEY: { value: aiGatewayApiKey.value },
+						BETTER_AUTH_SECRET: { value: suthSecret },
+						AI_GATEWAY_API_KEY: { value: aiGatewayApiKey },
 					},
 					customDomains: [
 						{
@@ -81,10 +98,12 @@ export default $config({
 					},
 				});
 
-				const zoneId = new sst.Secret('CLOUDFLARE_ZONE_ID');
+				const zoneId = process.env.CLOUDFLARE_ZONE_ID;
+				if (!zoneId)
+					throw new Error('CLOUDFLARE_ZONE_ID environment variable is not set');
 
 				const dns = new cloudflare.DnsRecord(`${projectName}-${appName}`, {
-					zoneId: zoneId.value,
+					zoneId,
 					name:
 						$app.stage === 'prod'
 							? `${appName}.${projectName}`
