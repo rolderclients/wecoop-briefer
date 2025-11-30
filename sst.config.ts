@@ -6,7 +6,7 @@ export default $config({
 			removal: input?.stage === 'production' ? 'retain' : 'remove',
 			protect: ['production'].includes(input?.stage),
 			home: 'cloudflare',
-			providers: { render: { skipDeployAfterServiceUpdate: true } },
+			providers: { render: '1.3.6' },
 		};
 	},
 	async run() {
@@ -14,7 +14,6 @@ export default $config({
 		const password = new sst.Secret('SURREALDB_PASSWORD');
 		const aiGatewayApiKey = new sst.Secret('AI_GATEWAY_API_KEY');
 		const authSessionSecret = new sst.Secret('BETTER_AUTH_SECRET');
-
 		const project = new sst.Linkable('Project', {
 			properties: {
 				db: {
@@ -42,7 +41,6 @@ export default $config({
 				},
 			},
 		});
-
 		if ($dev) {
 			new sst.x.DevCommand('Dev', {
 				link: [project],
@@ -52,7 +50,6 @@ export default $config({
 				},
 				environment: { PORT: '3000' },
 			});
-
 			new sst.x.DevCommand('Preview', {
 				link: [project],
 				dev: {
@@ -63,6 +60,10 @@ export default $config({
 			});
 		}
 
+		sst.Linkable.wrap(render.WebService, () => ({
+			properties: project.properties,
+		}));
+
 		if (['dev', 'test', 'prod'].includes($app.stage)) {
 			const renderProject = new render.Project('wecoop', {
 				name: 'Wecoop',
@@ -72,7 +73,6 @@ export default $config({
 					prod: { name: 'prod', protectedStatus: 'protected' },
 				},
 			});
-
 			const service = new render.WebService('briefer', {
 				name: `briefer-${$app.stage}`,
 				environmentId: renderProject.environments.apply(
@@ -91,7 +91,7 @@ export default $config({
 				// ],
 				runtimeSource: {
 					nativeRuntime: {
-						autoDeploy: false,
+						autoDeploy: true,
 						branch: 'master',
 						repoUrl: 'https://github.com/rolderclients/wecoop-briefer',
 						buildCommand: 'bun install && bun run build',
@@ -99,7 +99,6 @@ export default $config({
 					},
 				},
 			});
-
 			return { url: service.url };
 		}
 	},
