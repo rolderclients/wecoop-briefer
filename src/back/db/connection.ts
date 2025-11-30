@@ -3,7 +3,7 @@ import { getCookie } from '@tanstack/react-start/server';
 import { Resource } from 'sst';
 import { DateTime, Surreal } from 'surrealdb';
 
-console.log(Resource.SURREALDB_PASSWORD);
+console.log(Resource);
 
 let db: Surreal | null = null;
 
