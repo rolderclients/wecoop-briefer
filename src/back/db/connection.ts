@@ -36,6 +36,9 @@ export const getDBFn = createServerOnlyFn(async (): Promise<Surreal> => {
 		if (!url || !namespace || !database || !username || !password) {
 			throw new Error('Missing required SurrealDB environment variables');
 		}
+		if (!url || !namespace || !database || !username || !password) {
+			throw new Error('Missing required SurrealDB environment variables');
+		}
 
 		await instance.connect(url, { authentication: { username, password } });
 

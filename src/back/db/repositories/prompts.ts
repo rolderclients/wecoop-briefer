@@ -12,7 +12,7 @@ import { getDB } from '..';
 import { fromDTO, fromDTOs } from '../utils';
 
 const getServicesWithPromptsFn = createServerFn({ method: 'GET' })
-	.inputValidator((data: { archived?: boolean }) => data)
+	.inputValidator((data: { archived: boolean }) => data)
 	.handler(async ({ data: { archived = false } }) => {
 		const db = await getDB();
 
@@ -35,9 +35,9 @@ const getServicesWithPromptsFn = createServerFn({ method: 'GET' })
 		return result;
 	});
 
-export const servicesWithPromptsQueryOptions = (archived?: boolean) =>
+export const servicesWithPromptsQueryOptions = (archived: boolean) =>
 	queryOptions<ServiceWithPrompts[]>({
-		queryKey: ['servicesWithPrompts', !!archived],
+		queryKey: ['servicesWithPrompts', archived],
 		queryFn: () => getServicesWithPromptsFn({ data: { archived } }),
 	});
 

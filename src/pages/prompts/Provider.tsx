@@ -3,7 +3,7 @@ import {
 	type UseMutationResult,
 	useSuspenseQuery,
 } from '@tanstack/react-query';
-import { useSearch } from '@tanstack/react-router';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import {
 	createContext,
 	type ReactNode,
@@ -57,20 +57,26 @@ interface PromptsContext {
 const PromptsContext = createContext<PromptsContext | null>(null);
 
 export const PromptsProvider = ({ children }: { children: ReactNode }) => {
-	const { archived: initialArchived } = useSearch({ from: Route.id });
-	const { data: services } = useSuspenseQuery(servicesQueryOptions());
+	const navigate = useNavigate({ from: Route.fullPath });
+	const isArchived = useSearch({
+		from: Route.id,
+		select: (data) => !!data.archived,
+	});
+
+	const { data: services } = useSuspenseQuery(servicesQueryOptions(isArchived));
 	const { data: models } = useSuspenseQuery(modelsQueryOptions());
 	const { data: servicesWithPrompts } = useSuspenseQuery(
-		servicesWithPromptsQueryOptions(initialArchived),
+		servicesWithPromptsQueryOptions(isArchived),
 	);
 
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
-	const [isArchived, setIsArchived] = useState(initialArchived || false);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <>
 	useEffect(() => {
-		setIsArchived(initialArchived || false);
-	}, [initialArchived]);
+		setSelectedIds([]);
+		setSelectedPrompt(null);
+	}, [isArchived]);
 
 	const [isCreateOpened, { open: openCreate, close: closeCreate }] =
 		useDisclosure(false);
@@ -108,7 +114,8 @@ export const PromptsProvider = ({ children }: { children: ReactNode }) => {
 		selectedPrompt,
 		setSelectedPrompt,
 		isArchived,
-		setIsArchived,
+		setIsArchived: (archived: boolean) =>
+			navigate({ search: () => ({ archived }) }),
 		isCreateOpened,
 		openCreate,
 		closeCreate,

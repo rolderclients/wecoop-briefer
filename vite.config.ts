@@ -21,6 +21,7 @@ const config = defineConfig({
   ssr: {
     noExternal: ['streamdown'],
   },
+  server: { port: 3000 }
 })
 
 export default config
