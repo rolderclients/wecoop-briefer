@@ -16,8 +16,6 @@ export const Toolbar = ({
 
   const [downloading, setDownloading] = useState<boolean>(false);
 
-  console.log("htmlData", htmlData);
-
   return !disabledToolbar ? (
     <RichTextEditor.Toolbar sticky>
       <RichTextEditor.ControlsGroup>
