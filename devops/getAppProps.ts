@@ -1,6 +1,6 @@
 import type { App, AppInput } from '.sst/platform/src/config';
+import ycAccountKey from '../.sst/yc_account_key.json';
 import { env } from './env';
-import ycKeyFile from './yc_key.json';
 
 export const getAppProps = (input: AppInput): App => {
 	const { projectName, appName } = env;
@@ -16,7 +16,7 @@ export const getAppProps = (input: AppInput): App => {
 			kubernetes: '4.24.1',
 			yandex: {
 				version: '0.13.0',
-				serviceAccountKeyFile: ycKeyFile,
+				serviceAccountKeyFile: ycAccountKey,
 			},
 		},
 	};

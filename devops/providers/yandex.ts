@@ -1,4 +1,5 @@
 import type { Output } from '@pulumi/pulumi';
+import { writeFile } from 'devops/utils';
 import { env } from '../env';
 
 export const getYandexServiceAccount = () => {
@@ -24,14 +25,27 @@ export const getYandexServiceAccount = () => {
 export const setYandexStorageBucket = (serviceAccountId: Output<string>) => {
 	const { projectName, bucket } = env;
 
-	const staticKey = new yandex.IamServiceAccountStaticAccessKey('StaticKey', {
-		serviceAccountId,
-		description: `Static S3 key for ${projectName}`,
+	const yandexStorageKeys = new yandex.IamServiceAccountStaticAccessKey(
+		'StaticKey',
+		{
+			serviceAccountId,
+			description: `Static S3 key for ${projectName}`,
+		},
+	);
+
+	yandexStorageKeys.accessKey.apply((accessKey) => {
+		yandexStorageKeys.secretKey.apply((secretKey) =>
+			writeFile('yc_storage_keys.json', {
+				accessKey: accessKey,
+				secretKey: secretKey,
+			}),
+		);
 	});
 
 	new yandex.StorageBucket('Bucket', {
 		bucket,
-		accessKey: staticKey.accessKey.apply((key) => key),
-		secretKey: staticKey.secretKey.apply((key) => key),
+		accessKey: yandexStorageKeys.accessKey.apply((key) => key),
+		secretKey: yandexStorageKeys.secretKey.apply((key) => key),
+		forceDestroy: true,
 	});
 };

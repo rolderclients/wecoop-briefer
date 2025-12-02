@@ -2,7 +2,6 @@ export const env = {
 	// ### Project ####################################################################
 	projectName: 'wecoop',
 	appName: 'briefer',
-	projectId: 'prj-...',
 	domain: {
 		dev: 'rolder.dev',
 		test: 'rolder.dev',

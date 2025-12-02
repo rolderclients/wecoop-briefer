@@ -3,7 +3,6 @@ import { env } from './env';
 const requiredProjectEnvs = {
 	projectName: true,
 	appName: true,
-	projectId: true,
 	domain: {
 		dev: true,
 		test: true,

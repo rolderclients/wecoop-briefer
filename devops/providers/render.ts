@@ -1,22 +1,30 @@
 /// <reference path="../../.sst/platform/config.d.ts" />
 
 import type { Output } from '@pulumi/pulumi';
+import { readFile, writeFile } from 'devops/utils';
 import { env } from '../env';
 import type { Stage } from '../types';
 
 export const getRenderProject = () => {
-	const { projectName, projectId } = env;
+	const { projectName } = env;
 
-	return $app.stage !== 'init'
-		? render.Project.get(projectName, projectId)
-		: new render.Project(projectName, {
-				name: projectName,
-				environments: {
-					dev: { name: 'dev', protectedStatus: 'unprotected' },
-					test: { name: 'test', protectedStatus: 'unprotected' },
-					prod: { name: 'prod', protectedStatus: 'protected' },
-				},
-			});
+	const projectJson = readFile('project.json');
+
+	const project =
+		$app.stage !== 'init'
+			? render.Project.get(projectName, projectJson.id)
+			: new render.Project(projectName, {
+					name: projectName,
+					environments: {
+						dev: { name: 'dev', protectedStatus: 'unprotected' },
+						test: { name: 'test', protectedStatus: 'unprotected' },
+						prod: { name: 'prod', protectedStatus: 'protected' },
+					},
+				});
+
+	project.id.apply((id) => writeFile(`project.json`, { id }));
+
+	return project;
 };
 
 export const getRenderService = (environmentId: Output<string>) => {
@@ -34,7 +42,10 @@ export const getRenderService = (environmentId: Output<string>) => {
 		BETTER_AUTH_URL,
 		BETTER_AUTH_SECRET,
 		AI_GATEWAY_API_KEY,
+		bucket,
 	} = env;
+
+	const yandexStorageKeys = readFile('yc_storage_keys.json');
 
 	return new render.WebService(appName, {
 		name: `${appName}-${$app.stage}`,
@@ -51,6 +62,9 @@ export const getRenderService = (environmentId: Output<string>) => {
 			BETTER_AUTH_URL: { value: BETTER_AUTH_URL[$app.stage as Stage] },
 			BETTER_AUTH_SECRET: { value: BETTER_AUTH_SECRET[$app.stage as Stage] },
 			AI_GATEWAY_API_KEY: { value: AI_GATEWAY_API_KEY[$app.stage as Stage] },
+			BUCKET_NAME: { value: bucket },
+			YANDEX_STORAGE_ACCESS_KEY: { value: yandexStorageKeys.accessKey },
+			YANDEX_STORAGE_SECRET_KEY: { value: yandexStorageKeys.secretKey },
 		},
 		customDomains: [
 			{

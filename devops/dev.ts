@@ -1,4 +1,5 @@
 import { env } from './env';
+import { readFile } from './utils';
 
 export const setDev = () => {
 	const {
@@ -9,7 +10,10 @@ export const setDev = () => {
 		SURREALDB_PASSWORD,
 		BETTER_AUTH_SECRET,
 		AI_GATEWAY_API_KEY,
+		bucket,
 	} = env;
+
+	const yandexStorageKeys = readFile('yc_storage_keys.json');
 
 	new sst.x.DevCommand('DevServer', {
 		dev: {
@@ -26,6 +30,9 @@ export const setDev = () => {
 			BETTER_AUTH_URL: 'http://localhost:3000',
 			BETTER_AUTH_SECRET: BETTER_AUTH_SECRET.dev,
 			AI_GATEWAY_API_KEY: AI_GATEWAY_API_KEY.dev,
+			BUCKET_NAME: bucket,
+			YANDEX_STORAGE_ACCESS_KEY: yandexStorageKeys.accessKey,
+			YANDEX_STORAGE_SECRET_KEY: yandexStorageKeys.secretKey,
 		},
 	});
 };

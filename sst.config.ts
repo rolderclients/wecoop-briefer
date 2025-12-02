@@ -25,8 +25,6 @@ export default $config({
 
 				const accountId = getYandexServiceAccount();
 				setYandexStorageBucket(accountId);
-
-				return { projectId: renderProject.id };
 			} else {
 				const service = getRenderService(
 					renderProject.environments.apply((envs) => envs[$app.stage].id),
