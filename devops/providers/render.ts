@@ -62,7 +62,7 @@ export const getRenderService = (environmentId: Output<string>) => {
 			BETTER_AUTH_URL: { value: BETTER_AUTH_URL[$app.stage as Stage] },
 			BETTER_AUTH_SECRET: { value: BETTER_AUTH_SECRET[$app.stage as Stage] },
 			AI_GATEWAY_API_KEY: { value: AI_GATEWAY_API_KEY[$app.stage as Stage] },
-			BUCKET_NAME: { value: bucket },
+			BUCKET_NAME: { value: bucket[$app.stage as Stage] },
 			YANDEX_STORAGE_ACCESS_KEY: { value: yandexStorageKeys.accessKey },
 			YANDEX_STORAGE_SECRET_KEY: { value: yandexStorageKeys.secretKey },
 		},

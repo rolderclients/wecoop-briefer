@@ -10,22 +10,22 @@ export default $config({
 			getRenderProject,
 			getRenderService,
 			getCloudflareDns,
-			getYandexServiceAccount,
+			setYandexServiceAccount,
 			setYandexStorageBucket,
 			setDev,
 		} = await import('./devops');
 
 		if (['init', 'dev', 'test', 'prod'].includes($app.stage)) {
+			const folderId = process.env.YC_FOLDER_ID;
+			if (!folderId)
+				throw new Error('YC_FOLDER_ID environment variable is not set');
+
+			setYandexServiceAccount();
 			const renderProject = getRenderProject();
 
-			if ($app.stage === 'init') {
-				const folderId = process.env.YC_FOLDER_ID;
-				if (!folderId)
-					throw new Error('YC_FOLDER_ID environment variable is not set');
+			if ($app.stage !== 'init') {
+				setYandexStorageBucket();
 
-				const accountId = getYandexServiceAccount();
-				setYandexStorageBucket(accountId);
-			} else {
 				const service = getRenderService(
 					renderProject.environments.apply((envs) => envs[$app.stage].id),
 				);
