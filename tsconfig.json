@@ -25,6 +25,6 @@
       "~/*": ["./external/*"],
     }
   },
-  "include": ["src", "external"],
+  "include": ["src", "external", "devops"],
   "exclude": ["node_modules"]
 }
