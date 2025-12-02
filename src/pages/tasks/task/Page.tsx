@@ -72,6 +72,7 @@ export const TaskPage = () => {
                   component="div"
                   size="xs"
                   color="green"
+                  variant="light"
                   leftSection={<IconFileTypePdf size={16} />}
                   onClick={() => {
                     downloadPDFFromServer(
