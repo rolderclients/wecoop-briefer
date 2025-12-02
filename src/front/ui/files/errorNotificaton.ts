@@ -1,11 +1,7 @@
-import { useUploadFiles } from '@better-upload/client';
-import type {
-	ClientUploadErrorClass,
-	UploadHookProps,
-} from '@better-upload/client/internal';
+import type { ClientUploadError } from '@better-upload/client';
 import { notifications } from '@mantine/notifications';
 
-const codes: Record<ClientUploadErrorClass['type'], string> = {
+const serverErrorCodes: Record<ClientUploadError['type'], string> = {
 	unknown: 'Неизвестная ошибка',
 	invalid_request: 'Неверный запрос',
 	aborted: 'Загрузка прервана',
@@ -17,22 +13,11 @@ const codes: Record<ClientUploadErrorClass['type'], string> = {
 	too_many_files: 'Слишком много файлов',
 };
 
-export const useUpload = (props: UploadHookProps<true>) => {
-	return useUploadFiles({
-		...props,
-		onUploadComplete: () => {
-			notifications.show({
-				message: 'Загрузка файла завершена',
-				color: 'green',
-			});
-		},
-		onError: (error) => {
-			notifications.show({
-				title: codes[error.type],
-				message: error.message,
-				color: 'red',
-				autoClose: 5000,
-			});
-		},
+export const errorNotificaton = (error: ClientUploadError) => {
+	notifications.show({
+		title: serverErrorCodes[error.type],
+		message: error.message,
+		color: 'red',
+		autoClose: 5000,
 	});
 };

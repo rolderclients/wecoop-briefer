@@ -1,7 +1,6 @@
 import {
 	Box,
 	Button,
-	FileButton,
 	Grid,
 	Group,
 	Paper,
@@ -13,17 +12,16 @@ import { IconEdit } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { taskWithBriefAndChatQueryOptions } from '@/back';
-import { SimpleEditor, useUpload } from '@/front';
+import { Files, SimpleEditor } from '@/front';
 import { Route } from '@/routes/_authed/tasks/$taskId';
 import { ScrollArea } from '~/ui';
+import { TaskFiles } from './Files';
 
 export const TaskPage = () => {
 	const { taskId } = useParams({ from: Route.id });
 	const { data: task } = useSuspenseQuery(
 		taskWithBriefAndChatQueryOptions(taskId),
 	);
-
-	const { upload, isPending } = useUpload({ route: 'upload' });
 
 	return (
 		<Stack pb="xl" pt="sm">
@@ -43,7 +41,7 @@ export const TaskPage = () => {
 						<Title order={3}>Задание</Title>
 						<Paper withBorder radius="md">
 							<ScrollArea h="calc(100vh - 147px)">
-								<Stack px="md" py="sm">
+								<Stack px="md" py="sm" h="100%">
 									<Box style={{ whiteSpace: 'pre-wrap' }}>
 										<Text c="dimmed">Компания</Text>
 										<Text>{task.company.title}</Text>
@@ -57,20 +55,9 @@ export const TaskPage = () => {
 										<Text>{task.content}</Text>
 									</Box>
 
-									<FileButton
-										multiple
-										onChange={(files) => {
-											upload(files, {
-												metadata: { path: `tasks/${task.id}` },
-											});
-										}}
-									>
-										{(props) => (
-											<Button loading={isPending} {...props}>
-												Upload image
-											</Button>
-										)}
-									</FileButton>
+									<Files.Provider route="upload">
+										<TaskFiles taskId={task.id} />
+									</Files.Provider>
 								</Stack>
 
 								<ScrollArea.ScrollButton />
