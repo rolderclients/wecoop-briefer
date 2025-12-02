@@ -2,16 +2,10 @@ import { ActionIcon, Loader, Tooltip } from "@mantine/core";
 import { RichTextEditor } from "@mantine/tiptap";
 import { IconCheck, IconFileTypePdf } from "@tabler/icons-react";
 import { useEditor } from "./Provider";
-import { downloadPDFFromServer } from "@/components/reusables/functions";
+// import { downloadPDFFromServer } from "@/components/reusables/functions";
 import { useState } from "react";
 
-export const Toolbar = ({
-  saving,
-  htmlData,
-}: {
-  saving?: boolean;
-  htmlData?: string;
-}) => {
+export const Toolbar = ({ saving }: { saving?: boolean }) => {
   const { editor, disabledToolbar } = useEditor();
 
   const [downloading, setDownloading] = useState<boolean>(false);
@@ -66,6 +60,7 @@ export const Toolbar = ({
       </RichTextEditor.ControlsGroup>
 
       <RichTextEditor.ControlsGroup ml="auto">
+        {children}
         <RichTextEditor.Control style={{ cursor: "pointer" }}>
           <Tooltip
             label="Скачать PDF"
@@ -82,13 +77,13 @@ export const Toolbar = ({
               color="green"
               onClick={() => {
                 setDownloading(true);
-                console.log("htmlData", htmlData);
-                downloadPDFFromServer(htmlData || "", "brief.pdf")
-                  .then(() => setDownloading(false))
-                  .catch((error) => {
-                    console.error("Error downloading PDF:", error);
-                    setDownloading(false);
-                  });
+                console.log("htmlData", editor?.getHTML());
+                // downloadPDFFromServer(editor?.getHTML() || "", "brief.pdf")
+                //   .then(() => setDownloading(false))
+                //   .catch((error) => {
+                //     console.error("Error downloading PDF:", error);
+                //     setDownloading(false);
+                //   });
               }}
             >
               <IconFileTypePdf stroke={1.5} />

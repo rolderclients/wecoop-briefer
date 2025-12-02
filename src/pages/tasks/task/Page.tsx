@@ -15,7 +15,7 @@ import { taskWithBriefAndChatQueryOptions } from "@/back";
 import { SimpleEditor } from "@/front";
 import { Route } from "@/routes/_authed/tasks/$taskId";
 import { ScrollArea } from "~/ui";
-import { downloadPDFFromServer } from "@/components/reusables/functions";
+import { downloadPDF } from "@/back/functions";
 
 export const TaskPage = () => {
   const { taskId } = useParams({ from: Route.id });
@@ -75,10 +75,20 @@ export const TaskPage = () => {
                   variant="light"
                   leftSection={<IconFileTypePdf size={16} />}
                   onClick={() => {
-                    downloadPDFFromServer(
-                      task.brief?.content || "",
-                      "brief.pdf",
-                    );
+                    console.log("Нажали скачать файлы");
+                  }}
+                >
+                  Скачать файлы
+                </Button>
+
+                <Button
+                  component="div"
+                  size="xs"
+                  color="green"
+                  variant="light"
+                  leftSection={<IconFileTypePdf size={16} />}
+                  onClick={() => {
+                    downloadPDF(task.brief?.content || "", "brief.pdf");
                   }}
                 >
                   Скачать PDF
