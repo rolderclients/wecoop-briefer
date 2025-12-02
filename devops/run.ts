@@ -2,7 +2,7 @@ import { checkEnv } from './checkEnv';
 
 const [stage] = process.argv.slice(2); // убираем первые два элемента (путь к bun и скрипту)
 
-const stages = ['init', 'dev', 'staging', 'prod'];
+const stages = ['init', 'dev', 'test', 'prod'];
 if (!stages.includes(stage)) {
 	console.error(
 		`\nInvalid stage: "${stage}", supported stages are: ${stages.join(', ')}`,
