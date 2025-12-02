@@ -1,6 +1,8 @@
+import { useUploadFiles } from '@better-upload/client';
 import {
 	Box,
 	Button,
+	FileButton,
 	Grid,
 	Group,
 	Paper,
@@ -21,6 +23,10 @@ export const TaskPage = () => {
 	const { data: task } = useSuspenseQuery(
 		taskWithBriefAndChatQueryOptions(taskId),
 	);
+
+	const { upload } = useUploadFiles({
+		route: 'upload',
+	});
 
 	return (
 		<Stack pb="xl" pt="sm">
@@ -53,6 +59,16 @@ export const TaskPage = () => {
 										<Text c="dimmed">Описание</Text>
 										<Text>{task.content}</Text>
 									</Box>
+
+									<FileButton
+										accept="image/png,image/jpeg"
+										multiple
+										onChange={(files) => {
+											upload(files);
+										}}
+									>
+										{(props) => <Button {...props}>Upload image</Button>}
+									</FileButton>
 								</Stack>
 
 								<ScrollArea.ScrollButton />

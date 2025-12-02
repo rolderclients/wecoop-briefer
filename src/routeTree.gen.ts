@@ -13,6 +13,7 @@ import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as AuthForbiddenRouteImport } from './routes/auth/forbidden'
+import { Route as ApiUploadRouteImport } from './routes/api/upload'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthedUsersRouteImport } from './routes/_authed/users'
 import { Route as AuthedServicesRouteImport } from './routes/_authed/services'
@@ -40,6 +41,11 @@ const AuthSigninRoute = AuthSigninRouteImport.update({
 const AuthForbiddenRoute = AuthForbiddenRouteImport.update({
   id: '/auth/forbidden',
   path: '/auth/forbidden',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUploadRoute = ApiUploadRouteImport.update({
+  id: '/api/upload',
+  path: '/api/upload',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/services': typeof AuthedServicesRoute
   '/users': typeof AuthedUsersRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/upload': typeof ApiUploadRoute
   '/auth/forbidden': typeof AuthForbiddenRoute
   '/auth/signin': typeof AuthSigninRoute
   '/prompts/$promptId': typeof AuthedPromptsPromptIdRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/services': typeof AuthedServicesRoute
   '/users': typeof AuthedUsersRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/upload': typeof ApiUploadRoute
   '/auth/forbidden': typeof AuthForbiddenRoute
   '/auth/signin': typeof AuthSigninRoute
   '/prompts/$promptId': typeof AuthedPromptsPromptIdRoute
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/_authed/services': typeof AuthedServicesRoute
   '/_authed/users': typeof AuthedUsersRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/upload': typeof ApiUploadRoute
   '/auth/forbidden': typeof AuthForbiddenRoute
   '/auth/signin': typeof AuthSigninRoute
   '/_authed/prompts/$promptId': typeof AuthedPromptsPromptIdRoute
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/users'
     | '/api/chat'
+    | '/api/upload'
     | '/auth/forbidden'
     | '/auth/signin'
     | '/prompts/$promptId'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/users'
     | '/api/chat'
+    | '/api/upload'
     | '/auth/forbidden'
     | '/auth/signin'
     | '/prompts/$promptId'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/_authed/services'
     | '/_authed/users'
     | '/api/chat'
+    | '/api/upload'
     | '/auth/forbidden'
     | '/auth/signin'
     | '/_authed/prompts/$promptId'
@@ -182,6 +194,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
   ApiChatRoute: typeof ApiChatRoute
+  ApiUploadRoute: typeof ApiUploadRoute
   AuthForbiddenRoute: typeof AuthForbiddenRoute
   AuthSigninRoute: typeof AuthSigninRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -215,6 +228,13 @@ declare module '@tanstack/react-router' {
       path: '/auth/forbidden'
       fullPath: '/auth/forbidden'
       preLoaderRoute: typeof AuthForbiddenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/upload': {
+      id: '/api/upload'
+      path: '/api/upload'
+      fullPath: '/api/upload'
+      preLoaderRoute: typeof ApiUploadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -310,6 +330,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
   ApiChatRoute: ApiChatRoute,
+  ApiUploadRoute: ApiUploadRoute,
   AuthForbiddenRoute: AuthForbiddenRoute,
   AuthSigninRoute: AuthSigninRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
