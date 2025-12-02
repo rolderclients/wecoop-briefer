@@ -1,35 +1,41 @@
-import type { Output } from '@pulumi/pulumi';
-import { writeFile } from 'devops/utils';
 import { env } from '../env';
 import type { Stage } from '../types';
+import { readFile, writeFile } from '../utils';
 
-export const getYandexServiceAccount = () => {
+export const setYandexServiceAccount = () => {
 	const { projectName, appName } = env;
 
 	const folderId = process.env.YC_FOLDER_ID;
 	if (!folderId)
 		throw new Error('YC_FOLDER_ID environment variable is not set');
 
-	const account = new yandex.IamServiceAccount('ServiceAccount', {
-		name: `${projectName}-${appName}`,
-	});
+	const accountJson = readFile('yc_account.json');
+
+	const account =
+		$app.stage !== 'init'
+			? yandex.IamServiceAccount.get(projectName, accountJson.id)
+			: new yandex.IamServiceAccount('ServiceAccount', {
+					name: `${projectName}-${appName}`,
+				});
+
+	account.id.apply((id) => writeFile(`yc_account.json`, { id }));
 
 	new yandex.ResourcemanagerFolderIamMember('ServiceAccountAccess', {
 		folderId,
 		role: 'storage.editor',
 		member: $interpolate`serviceAccount:${account.id}`,
 	});
-
-	return account.id.apply((id) => id);
 };
 
-export const setYandexStorageBucket = (serviceAccountId: Output<string>) => {
+export const setYandexStorageBucket = () => {
 	const { projectName, bucket, domain, subDomain } = env;
+
+	const accountJson = readFile('yc_account.json');
 
 	const yandexStorageKeys = new yandex.IamServiceAccountStaticAccessKey(
 		'StaticKey',
 		{
-			serviceAccountId,
+			serviceAccountId: accountJson.id,
 			description: `Static S3 key for ${projectName}`,
 		},
 	);
@@ -44,7 +50,7 @@ export const setYandexStorageBucket = (serviceAccountId: Output<string>) => {
 	});
 
 	new yandex.StorageBucket('Bucket', {
-		bucket,
+		bucket: bucket[$app.stage as Stage],
 		accessKey: yandexStorageKeys.accessKey.apply((key) => key),
 		secretKey: yandexStorageKeys.secretKey.apply((key) => key),
 		forceDestroy: true,
@@ -52,10 +58,7 @@ export const setYandexStorageBucket = (serviceAccountId: Output<string>) => {
 			{
 				allowedOrigins: [
 					'http://localhost:3000',
-					...['dev', 'test', 'prod'].map(
-						(env) =>
-							`https://${subDomain[env as Stage]}.${domain[env as Stage]}`,
-					),
+					`https://${subDomain[$app.stage as Stage]}.${domain[$app.stage as Stage]}`,
 				],
 				allowedMethods: ['GET', 'PUT', 'POST', 'DELETE'],
 				allowedHeaders: ['*'],

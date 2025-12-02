@@ -19,7 +19,11 @@ const requiredProjectEnvs = {
 		test: true,
 		prod: true,
 	},
-	bucket: true,
+	bucket: {
+		dev: true,
+		test: true,
+		prod: true,
+	},
 	SURREALDB_URL: {
 		dev: true,
 		test: true,

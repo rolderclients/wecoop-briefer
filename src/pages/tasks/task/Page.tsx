@@ -1,4 +1,3 @@
-import { useUploadFiles } from '@better-upload/client';
 import {
 	Box,
 	Button,
@@ -14,7 +13,7 @@ import { IconEdit } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { taskWithBriefAndChatQueryOptions } from '@/back';
-import { SimpleEditor } from '@/front';
+import { SimpleEditor, useUpload } from '@/front';
 import { Route } from '@/routes/_authed/tasks/$taskId';
 import { ScrollArea } from '~/ui';
 
@@ -24,9 +23,7 @@ export const TaskPage = () => {
 		taskWithBriefAndChatQueryOptions(taskId),
 	);
 
-	const { upload } = useUploadFiles({
-		route: 'upload',
-	});
+	const { upload, isPending } = useUpload({ route: 'upload' });
 
 	return (
 		<Stack pb="xl" pt="sm">
@@ -61,13 +58,18 @@ export const TaskPage = () => {
 									</Box>
 
 									<FileButton
-										accept="image/png,image/jpeg"
 										multiple
 										onChange={(files) => {
-											upload(files);
+											upload(files, {
+												metadata: { path: `tasks/${task.id}` },
+											});
 										}}
 									>
-										{(props) => <Button {...props}>Upload image</Button>}
+										{(props) => (
+											<Button loading={isPending} {...props}>
+												Upload image
+											</Button>
+										)}
 									</FileButton>
 								</Stack>
 

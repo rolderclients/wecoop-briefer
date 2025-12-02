@@ -30,7 +30,7 @@ export const setDev = () => {
 			BETTER_AUTH_URL: 'http://localhost:3000',
 			BETTER_AUTH_SECRET: BETTER_AUTH_SECRET.dev,
 			AI_GATEWAY_API_KEY: AI_GATEWAY_API_KEY.dev,
-			BUCKET_NAME: bucket,
+			BUCKET_NAME: bucket.dev,
 			YANDEX_STORAGE_ACCESS_KEY: yandexStorageKeys.accessKey,
 			YANDEX_STORAGE_SECRET_KEY: yandexStorageKeys.secretKey,
 		},
