@@ -1,6 +1,7 @@
 import type { Output } from '@pulumi/pulumi';
 import { writeFile } from 'devops/utils';
 import { env } from '../env';
+import type { Stage } from '../types';
 
 export const getYandexServiceAccount = () => {
 	const { projectName, appName } = env;
@@ -23,7 +24,7 @@ export const getYandexServiceAccount = () => {
 };
 
 export const setYandexStorageBucket = (serviceAccountId: Output<string>) => {
-	const { projectName, bucket } = env;
+	const { projectName, bucket, domain, subDomain } = env;
 
 	const yandexStorageKeys = new yandex.IamServiceAccountStaticAccessKey(
 		'StaticKey',
@@ -47,5 +48,19 @@ export const setYandexStorageBucket = (serviceAccountId: Output<string>) => {
 		accessKey: yandexStorageKeys.accessKey.apply((key) => key),
 		secretKey: yandexStorageKeys.secretKey.apply((key) => key),
 		forceDestroy: true,
+		corsRules: [
+			{
+				allowedOrigins: [
+					'http://localhost:3000',
+					...['dev', 'test', 'prod'].map(
+						(env) =>
+							`https://${subDomain[env as Stage]}.${domain[env as Stage]}`,
+					),
+				],
+				allowedMethods: ['GET', 'PUT', 'POST', 'DELETE'],
+				allowedHeaders: ['*'],
+				exposeHeaders: ['ETag'],
+			},
+		],
 	});
 };

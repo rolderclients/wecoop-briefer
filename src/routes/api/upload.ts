@@ -7,29 +7,26 @@ if (!bucket) throw new Error('BUCKET_NAME environment variable is not set');
 
 const accessKeyId = process.env.YANDEX_STORAGE_ACCESS_KEY;
 const secretAccessKey = process.env.YANDEX_STORAGE_SECRET_KEY;
-console.log(accessKeyId, secretAccessKey);
 if (!accessKeyId)
 	throw new Error('YANDEX_STORAGE_ACCESS_KEY environment variable is not set');
 if (!secretAccessKey)
 	throw new Error('YANDEX_STORAGE_SECRET_KEY environment variable is not set');
 
 const s3 = custom({
-	host: 'https://storage.yandexcloud.net',
+	host: 'storage.yandexcloud.net',
 	accessKeyId,
 	secretAccessKey,
 	region: 'ru-central1',
-	secure: true,
-	forcePathStyle: false,
 });
 
 const router: Router = {
 	client: s3,
 	bucketName: bucket,
 	routes: {
-		images: route({
+		upload: route({
 			fileTypes: ['image/*'],
 			multipleFiles: true,
-			maxFiles: 4,
+			maxFiles: 5,
 		}),
 	},
 };
