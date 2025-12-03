@@ -1,80 +1,282 @@
 import chromium from "@sparticuz/chromium";
 import { createServerFn } from "@tanstack/react-start";
-import puppeteer from "puppeteer-core";
+import puppeteer, { Browser, Page } from "puppeteer-core";
 
-// Крутится на сервере и формирует pdfBuffer из htnl
-const generatePDF = createServerFn({ method: "POST" })
-  .inputValidator((htmlData: string) => htmlData)
-  .handler(async (htmlData): Promise<any> => {
-    // Созадем экземпляр брацузера
-    const browser = await puppeteer.launch({
-      executablePath: await chromium.executablePath(),
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+// Интерфейсы для типизации 📝
+interface PDFOptions {
+  format?: "A4" | "A3" | "Letter";
+  margin?: {
+    top?: string;
+    bottom?: string;
+    left?: string;
+    right?: string;
+  };
+  printBackground?: boolean;
+}
 
-    console.log("htmlData", htmlData);
+interface GeneratePDFInput {
+  htmlData: string;
+  options?: PDFOptions;
+}
 
-    // Создаем новую страницу в браузере
-    const page = await browser.newPage();
+// Serializable Buffer type для TanStack
+interface SerializableBuffer {
+  data: number[];
+  type: "Buffer";
+}
 
-    // Устанавливаем настройки страницы А4
-    await page.setViewport({ width: 1024, height: 768 });
+// Конфигурация браузера для оптимизации 🚀
+const getBrowserConfig = async () => ({
+  executablePath: await chromium.executablePath(),
+  args: [
+    // Основные флаги безопасности
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
 
-    // Устанавливаем контент страницы
-    await page.setContent(htmlData);
+    // Оптимизация производительности ⚡
+    "--disable-dev-shm-usage",
+    "--disable-accelerated-2d-canvas",
+    "--no-first-run",
+    "--no-zygote",
+    "--disable-gpu",
+    "--disable-web-security",
 
-    // Устанавливаем настройки PDF
-    await page.emulateMediaType("screen");
+    // Экономия памяти 💾
+    "--memory-pressure-off",
+    "--max_old_space_size=4096",
 
-    // Устанавливаем настройки PDF
-    // await page.emulateMediaFeatures([
-    // { name: "color", value: "1" },
-    // { name: "color-index", value: "0" },
-    // { name: "monochrome", value: "0" },
-    // { name: "resolution", value: "300dpi" },
-    // ]);
+    // Отключаем ненужные фичи
+    "--disable-background-timer-throttling",
+    "--disable-backgrounding-occluded-windows",
+    "--disable-renderer-backgrounding",
+  ],
+});
 
-    // Создаем PDF buffer
-    const pdfBuffer = await page.pdf({ format: "A4" });
+// Дефолтные настройки PDF 📄
+const DEFAULT_PDF_OPTIONS: PDFOptions = {
+  format: "A4",
+  margin: {
+    top: "20px",
+    bottom: "20px",
+    left: "80px",
+    right: "20px",
+  },
+  printBackground: true,
+};
 
-    // Завершаем экземпляр
-    await browser.close();
+// Валидация входных данных 🛡️
+const validateInput = (data: any): data is GeneratePDFInput => {
+  return (
+    data &&
+    typeof data === "object" &&
+    typeof data.htmlData === "string" &&
+    data.htmlData.trim().length > 0
+  );
+};
 
-    // Возвращаем буффер PDF файла
-    return pdfBuffer;
+// Создание страницы с оптимальными настройками 🔧
+const setupPage = async (page: Page): Promise<void> => {
+  // Устанавливаем viewport для корректного рендеринга
+  await page.setViewport({
+    width: 1024,
+    height: 768,
+    deviceScaleFactor: 1,
   });
 
-// Рабоатет на клиенте и передает html в функцию, а затем скачивает PDF файл
-export const downloadPDF = async (html: string, fileName: string) => {
+  // Эмулируем медиа для печати
+  await page.emulateMediaType("print");
+
+  // Отключаем изображения для ускорения (опционально)
+  // await page.setRequestInterception(true);
+  // page.on('request', (req) => {
+  //   if(req.resourceType() == 'image'){
+  //     req.abort();
+  //   } else {
+  //     req.continue();
+  //   }
+  // });
+};
+
+// Конвертация Buffer в serializable формат (серверная сторона)
+const bufferToSerializable = (buffer: Buffer): SerializableBuffer => {
+  return {
+    data: Array.from(buffer),
+    type: "Buffer",
+  };
+};
+
+// Конвертация serializable формата в Uint8Array (клиентская сторона)
+const serializableToUint8Array = (
+  serializable: SerializableBuffer,
+): Uint8Array => {
+  return new Uint8Array(serializable.data);
+};
+
+// Основная функция генерации PDF 🎯
+const generatePDF = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown): GeneratePDFInput => {
+    if (!validateInput(data)) {
+      throw new Error(
+        "Неверные входные данные: htmlData должен быть непустой строкой",
+      );
+    }
+    return data;
+  })
+  .handler(async ({ data }): Promise<SerializableBuffer> => {
+    let browser: Browser | null = null;
+    let page: Page | null = null;
+
+    try {
+      console.log("🚀 Запуск генерации PDF...");
+
+      // Создаем браузер с оптимизированными настройками
+      const config = await getBrowserConfig();
+      browser = await puppeteer.launch(config);
+
+      // Создаем страницу
+      page = await browser.newPage();
+
+      // Настраиваем страницу
+      await setupPage(page);
+
+      console.log("📄 Загружаем HTML контент...");
+
+      // Устанавливаем контент с таймаутом
+      await page.setContent(data.htmlData, {
+        waitUntil: ["networkidle0", "domcontentloaded"],
+        timeout: 30000, // 30 секунд таймаут
+      });
+
+      // Ждем загрузки всех ресурсов
+      await page.evaluateHandle("document.fonts.ready");
+
+      console.log("📋 Генерируем PDF...");
+
+      // Объединяем дефолтные и пользовательские настройки
+      const pdfOptions = {
+        ...DEFAULT_PDF_OPTIONS,
+        ...data.options,
+      };
+
+      // Создаем PDF buffer с оптимизированными настройками
+      const pdfBuffer = await page.pdf({
+        format: pdfOptions.format,
+        margin: pdfOptions.margin,
+        printBackground: pdfOptions.printBackground,
+        preferCSSPageSize: true,
+        displayHeaderFooter: false,
+        timeout: 60000, // 60 секунд для генерации PDF
+      });
+
+      console.log("✅ PDF успешно сгенерирован");
+      return bufferToSerializable(Buffer.from(pdfBuffer));
+    } catch (error) {
+      console.error("❌ Ошибка при генерации PDF:", error);
+      throw new Error(
+        `Не удалось сгенерировать PDF: ${error instanceof Error ? error.message : "Неизвестная ошибка"}`,
+      );
+    } finally {
+      // Гарантированная очистка ресурсов 🧹
+      try {
+        if (page) {
+          await page.close();
+          console.log("📄 Страница закрыта");
+        }
+        if (browser) {
+          await browser.close();
+          console.log("🌐 Браузер закрыт");
+        }
+      } catch (cleanupError) {
+        console.error("⚠️ Ошибка при очистке ресурсов:", cleanupError);
+      }
+    }
+  });
+
+// Утилита для безопасного создания Blob 🛡️
+const createPDFBlob = (pdfData: Uint8Array): Blob => {
   try {
-    // Получаем PDF как blob
-    const pdfBuffer = await generatePDF(html);
+    // Создаем новый ArrayBuffer для совместимости
+    const arrayBuffer = new ArrayBuffer(pdfData.length);
+    const view = new Uint8Array(arrayBuffer);
+    view.set(pdfData);
+    return new Blob([arrayBuffer], { type: "application/pdf" });
+  } catch (error) {
+    throw new Error("Не удалось создать PDF blob");
+  }
+};
 
-    const arrayBuffer = pdfBuffer.buffer.slice(
-      pdfBuffer.byteOffset,
-      pdfBuffer.byteOffset + pdfBuffer.byteLength,
-    );
+// Функция для скачивания с улучшенным error handling 📥
+export const downloadPDF = async (
+  html: string,
+  fileName: string,
+  options?: PDFOptions,
+): Promise<void> => {
+  // Валидация входных параметров
+  if (!html || typeof html !== "string" || html.trim().length === 0) {
+    throw new Error("HTML контент не может быть пустым");
+  }
 
-    // Создаем Blob из ArrayBuffer
-    const pdfBlob = new Blob([arrayBuffer], { type: "application/pdf" });
+  if (!fileName || typeof fileName !== "string") {
+    throw new Error("Имя файла должно быть указано");
+  }
+
+  // Добавляем расширение если его нет
+  const finalFileName = fileName.endsWith(".pdf")
+    ? fileName
+    : `${fileName}.pdf`;
+
+  try {
+    console.log("📤 Начинаем скачивание PDF:", finalFileName);
+
+    // Получаем PDF buffer от сервера
+    const serializedBuffer = await generatePDF({
+      data: {
+        htmlData: html,
+        options,
+      },
+    });
+
+    // Конвертируем в Uint8Array для браузера
+    const pdfData = serializableToUint8Array(serializedBuffer);
+
+    // Создаем безопасный Blob
+    const pdfBlob = createPDFBlob(pdfData);
 
     // Создаем URL для скачивания
     const url = URL.createObjectURL(pdfBlob);
 
-    // Создаем временную ссылку для скачивания
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
+    try {
+      // Создаем и настраиваем ссылку для скачивания
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = finalFileName;
+      link.style.display = "none";
 
-    // Запускаем скачивание
-    link.click();
+      // Добавляем в DOM, кликаем и удаляем
+      document.body.appendChild(link);
+      link.click();
 
-    // Очищаем ресурсы
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      // Небольшая задержка перед удалением для корректной работы
+      setTimeout(() => {
+        document.body.removeChild(link);
+      }, 100);
+
+      console.log("✅ PDF успешно скачан:", finalFileName);
+    } finally {
+      // Освобождаем URL в любом случае
+      URL.revokeObjectURL(url);
+    }
   } catch (error) {
-    console.error("Ошибка при скачивании PDF:", error);
-    throw error;
+    console.error("❌ Ошибка при скачивании PDF:", error);
+
+    // Более детальная информация об ошибке
+    if (error instanceof Error) {
+      throw new Error(`Не удалось скачать PDF: ${error.message}`);
+    } else {
+      throw new Error("Произошла неизвестная ошибка при скачивании PDF");
+    }
   }
 };
+
+// Экспортируем типы для использования в других файлах
+export type { PDFOptions, GeneratePDFInput };

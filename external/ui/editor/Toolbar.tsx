@@ -1,14 +1,17 @@
-import { ActionIcon, Loader, Tooltip } from "@mantine/core";
+import { Loader } from "@mantine/core";
 import { RichTextEditor } from "@mantine/tiptap";
-import { IconCheck, IconFileTypePdf } from "@tabler/icons-react";
+import { IconCheck } from "@tabler/icons-react";
 import { useEditor } from "./Provider";
-// import { downloadPDFFromServer } from "@/components/reusables/functions";
-import { useState } from "react";
+import { ReactNode } from "react";
 
-export const Toolbar = ({ saving }: { saving?: boolean }) => {
+export const Toolbar = ({
+  saving,
+  children,
+}: {
+  saving?: boolean;
+  children?: ReactNode;
+}) => {
   const { editor, disabledToolbar } = useEditor();
-
-  const [downloading, setDownloading] = useState<boolean>(false);
 
   return !disabledToolbar ? (
     <RichTextEditor.Toolbar sticky>
@@ -61,35 +64,6 @@ export const Toolbar = ({ saving }: { saving?: boolean }) => {
 
       <RichTextEditor.ControlsGroup ml="auto">
         {children}
-        <RichTextEditor.Control style={{ cursor: "pointer" }}>
-          <Tooltip
-            label="Скачать PDF"
-            color="dark"
-            position="bottom"
-            offset={10}
-            openDelay={100}
-            closeDelay={200}
-          >
-            <ActionIcon
-              loading={downloading}
-              size={16}
-              variant="transparent"
-              color="green"
-              onClick={() => {
-                setDownloading(true);
-                console.log("htmlData", editor?.getHTML());
-                // downloadPDFFromServer(editor?.getHTML() || "", "brief.pdf")
-                //   .then(() => setDownloading(false))
-                //   .catch((error) => {
-                //     console.error("Error downloading PDF:", error);
-                //     setDownloading(false);
-                //   });
-              }}
-            >
-              <IconFileTypePdf stroke={1.5} />
-            </ActionIcon>
-          </Tooltip>
-        </RichTextEditor.Control>
 
         <RichTextEditor.Control ml="10px" style={{ cursor: "default" }}>
           {saving ? <Loader size={14} /> : <IconCheck stroke={1.5} size={16} />}
