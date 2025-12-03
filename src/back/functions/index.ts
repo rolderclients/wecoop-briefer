@@ -1,1 +1,1 @@
-export * from "./downloadPDF";
+export * from './generatePDFFn';
