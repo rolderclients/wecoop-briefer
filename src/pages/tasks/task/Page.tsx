@@ -13,9 +13,14 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { taskWithBriefAndChatQueryOptions } from '@/back';
+<<<<<<< HEAD
 import { downloadPDF, SimpleEditor } from '@/front';
+=======
+import { Files, SimpleEditor } from '@/front';
+>>>>>>> master
 import { Route } from '@/routes/_authed/tasks/$taskId';
 import { ScrollArea } from '~/ui';
+import { TaskFiles } from './Files';
 
 export const TaskPage = () => {
 	const { taskId } = useParams({ from: Route.id });
@@ -43,7 +48,7 @@ export const TaskPage = () => {
 						<Title order={3}>Задание</Title>
 						<Paper withBorder radius="md">
 							<ScrollArea h="calc(100vh - 147px)">
-								<Stack px="md" py="sm">
+								<Stack px="md" py="sm" h="100%">
 									<Box style={{ whiteSpace: 'pre-wrap' }}>
 										<Text c="dimmed">Компания</Text>
 										<Text>{task.company.title}</Text>
@@ -56,6 +61,10 @@ export const TaskPage = () => {
 										<Text c="dimmed">Описание</Text>
 										<Text>{task.content}</Text>
 									</Box>
+
+									<Files.Provider route="upload">
+										<TaskFiles taskId={task.id} />
+									</Files.Provider>
 								</Stack>
 
 								<ScrollArea.ScrollButton />

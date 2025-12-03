@@ -10,6 +10,7 @@
 		"includes": [
 			"**/src/**/*",
 			"**/external/**/*",
+			"**/devops/**/*",
 			"**/.vscode/**/*",
 			"**/vite.config.js",
 			"sst.config.ts",
@@ -17,7 +18,8 @@
 			"!**/src/styles.css",
 			"!**/src/components/ui/**/*",
 			"!**/src/components/ai-elements/**/*",
-			"!tmp"
+			"!tmp",
+			"!.sst"
 		]
 	},
 	"formatter": {

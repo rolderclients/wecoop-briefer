@@ -1,3 +1,4 @@
+import dropzoneCss from '@mantine/dropzone/styles.css?url';
 import tiptapCss from '@mantine/tiptap/styles.css?url';
 import { createFileRoute } from '@tanstack/react-router';
 import { taskWithBriefAndChatQueryOptions } from '@/back';
@@ -14,6 +15,10 @@ export const Route = createFileRoute('/_authed/tasks/$taskId/')({
 			{
 				rel: 'stylesheet',
 				href: tiptapCss,
+			},
+			{
+				rel: 'stylesheet',
+				href: dropzoneCss,
 			},
 		],
 	}),
