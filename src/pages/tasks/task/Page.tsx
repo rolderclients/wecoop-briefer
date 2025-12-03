@@ -11,9 +11,9 @@ import {
 import { IconEdit, IconFileTypePdf } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
+import { useState } from 'react';
 import { taskWithBriefAndChatQueryOptions } from '@/back';
-import { downloadPDF } from '@/back/functions';
-import { SimpleEditor } from '@/front';
+import { downloadPDF, SimpleEditor } from '@/front';
 import { Route } from '@/routes/_authed/tasks/$taskId';
 import { ScrollArea } from '~/ui';
 
@@ -22,6 +22,8 @@ export const TaskPage = () => {
 	const { data: task } = useSuspenseQuery(
 		taskWithBriefAndChatQueryOptions(taskId),
 	);
+
+	const [downloading, setDownloading] = useState<boolean>(false);
 
 	return (
 		<Stack pb="xl" pt="sm">
@@ -69,26 +71,16 @@ export const TaskPage = () => {
 
 							<Group>
 								<Button
+									loading={downloading}
 									component="div"
 									size="xs"
 									color="green"
 									variant="light"
 									leftSection={<IconFileTypePdf size={16} />}
-									onClick={() => {
-										console.log('Нажали скачать файлы');
-									}}
-								>
-									Скачать файлы
-								</Button>
-
-								<Button
-									component="div"
-									size="xs"
-									color="green"
-									variant="light"
-									leftSection={<IconFileTypePdf size={16} />}
-									onClick={() => {
-										downloadPDF(task.brief?.content || '', 'brief.pdf');
+									onClick={async () => {
+										setDownloading(true);
+										await downloadPDF(task.brief?.content || '', 'brief.pdf');
+										setDownloading(false);
 									}}
 								>
 									Скачать PDF

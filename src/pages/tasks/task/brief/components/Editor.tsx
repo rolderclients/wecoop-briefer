@@ -44,7 +44,7 @@ export const BriefEditor = ({
 						position="bottom"
 						offset={10}
 						openDelay={100}
-						closeDelay={200}
+						closeDelay={100}
 					>
 						{downloading ? (
 							<Loader size={14} />

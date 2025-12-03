@@ -14,7 +14,7 @@ interface PDFOptions {
 	printBackground?: boolean;
 }
 
-// Serializable Buffer type для TanStack
+// Serializable Buffer тип
 interface SerializableBuffer {
 	data: number[];
 	type: 'Buffer';
@@ -24,26 +24,24 @@ interface SerializableBuffer {
 const getBrowserConfig = async () => ({
 	executablePath: await chromium.executablePath(),
 	args: [
+		// https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md
+		// https://docs.google.com/spreadsheets/d/1n-vw_PCPS45jX3Jt9jQaAhFqBY6Ge1vWF_Pa0k7dCk4/edit?gid=1265672696#gid=1265672696
+		// https://chromeflags.org/
 		// Основные флаги безопасности
-		'--no-sandbox',
-		'--disable-setuid-sandbox',
-
+		'--headless', // Запускается в автономном режиме, то есть без пользовательского интерфейса или зависимостей от сервера отображения.
+		'--no-sandbox', // Отключение изолированной среды, если полностью доверяете контенту, который открываете.
 		// Оптимизация производительности ⚡
-		'--disable-dev-shm-usage',
-		'--disable-accelerated-2d-canvas',
-		'--no-first-run',
-		'--no-zygote',
-		'--disable-gpu',
-		'--disable-web-security',
-
+		'--disable-dev-shm-usage', // Эта опция позволяет браузеру использовать файловую систему для межпроцессорного взаимодействия вместо разделяемой памяти, которая часто ограничена в Docker контейнерах.
+		'--no-first-run', // Пропустить мастера первого запуска
+		'--no-zygote', //  полностью отключает использование процесса zygote. Это нужно для запуска браузера без заголовка (Headless Chrome) в средах, где поддержание процесса zygote не требуется или нецелесообразно. Должен использоваться совместно с --no-sandbox
+		'--disable-web-security', // Отсключает CORS. Параметр --disable-web-security в команде запуска браузера Chromium отключает функции веб-безопасности, позволяя выполнять запросы из разных источников, которые обычно блокируются браузерами.
 		// Экономия памяти 💾
-		'--memory-pressure-off',
-		'--max_old_space_size=4096',
-
+		// '--memory-pressure-off', // Отключает мониторинг давления памяти. Это использует меньше ресурсов, что полезно в условиях ограниченной памяти. Но может пропустить сигналы о критическом давлении памяти.
+		'--max_old_space_size=4096', // Увеличивает лимит памяти до 4 Гб, с 1,4 Гб для V8 JS.
 		// Отключаем ненужные фичи
-		'--disable-background-timer-throttling',
-		'--disable-backgrounding-occluded-windows',
-		'--disable-renderer-backgrounding',
+		'--disable-background-timer-throttling', // Отключаем ограничение времени для запуска вкладки и его отслеживания.
+		'--disable-backgrounding-occluded-windows', // Отключает обработку фоновой вкладки.
+		'--disable-renderer-backgrounding', // Отсключает снижение производительности фоновых вкладок, делая упор на производительности активной вкладки.
 	],
 });
 
@@ -70,16 +68,6 @@ const setupPage = async (page: Page): Promise<void> => {
 
 	// Эмулируем медиа для печати
 	await page.emulateMediaType('print');
-
-	// Отключаем изображения для ускорения (опционально)
-	// await page.setRequestInterception(true);
-	// page.on('request', (req) => {
-	//   if(req.resourceType() == 'image'){
-	//     req.abort();
-	//   } else {
-	//     req.continue();
-	//   }
-	// });
 };
 
 // Конвертация Buffer в serializable формат (серверная сторона)
@@ -98,7 +86,7 @@ export const generatePDFFn = createServerFn({ method: 'POST' })
 		let page: Page | null = null;
 
 		try {
-			console.log('🚀 Запуск генерации PDF...');
+			// console.log('generatePDFFn: 🚀 Запуск генерации PDF...');
 
 			// Создаем браузер с оптимизированными настройками
 			const config = await getBrowserConfig();
@@ -110,7 +98,7 @@ export const generatePDFFn = createServerFn({ method: 'POST' })
 			// Настраиваем страницу
 			await setupPage(page);
 
-			console.log('📄 Загружаем HTML контент...');
+			// console.log('generatePDFFn: 📄 Загружаем HTML контент...');
 
 			// Устанавливаем контент с таймаутом
 			await page.setContent(data.htmlData, {
@@ -121,7 +109,7 @@ export const generatePDFFn = createServerFn({ method: 'POST' })
 			// Ждем загрузки всех ресурсов
 			await page.evaluateHandle('document.fonts.ready');
 
-			console.log('📋 Генерируем PDF...');
+			// console.log('generatePDFFn: 📋 Генерируем PDF...');
 
 			// Объединяем дефолтные и пользовательские настройки
 			const pdfOptions = {
@@ -139,7 +127,7 @@ export const generatePDFFn = createServerFn({ method: 'POST' })
 				timeout: 60000, // 60 секунд для генерации PDF
 			});
 
-			console.log('✅ PDF успешно сгенерирован');
+			// console.log('generatePDFFn: ✅ PDF успешно сгенерирован');
 			return bufferToSerializable(Buffer.from(pdfBuffer));
 		} catch (error) {
 			console.error('❌ Ошибка при генерации PDF:', error);
@@ -151,14 +139,17 @@ export const generatePDFFn = createServerFn({ method: 'POST' })
 			try {
 				if (page) {
 					await page.close();
-					console.log('📄 Страница закрыта');
+					console.log('generatePDFFn: 📄 Страница закрыта');
 				}
 				if (browser) {
 					await browser.close();
-					console.log('🌐 Браузер закрыт');
+					console.log('generatePDFFn: 🌐 Браузер закрыт');
 				}
 			} catch (cleanupError) {
-				console.error('⚠️ Ошибка при очистке ресурсов:', cleanupError);
+				console.error(
+					'generatePDFFn: ⚠️ Ошибка при очистке ресурсов:',
+					cleanupError,
+				);
 			}
 		}
 	});

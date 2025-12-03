@@ -1,6 +1,3 @@
-import chromium from '@sparticuz/chromium';
-import { createServerFn } from '@tanstack/react-start';
-import puppeteer, { Browser, type Page } from 'puppeteer-core';
 import { generatePDFFn } from '@/back/functions/generatePDFFn';
 import { defaultErrorNotification } from '@/front';
 
@@ -16,96 +13,11 @@ interface PDFOptions {
 	printBackground?: boolean;
 }
 
-interface GeneratePDFInput {
-	htmlData: string;
-	options?: PDFOptions;
-}
-
 // Serializable Buffer type для TanStack
 interface SerializableBuffer {
 	data: number[];
 	type: 'Buffer';
 }
-
-// Конфигурация браузера для оптимизации 🚀
-const getBrowserConfig = async () => ({
-	executablePath: await chromium.executablePath(),
-	args: [
-		// Основные флаги безопасности
-		'--no-sandbox',
-		'--disable-setuid-sandbox',
-
-		// Оптимизация производительности ⚡
-		'--disable-dev-shm-usage',
-		'--disable-accelerated-2d-canvas',
-		'--no-first-run',
-		'--no-zygote',
-		'--disable-gpu',
-		'--disable-web-security',
-
-		// Экономия памяти 💾
-		'--memory-pressure-off',
-		'--max_old_space_size=4096',
-
-		// Отключаем ненужные фичи
-		'--disable-background-timer-throttling',
-		'--disable-backgrounding-occluded-windows',
-		'--disable-renderer-backgrounding',
-	],
-});
-
-// Дефолтные настройки PDF 📄
-const DEFAULT_PDF_OPTIONS: PDFOptions = {
-	format: 'A4',
-	margin: {
-		top: '20px',
-		bottom: '20px',
-		left: '80px',
-		right: '20px',
-	},
-	printBackground: true,
-};
-
-// Валидация входных данных 🛡️
-const validateInput = (data: any): data is GeneratePDFInput => {
-	return (
-		data &&
-		typeof data === 'object' &&
-		typeof data.htmlData === 'string' &&
-		data.htmlData.trim().length > 0
-	);
-};
-
-// Создание страницы с оптимальными настройками 🔧
-const setupPage = async (page: Page): Promise<void> => {
-	// Устанавливаем viewport для корректного рендеринга
-	await page.setViewport({
-		width: 1024,
-		height: 768,
-		deviceScaleFactor: 1,
-	});
-
-	// Эмулируем медиа для печати
-	await page.emulateMediaType('print');
-
-	// Отключаем изображения для ускорения (опционально)
-	// await page.setRequestInterception(true);
-	// page.on('request', (req) => {
-	//   if(req.resourceType() == 'image'){
-	//     req.abort();
-	//   } else {
-	//     req.continue();
-	//   }
-	// });
-};
-
-// Конвертация Buffer в serializable формат (серверная сторона)
-const bufferToSerializable = (buffer: Buffer): SerializableBuffer => {
-	return {
-		data: Array.from(buffer),
-		type: 'Buffer',
-	};
-};
 
 // Конвертация serializable формата в Uint8Array (клиентская сторона)
 const serializableToUint8Array = (
@@ -122,7 +34,7 @@ const createPDFBlob = (pdfData: Uint8Array): Blob => {
 		const view = new Uint8Array(arrayBuffer);
 		view.set(pdfData);
 		return new Blob([arrayBuffer], { type: 'application/pdf' });
-	} catch (error) {
+	} catch {
 		throw new Error('Не удалось создать PDF blob');
 	}
 };
@@ -148,7 +60,7 @@ export const downloadPDF = async (
 		: `${fileName}.pdf`;
 
 	try {
-		console.log('📤 Начинаем скачивание PDF:', finalFileName);
+		// console.log('downloadPDF: 📤 Начинаем скачивание PDF:', finalFileName);
 
 		// Получаем PDF buffer от сервера
 		const serializedBuffer = await generatePDFFn({
@@ -183,23 +95,25 @@ export const downloadPDF = async (
 				document.body.removeChild(link);
 			}, 100);
 
-			console.log('✅ PDF успешно скачан:', finalFileName);
+			// console.log('downloadPDF: ✅ PDF успешно скачан:', finalFileName);
 		} finally {
 			// Освобождаем URL в любом случае
 			URL.revokeObjectURL(url);
 		}
 	} catch (error) {
-		console.error('❌ Ошибка при скачивании PDF:', error);
+		console.error('downloadPDF: ❌ Ошибка при скачивании PDF:', error);
 		defaultErrorNotification(error as Error);
 
 		// Более детальная информация об ошибке
 		if (error instanceof Error) {
-			throw new Error(`Не удалось скачать PDF: ${error.message}`);
+			throw new Error(`downloadPDF: Не удалось скачать PDF: ${error.message}`);
 		} else {
-			throw new Error('Произошла неизвестная ошибка при скачивании PDF');
+			throw new Error(
+				'downloadPDF: Произошла неизвестная ошибка при скачивании PDF',
+			);
 		}
 	}
 };
 
 // Экспортируем типы для использования в других файлах
-export type { PDFOptions, GeneratePDFInput };
+export type { PDFOptions };
