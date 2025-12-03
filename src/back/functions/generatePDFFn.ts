@@ -139,11 +139,11 @@ export const generatePDFFn = createServerFn({ method: 'POST' })
 			try {
 				if (page) {
 					await page.close();
-					console.log('generatePDFFn: 📄 Страница закрыта');
+					// console.log('generatePDFFn: 📄 Страница закрыта');
 				}
 				if (browser) {
 					await browser.close();
-					console.log('generatePDFFn: 🌐 Браузер закрыт');
+					// console.log('generatePDFFn: 🌐 Браузер закрыт');
 				}
 			} catch (cleanupError) {
 				console.error(

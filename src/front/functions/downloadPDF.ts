@@ -35,6 +35,9 @@ const createPDFBlob = (pdfData: Uint8Array): Blob => {
 		view.set(pdfData);
 		return new Blob([arrayBuffer], { type: 'application/pdf' });
 	} catch {
+		defaultErrorNotification(
+			'downloadPDF: Не удалось создать PDF blob' as unknown as Error,
+		);
 		throw new Error('Не удалось создать PDF blob');
 	}
 };
@@ -47,10 +50,16 @@ export const downloadPDF = async (
 ): Promise<void> => {
 	// Валидация входных параметров
 	if (!html || typeof html !== 'string' || html.trim().length === 0) {
+		defaultErrorNotification(
+			'downloadPDF: HTML контент не может быть пустым' as unknown as Error,
+		);
 		throw new Error('HTML контент не может быть пустым');
 	}
 
 	if (!fileName || typeof fileName !== 'string') {
+		defaultErrorNotification(
+			'downloadPDF: Имя файла должно быть указано' as unknown as Error,
+		);
 		throw new Error('Имя файла должно быть указано');
 	}
 
@@ -106,8 +115,14 @@ export const downloadPDF = async (
 
 		// Более детальная информация об ошибке
 		if (error instanceof Error) {
+			defaultErrorNotification(
+				`downloadPDF: Не удалось скачать PDF: ${error.message}` as unknown as Error,
+			);
 			throw new Error(`downloadPDF: Не удалось скачать PDF: ${error.message}`);
 		} else {
+			defaultErrorNotification(
+				'downloadPDF: Произошла неизвестная ошибка при скачивании PDF' as unknown as Error,
+			);
 			throw new Error(
 				'downloadPDF: Произошла неизвестная ошибка при скачивании PDF',
 			);
