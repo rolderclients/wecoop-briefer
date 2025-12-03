@@ -13,11 +13,8 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { taskWithBriefAndChatQueryOptions } from '@/back';
-<<<<<<< HEAD
-import { downloadPDF, SimpleEditor } from '@/front';
-=======
-import { Files, SimpleEditor } from '@/front';
->>>>>>> master
+import { downloadPDF, Files, SimpleEditor } from '@/front';
+
 import { Route } from '@/routes/_authed/tasks/$taskId';
 import { ScrollArea } from '~/ui';
 import { TaskFiles } from './Files';
