@@ -1,6 +1,7 @@
 import {
 	Box,
 	Button,
+	CopyButton,
 	Grid,
 	Group,
 	Paper,
@@ -11,36 +12,41 @@ import {
 import { IconEdit, IconFileTypePdf } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { taskWithBriefAndChatQueryOptions } from '@/back';
 import { downloadPDF, Files, SimpleEditor } from '@/front';
 
 import { Route } from '@/routes/_authed/tasks/$taskId';
 import { ScrollArea } from '~/ui';
-import { TasksProvider, useTasks } from '../Provider';
 import { TaskFiles } from './Files';
 
 export const TaskPage = () => {
-	return (
-		<TasksProvider>
-			<TaskPageContent />
-		</TasksProvider>
-	);
-};
-
-const TaskPageContent = () => {
 	const { taskId } = useParams({ from: Route.id });
 	const { data: task } = useSuspenseQuery(
 		taskWithBriefAndChatQueryOptions({ id: taskId, archived: false }),
 	);
-	const { openEdit, setSelectedTask } = useTasks();
 
 	const [downloading, setDownloading] = useState<boolean>(false);
+	const [currentTaskURL, setCurrentTaskURL] = useState<string>('');
+
+	useEffect(() => {
+		console.log('url', `${location.origin}/task/${taskId}`);
+		setCurrentTaskURL(`${location.origin}/task/${taskId}`);
+	}, [taskId]);
 
 	return (
 		<Stack pb="xl" pt="sm">
 			<Group justify="space-between">
-				<Title>{task.title}</Title>
+				<Group justify="flex-start">
+					<Title>{task.title}</Title>
+					<CopyButton value={currentTaskURL}>
+						{({ copied, copy }) => (
+							<Button color={copied ? 'teal' : 'blue'} onClick={copy}>
+								{copied ? 'Ссылка скопирована' : 'Сформировать ссылку'}
+							</Button>
+						)}
+					</CopyButton>
+				</Group>
 				<Text c="dimmed">
 					Дата создания:{' '}
 					<Text c="var(--mantine-color-text)" span>
@@ -54,15 +60,7 @@ const TaskPageContent = () => {
 					<Stack gap="xs">
 						<Group justify="space-between">
 							<Title order={3}>Задание</Title>
-							<Button
-								size="xs"
-								leftSection={<IconEdit size={16} />}
-								onClick={(e) => {
-									e.preventDefault();
-									setSelectedTask(task);
-									openEdit();
-								}}
-							>
+							<Button size="xs" leftSection={<IconEdit size={16} />}>
 								Редактировать
 							</Button>
 						</Group>
