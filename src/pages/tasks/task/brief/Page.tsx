@@ -12,7 +12,7 @@ import { BriefChat, BriefEditor } from './components';
 export const BriefPage = () => {
 	const { taskId } = useParams({ from: Route.id });
 	const { data: task } = useSuspenseQuery(
-		taskWithBriefAndChatQueryOptions(taskId),
+		taskWithBriefAndChatQueryOptions({ id: taskId, archived: false }),
 	);
 
 	const { mutate, status } = useMutaitionWithInvalidate<UpdateBrief>(

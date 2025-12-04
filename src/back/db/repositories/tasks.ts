@@ -12,7 +12,7 @@ import { fromDTO, fromDTOs } from '../utils';
 
 const getTasksFn = createServerFn({ method: 'GET' })
 	.inputValidator((data: { archived: boolean }) => data)
-	.handler(async ({ data: { archived = false } }) => {
+	.handler(async ({ data: { archived } }) => {
 		const db = await getDB();
 
 		const [result] = await db
@@ -35,11 +35,11 @@ export const tasksQueryOptions = (archived: boolean) =>
 	});
 
 const getTaskWithBriefAndChatFn = createServerFn({ method: 'POST' })
-	.inputValidator((data: string) => data)
+	.inputValidator((data: { id: string; archived: boolean }) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		const id = await fromDTO(data);
+		const { id, archived } = await fromDTO(data);
 		const [result] = await db
 			.query(surql`SELECT
           *,
@@ -56,17 +56,21 @@ const getTaskWithBriefAndChatFn = createServerFn({ method: 'POST' })
               title
             }
           } as prompt
-        FROM ONLY ${id}`)
+        FROM ONLY ${id}
+        WHERE ${eq('archived', archived)}`)
 			.json()
 			.collect<[TaskWithBriefAndChat]>();
 
-		return result;
+		return result || null;
 	});
 
-export const taskWithBriefAndChatQueryOptions = (taskId: string) =>
+export const taskWithBriefAndChatQueryOptions = (data: {
+	id: string;
+	archived: boolean;
+}) =>
 	queryOptions<TaskWithBriefAndChat>({
-		queryKey: ['taskWithBriefAndChat', taskId],
-		queryFn: () => getTaskWithBriefAndChatFn({ data: taskId }),
+		queryKey: ['taskWithBriefAndChat', data.id, data.archived],
+		queryFn: () => getTaskWithBriefAndChatFn({ data }),
 	});
 
 export const createTaskFn = createServerFn({ method: 'POST' })

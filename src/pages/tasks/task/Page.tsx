@@ -17,13 +17,23 @@ import { downloadPDF, Files, SimpleEditor } from '@/front';
 
 import { Route } from '@/routes/_authed/tasks/$taskId';
 import { ScrollArea } from '~/ui';
+import { TasksProvider, useTasks } from '../Provider';
 import { TaskFiles } from './Files';
 
 export const TaskPage = () => {
+	return (
+		<TasksProvider>
+			<TaskPageContent />
+		</TasksProvider>
+	);
+};
+
+const TaskPageContent = () => {
 	const { taskId } = useParams({ from: Route.id });
 	const { data: task } = useSuspenseQuery(
-		taskWithBriefAndChatQueryOptions(taskId),
+		taskWithBriefAndChatQueryOptions({ id: taskId, archived: false }),
 	);
+	const { openEdit, setSelectedTask } = useTasks();
 
 	const [downloading, setDownloading] = useState<boolean>(false);
 
@@ -42,7 +52,20 @@ export const TaskPage = () => {
 			<Grid gutter="xl" overflow="hidden">
 				<Grid.Col span={4}>
 					<Stack gap="xs">
-						<Title order={3}>Задание</Title>
+						<Group justify="space-between">
+							<Title order={3}>Задание</Title>
+							<Button
+								size="xs"
+								leftSection={<IconEdit size={16} />}
+								onClick={(e) => {
+									e.preventDefault();
+									setSelectedTask(task);
+									openEdit();
+								}}
+							>
+								Редактировать
+							</Button>
+						</Group>
 						<Paper withBorder radius="md">
 							<ScrollArea h="calc(100vh - 147px)">
 								<Stack px="md" py="sm" h="100%">

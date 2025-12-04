@@ -7,7 +7,7 @@ import { TaskPage } from '@/pages';
 export const Route = createFileRoute('/_authed/tasks/$taskId/')({
 	loader: async ({ context, params: { taskId } }) => {
 		await context.queryClient.ensureQueryData(
-			taskWithBriefAndChatQueryOptions(taskId),
+			taskWithBriefAndChatQueryOptions({ id: taskId, archived: false }),
 		);
 	},
 	head: () => ({

@@ -6,7 +6,7 @@ import { BriefPage } from '@/pages';
 export const Route = createFileRoute('/_authed/tasks/$taskId/brief')({
 	loader: async ({ context, params: { taskId } }) => {
 		await context.queryClient.ensureQueryData(
-			taskWithBriefAndChatQueryOptions(taskId),
+			taskWithBriefAndChatQueryOptions({ id: taskId, archived: false }),
 		);
 	},
 	head: () => ({
