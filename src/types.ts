@@ -158,3 +158,9 @@ export interface UpdateTask {
 	service?: string;
 	archived?: boolean;
 }
+
+// Comment for task
+export interface CreateComment {
+	value: string;
+	task: string; // тут id задачи
+}
