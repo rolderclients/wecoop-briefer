@@ -160,6 +160,12 @@ export interface UpdateTask {
 }
 
 // Comment for task
+export interface Comment {
+	id: string;
+	value: string;
+	task: string; // тут id задачи
+}
+
 export interface CreateComment {
 	value: string;
 	task: string; // тут id задачи

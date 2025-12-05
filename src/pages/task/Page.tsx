@@ -1,36 +1,75 @@
 import {
-	Box,
 	Button,
 	Grid,
 	Group,
+	Modal,
 	Paper,
 	Stack,
 	Text,
 	Title,
 } from '@mantine/core';
-import { IconEdit, IconFileTypePdf } from '@tabler/icons-react';
+import { useDisclosure } from '@mantine/hooks';
+import { IconFileTypePdf } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import { useState } from 'react';
-import { taskWithBriefAndChatQueryOptions } from '@/back';
-import { SimpleEditor } from '@/front';
+import { createTaskFn, taskWithBriefAndChatQueryOptions } from '@/back';
+import {
+	commentsQueryOptions,
+	createCommentFn,
+} from '@/back/db/repositories/comment';
+import { Textarea } from '@/components/ui/textarea';
+import { SimpleEditor, useMutaitionWithInvalidate } from '@/front';
 import { Route } from '@/routes/task.$taskId';
+import type { Comment, CreateComment, TaskWithBriefAndChat } from '@/types';
 import { ScrollArea } from '~/ui';
+
+// Сделал фрон для добавления комментариев при просмотре задачи
+// const createCommentSchema = z.object({
+// 	title: string,
+// 	content: z.string().optional(),
+// 	company: z
+// 		.object({
+// 			title: z.string().optional(),
+// 			info: z.string().optional(),
+// 		})
+// 		.optional(),
+// 	service: z.string().min(1, 'Услуга обязательна'),
+// });
+
+// const createCommentForTask = async (
+// 	comment: string,
+// 	task: TaskWithBriefAndChat,
+// ) => {
+// 	console.log(comment, task);
+
+// 	await createMutation.mutateAsync(value);
+// 	// notifications.show({
+// 	// 	message: `Задача "${value.title}" создана`,
+// 	// 	color: 'green',
+// 	// });
+// };
 
 export const UnautorizedTaskPage = () => {
 	const { taskId } = useParams({ from: Route.id });
+	const { data: comments } = useSuspenseQuery(
+		commentsQueryOptions({ task: `task:${taskId}` }),
+	);
 	const { data: task } = useSuspenseQuery(
-		taskWithBriefAndChatQueryOptions({ id: taskId, archived: false }),
+		taskWithBriefAndChatQueryOptions({ id: `task:${taskId}`, archived: false }),
 	);
 
+	const [openedModal, { open, close }] = useDisclosure(false);
 	const [newComment, setNewComment] = useState<string>('');
-	const [comments, setComments] = useState<string[]>([
-		'Комментарий 1',
-		'Комментарий 2',
-	]);
+
+	const createMutation = useMutaitionWithInvalidate<CreateComment>(
+		createCommentFn,
+		['commnets'],
+	);
 
 	console.log('taskId', taskId);
 	console.log('task', task);
+	console.log('comments', comments);
 
 	return (
 		<Stack pb="xl" pt="sm">
@@ -55,7 +94,13 @@ export const UnautorizedTaskPage = () => {
 							<Title order={3}>Бриф</Title>
 
 							<Group>
-								<Button component="div" size="xs" color="green" variant="light">
+								<Button
+									disabled={true}
+									component="div"
+									size="xs"
+									color="green"
+									variant="light"
+								>
 									Просмотр
 								</Button>
 
@@ -83,31 +128,80 @@ export const UnautorizedTaskPage = () => {
 						<Title order={3}>Ваши комментарии</Title>
 
 						<Paper withBorder radius="md" h="100%">
-							<ScrollArea p="xl">
-								{comments?.map((iComment) => {
-									return (
-										<Group key={iComment}>
-											<Text>{iComment}</Text>
-										</Group>
-									);
-								})}
-								<Group w="100%" justify="center" mt="50px">
-									<Button
-										radius="xl"
-										bg="green"
-										onClick={() => {
-											console.log('comments', comments);
-											setComments([...comments, 'Заглушка']);
-										}}
-									>
+							<Stack justify="space-between" h="100%">
+								<ScrollArea p="xl" h="calc(100vh - 300px)">
+									<Stack>
+										{comments?.map((iComment: Comment) => {
+											return (
+												<Paper
+													key={iComment.id}
+													withBorder
+													radius="md"
+													h="100%"
+												>
+													<Stack gap={0} align="stretch">
+														<Group
+															pt="xs"
+															pr="xs"
+															pl="xs"
+															pb={0}
+															justify="space-between"
+														>
+															<Text c="cyan" size="xs">
+																{task.company.title}
+															</Text>
+															<Text c="cyan" size="xs">
+																{'05.12.25'}
+															</Text>
+														</Group>
+														<Group p="xs">
+															<Text c="teal">{iComment.value}</Text>
+														</Group>
+													</Stack>
+												</Paper>
+											);
+										})}
+									</Stack>
+								</ScrollArea>
+								<Group w="100%" justify="center" mb="50px">
+									<Button radius="xl" bg="green" onClick={open}>
 										Добавить комментарий
 									</Button>
 								</Group>
-							</ScrollArea>
+							</Stack>
 						</Paper>
 					</Stack>
 				</Grid.Col>
 			</Grid>
+			<Modal
+				size="50%"
+				opened={openedModal}
+				onClose={close}
+				title="Новый комментарий"
+			>
+				<Stack>
+					<Textarea
+						value={newComment}
+						onChange={(event) => setNewComment(event.currentTarget.value)}
+					></Textarea>
+					<Group w="100%" justify="flex-end">
+						<Button
+							radius="xl"
+							size="xs"
+							bg="green"
+							onClick={async () => {
+								await createMutation.mutateAsync({
+									value: newComment,
+									task: task.id,
+								});
+								close();
+							}}
+						>
+							Добавить комментарий
+						</Button>
+					</Group>
+				</Stack>
+			</Modal>
 		</Stack>
 	);
 };
