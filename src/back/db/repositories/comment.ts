@@ -1,23 +1,27 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
-import { eq, surql } from 'surrealdb';
+import { eq, RecordId, surql } from 'surrealdb';
 import type { Comment, CreateComment } from '@/types';
 import { getDB } from '..';
 import { fromDTO, fromDTOs } from '../utils';
 
 const getCommentsFn = createServerFn({ method: 'GET' })
 	.inputValidator((data: { task: string }) => data)
-	.handler(async ({ data: { task } }) => {
+	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		console.log('tasktasktask', task);
+		// Преобразуем строку в Record ID
+		const task = data.task.includes(':')
+			? new RecordId('task', data.task.split(':')[1]) // Не достаточно просто подаствить task:12w21e1e12 в eq('task', task)
+			: data.task;
+		console.log('data.task:', data.task);
+		console.log('task:', task);
 
 		const [result] = await db
 			.query(surql`SELECT *
-        FROM comment
-WHERE ${eq('task', task)}
-        ORDER BY time.created
-      `) // WHERE ${eq('task', task)} WHERE task=task:1n8cdtl4hwrah6y3i4xd
+				FROM comment
+				WHERE ${eq('task', task)}
+				ORDER BY time.created`)
 			.json()
 			.collect<[Comment[]]>();
 
