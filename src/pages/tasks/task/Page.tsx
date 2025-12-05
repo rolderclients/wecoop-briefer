@@ -12,7 +12,7 @@ import { IconEdit } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { taskWithBriefAndChatQueryOptions } from '@/back';
-import { Files, SimpleEditor } from '@/front';
+import { SimpleEditor } from '@/front';
 import { Route } from '@/routes/_authed/tasks/$taskId';
 import { ScrollArea } from '~/ui';
 import { TaskFiles } from './Files';
@@ -40,8 +40,8 @@ export const TaskPage = () => {
 					<Stack gap="xs">
 						<Title order={3}>Задание</Title>
 						<Paper withBorder radius="md">
-							<ScrollArea h="calc(100vh - 147px)">
-								<Stack px="md" py="sm" h="100%">
+							<ScrollArea>
+								<Stack px="md" pt="sm" h="calc(100vh - 147px)">
 									<Box style={{ whiteSpace: 'pre-wrap' }}>
 										<Text c="dimmed">Компания</Text>
 										<Text>{task.company.title}</Text>
@@ -55,9 +55,7 @@ export const TaskPage = () => {
 										<Text>{task.content}</Text>
 									</Box>
 
-									<Files.Provider route="upload">
-										<TaskFiles taskId={task.id} />
-									</Files.Provider>
+									<TaskFiles taskId={task.id} />
 								</Stack>
 
 								<ScrollArea.ScrollButton />

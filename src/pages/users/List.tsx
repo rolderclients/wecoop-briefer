@@ -2,17 +2,19 @@ import {
 	Box,
 	Grid,
 	Group,
+	Paper,
 	Space,
 	Stack,
 	Switch,
 	Text,
 	Tooltip,
 } from '@mantine/core';
+import { useHover } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconEdit, IconKey, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
 import { type User, useAuth } from '@/front';
-import { HoverActionIcon, HoverPaper, usePaperHover } from '~/ui';
+import { HoverActionIcon } from '~/ui';
 import { useUsers } from './provider';
 
 const roles = {
@@ -46,7 +48,7 @@ export const UsersList = () => {
 };
 
 const UserPaper = ({ user }: { user: User }) => {
-	const { paperHovered, paperRef } = usePaperHover();
+	const { ref, hovered } = useHover();
 	const {
 		setSelectedUser,
 		openEdit,
@@ -59,7 +61,7 @@ const UserPaper = ({ user }: { user: User }) => {
 	const [blocked, setBlocked] = useState(Boolean(user.banned));
 
 	return (
-		<HoverPaper ref={paperRef} radius="md" withBorder>
+		<Paper ref={ref} radius="md" withBorder>
 			<Grid px="md" py="xs" align="center">
 				<Grid.Col span="auto">
 					<Text inline>{user.name}</Text>
@@ -112,7 +114,7 @@ const UserPaper = ({ user }: { user: User }) => {
 							<HoverActionIcon
 								aria-label="Удалить"
 								color="red"
-								hovered={paperHovered}
+								hovered={hovered}
 								onClick={() => {
 									setSelectedUser(user.id);
 									openDelete();
@@ -126,7 +128,7 @@ const UserPaper = ({ user }: { user: User }) => {
 
 						<HoverActionIcon
 							aria-label="Изменить данные доступа"
-							hovered={paperHovered}
+							hovered={hovered}
 							onClick={() => {
 								setSelectedUser(user.id);
 								openEditCredentials();
@@ -139,7 +141,7 @@ const UserPaper = ({ user }: { user: User }) => {
 
 						<HoverActionIcon
 							aria-label="Изменить"
-							hovered={paperHovered}
+							hovered={hovered}
 							onClick={() => {
 								setSelectedUser(user.id);
 								openEdit();
@@ -151,6 +153,6 @@ const UserPaper = ({ user }: { user: User }) => {
 					</Group>
 				</Grid.Col>
 			</Grid>
-		</HoverPaper>
+		</Paper>
 	);
 };

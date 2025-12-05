@@ -44,7 +44,7 @@ DEFINE FIELD OVERWRITE time ON prompt TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON prompt TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON prompt TYPE datetime VALUE time::now();
 
--- // Task
+// Task
 DEFINE TABLE OVERWRITE task TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
 DEFINE FIELD OVERWRITE title ON task TYPE string;
 DEFINE FIELD OVERWRITE content ON task TYPE option<string>;
@@ -52,6 +52,7 @@ DEFINE FIELD OVERWRITE company ON task TYPE option<object>;
 DEFINE FIELD OVERWRITE company.title ON task TYPE option<string>;
 DEFINE FIELD OVERWRITE company.info ON task TYPE option<string>;
 DEFINE FIELD OVERWRITE archived ON task TYPE bool DEFAULT false;
+DEFINE FIELD OVERWRITE files ON task COMPUTED <~file;
 DEFINE FIELD OVERWRITE service ON task TYPE record<service> REFERENCE ON DELETE IGNORE;
 DEFINE FIELD OVERWRITE brief ON task TYPE record<brief> DEFAULT (CREATE ONLY brief).id;
 DEFINE FIELD OVERWRITE chat ON task TYPE record<chat> DEFAULT (CREATE ONLY chat).id;
@@ -59,8 +60,22 @@ DEFINE FIELD OVERWRITE time ON task TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON task TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON task TYPE datetime VALUE time::now();
 
-// Delete brief on task deletion
-DEFINE EVENT OVERWRITE task_deleted ON task WHEN $event = 'DELETE' THEN DELETE $before.brief.id;
+// Delete brief and files on task deletion
+DEFINE EVENT OVERWRITE task_deleted ON task WHEN $event = 'DELETE' THEN {
+    DELETE $before.brief.id;
+    DELETE file WHERE id IN $before.files.id;
+};
+
+// File
+DEFINE TABLE OVERWRITE file TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
+DEFINE FIELD OVERWRITE s3Key ON file TYPE string;
+DEFINE FIELD OVERWRITE originalName ON file TYPE string;
+DEFINE FIELD OVERWRITE type ON file TYPE string;
+DEFINE FIELD OVERWRITE size ON file TYPE number;
+DEFINE FIELD OVERWRITE task ON file TYPE record<task> REFERENCE ON DELETE IGNORE;
+DEFINE FIELD OVERWRITE time ON file TYPE object DEFAULT { };
+DEFINE FIELD OVERWRITE time.created ON file TYPE datetime DEFAULT time::now() READONLY;
+DEFINE FIELD OVERWRITE time.updated ON file TYPE datetime VALUE time::now();
 
 // Brief
 DEFINE TABLE OVERWRITE brief TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
