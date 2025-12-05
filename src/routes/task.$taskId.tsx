@@ -5,7 +5,7 @@ import { UnautorizedTaskPage } from '@/pages/task/Page';
 export const Route = createFileRoute('/task/$taskId')({
 	loader: async ({ context }) => {
 		await context.queryClient.ensureQueryData(
-			commentsQueryOptions({ task: `task:${Route.id}` }), // Так как решил в ссылке не показывать task: добавляем здесь
+			commentsQueryOptions({ taskId: `task:${Route.id}` }), // Так как решил в ссылке не показывать task: добавляем здесь
 		);
 	},
 	component: UnautorizedTaskPage,

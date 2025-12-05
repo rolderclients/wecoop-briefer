@@ -6,21 +6,21 @@ import { getDB } from '..';
 import { fromDTO, fromDTOs } from '../utils';
 
 const getCommentsFn = createServerFn({ method: 'GET' })
-	.inputValidator((data: { task: string }) => data)
+	.inputValidator((data: { taskId: string }) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
 
 		// Преобразуем строку в Record ID
-		const task = data.task.includes(':')
-			? new RecordId('task', data.task.split(':')[1]) // Не достаточно просто подаствить task:12w21e1e12 в eq('task', task)
-			: data.task;
-		console.log('data.task:', data.task);
-		console.log('task:', task);
+		const taskId = data.taskId.includes(':')
+			? new RecordId('task', data.taskId.split(':')[1]) // Не достаточно просто подаствить task:12w21e1e12 в eq('task', task)
+			: data.taskId;
+		console.log('data.task:', data.taskId);
+		console.log('task:', taskId);
 
 		const [result] = await db
 			.query(surql`SELECT *
 				FROM comment
-				WHERE ${eq('task', task)}
+				WHERE ${eq('task', taskId)}
 				ORDER BY time.created`)
 			.json()
 			.collect<[Comment[]]>();
@@ -28,9 +28,9 @@ const getCommentsFn = createServerFn({ method: 'GET' })
 		return result;
 	});
 
-export const commentsQueryOptions = (data: { task: string }) =>
+export const commentsQueryOptions = (data: { taskId: string }) =>
 	queryOptions<Comment[]>({
-		queryKey: ['comments', data.task],
+		queryKey: ['comments', data.taskId],
 		queryFn: () => getCommentsFn({ data }),
 	});
 
@@ -40,7 +40,7 @@ export const createCommentFn = createServerFn({ method: 'POST' })
 		const db = await getDB();
 
 		const content = await fromDTO(data);
-		await db.query(surql`CREATE task CONTENT ${content};`);
+		await db.query(surql`CREATE comment CONTENT ${content};`);
 	});
 
 export const deleteCommentsFn = createServerFn({ method: 'POST' })

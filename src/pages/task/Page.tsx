@@ -12,59 +12,40 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconFileTypePdf } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
+import dayjs from 'dayjs';
 import { useState } from 'react';
-import { createTaskFn, taskWithBriefAndChatQueryOptions } from '@/back';
+import { taskWithBriefAndChatQueryOptions } from '@/back';
 import {
 	commentsQueryOptions,
 	createCommentFn,
 } from '@/back/db/repositories/comment';
 import { Textarea } from '@/components/ui/textarea';
-import { SimpleEditor, useMutaitionWithInvalidate } from '@/front';
+import { downloadPDF, SimpleEditor, useMutaitionWithInvalidate } from '@/front';
 import { Route } from '@/routes/task.$taskId';
-import type { Comment, CreateComment, TaskWithBriefAndChat } from '@/types';
+import type { Comment, CreateComment } from '@/types';
 import { ScrollArea } from '~/ui';
 
-// Сделал фрон для добавления комментариев при просмотре задачи
-// const createCommentSchema = z.object({
-// 	title: string,
-// 	content: z.string().optional(),
-// 	company: z
-// 		.object({
-// 			title: z.string().optional(),
-// 			info: z.string().optional(),
-// 		})
-// 		.optional(),
-// 	service: z.string().min(1, 'Услуга обязательна'),
-// });
-
-// const createCommentForTask = async (
-// 	comment: string,
-// 	task: TaskWithBriefAndChat,
-// ) => {
-// 	console.log(comment, task);
-
-// 	await createMutation.mutateAsync(value);
-// 	// notifications.show({
-// 	// 	message: `Задача "${value.title}" создана`,
-// 	// 	color: 'green',
-// 	// });
-// };
-
 export const UnautorizedTaskPage = () => {
+	// Входные данные
 	const { taskId } = useParams({ from: Route.id });
 	const { data: comments } = useSuspenseQuery(
-		commentsQueryOptions({ task: `task:${taskId}` }),
+		commentsQueryOptions({ taskId: `task:${taskId}` }),
 	);
 	const { data: task } = useSuspenseQuery(
 		taskWithBriefAndChatQueryOptions({ id: `task:${taskId}`, archived: false }),
 	);
 
-	const [openedModal, { open, close }] = useDisclosure(false);
+	// Локальные состояния
 	const [newComment, setNewComment] = useState<string>('');
+	const [createButtonLoading, setCreateButtonLoading] =
+		useState<boolean>(false);
+	const [downloading, setDownloading] = useState<boolean>(false);
+	const [openedModal, { open, close }] = useDisclosure(false);
 
+	// Локальные функции
 	const createMutation = useMutaitionWithInvalidate<CreateComment>(
 		createCommentFn,
-		['commnets'],
+		['comments', task.id],
 	);
 
 	console.log('taskId', taskId);
@@ -105,9 +86,15 @@ export const UnautorizedTaskPage = () => {
 								</Button>
 
 								<Button
+									loading={downloading}
 									component="div"
 									size="xs"
 									leftSection={<IconFileTypePdf size={16} />}
+									onClick={async () => {
+										setDownloading(true);
+										await downloadPDF(task.brief?.content || '', 'brief.pdf');
+										setDownloading(false);
+									}}
 								>
 									Скачать
 								</Button>
@@ -151,17 +138,22 @@ export const UnautorizedTaskPage = () => {
 																{task.company.title}
 															</Text>
 															<Text c="cyan" size="xs">
-																{'05.12.25'}
+																{dayjs(iComment.time.created).format(
+																	'DD.MM.YY hh:mm',
+																)}
 															</Text>
 														</Group>
 														<Group p="xs">
-															<Text c="teal">{iComment.value}</Text>
+															<Text c="teal" style={{ whiteSpace: 'pre-wrap' }}>
+																{iComment.value}
+															</Text>
 														</Group>
 													</Stack>
 												</Paper>
 											);
 										})}
 									</Stack>
+									<ScrollArea.ScrollButton />
 								</ScrollArea>
 								<Group w="100%" justify="center" mb="50px">
 									<Button radius="xl" bg="green" onClick={open}>
@@ -186,14 +178,18 @@ export const UnautorizedTaskPage = () => {
 					></Textarea>
 					<Group w="100%" justify="flex-end">
 						<Button
+							loading={createButtonLoading}
 							radius="xl"
 							size="xs"
 							bg="green"
 							onClick={async () => {
+								setCreateButtonLoading(true);
 								await createMutation.mutateAsync({
 									value: newComment,
 									task: task.id,
 								});
+								setNewComment('');
+								setCreateButtonLoading(false);
 								close();
 							}}
 						>

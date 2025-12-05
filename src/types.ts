@@ -164,6 +164,10 @@ export interface Comment {
 	id: string;
 	value: string;
 	task: string; // тут id задачи
+	time: {
+		created: string;
+		updated: string;
+	};
 }
 
 export interface CreateComment {
