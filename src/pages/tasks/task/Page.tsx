@@ -31,7 +31,7 @@ export const TaskPage = () => {
 
 	useEffect(() => {
 		console.log('url', `${location.origin}/task/${taskId}`);
-		setCurrentTaskURL(`${location.origin}/task/${taskId}`);
+		setCurrentTaskURL(`${location.origin}/task/${taskId.replace('task:', '')}`);
 	}, [taskId]);
 
 	return (
