@@ -1,11 +1,13 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <> */
 import { Group, Modal, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useCallback, useEffect } from 'react';
 import z from 'zod/v4';
+import { servicesWithEnbledPromptsQueryOptions, updateTaskFn } from '@/back';
+import { useMutaitionWithInvalidate } from '@/front';
 import type { Task, UpdateTask } from '@/types';
 import { blurOnError, filedsSchema, useAppForm } from '~/ui';
-import { useDisclosure } from '@mantine/hooks';
 
 const schema = z.object({
 	title: filedsSchema.title,
@@ -19,21 +21,30 @@ const schema = z.object({
 	service: z.string().min(1, 'Услуга обязательна'),
 });
 
+interface EditProps {
+	opened: boolean;
+	task: Task;
+	// services?: Array<{ id: string; title: string }>; // Добавь свой тип сервисов
+	onClose: () => void;
+	// updateMutation?: any; // Замени на правильный тип мутации
+}
+
 const defaultValues: UpdateTask = {
 	id: '',
 	title: '',
 	service: '',
 };
 
-export const Edit = ({
-	task,
-	isEditingOpened,
-	closeEdit,
-	openEdit,
-}: {
-	task: Task;
-	isEditingOpened: boolean;
-}) => {
+export const Edit = ({ opened, task, onClose }: EditProps) => {
+	// Получаем все доступные услуги
+	const { data: services } = useSuspenseQuery(
+		servicesWithEnbledPromptsQueryOptions(),
+	);
+
+	const updateMutation = useMutaitionWithInvalidate<UpdateTask>(updateTaskFn, [
+		'tasks',
+	]);
+
 	const form = useAppForm({
 		defaultValues,
 		validators: { onSubmit: schema },
@@ -47,9 +58,6 @@ export const Edit = ({
 			closeForm();
 		},
 	});
-
-	const [isEditingOpened, { open: closeEdit, close: openEdit }] =
-		useDisclosure(false);
 
 	const resetForm = useCallback(() => {
 		if (task) {
@@ -67,13 +75,15 @@ export const Edit = ({
 
 	const closeForm = () => {
 		resetForm();
-		closeEdit();
+		onClose();
 	};
+
+	console.log('isEditingOpened в Edit', opened);
 
 	return (
 		<Modal
-			opened={isEditingOpened}
-			onClose={closeForm}
+			opened={opened}
+			onClose={onClose}
 			title={`Изменение задачи "${task?.title}"`}
 		>
 			<form
@@ -130,7 +140,7 @@ export const Edit = ({
 							<field.SelectField
 								label="Услуга"
 								placeholder="Выберите услугу"
-								data={services.map((i) => ({ label: i.title, value: i.id }))}
+								data={services?.map((i) => ({ label: i.title, value: i.id }))}
 								searchable
 							/>
 						)}

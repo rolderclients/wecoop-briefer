@@ -9,14 +9,15 @@ import {
 	Text,
 	Title,
 } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { IconEdit, IconFileTypePdf } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { taskWithBriefAndChatQueryOptions } from '@/back';
 import { downloadPDF, Files, SimpleEditor } from '@/front';
-
 import { Route } from '@/routes/_authed/tasks/$taskId';
+import type { Task } from '@/types';
 import { ScrollArea } from '~/ui';
 import { TaskFiles } from './Files';
 import { Edit } from './forms';
@@ -26,6 +27,8 @@ export const TaskPage = () => {
 	const { data: task } = useSuspenseQuery(
 		taskWithBriefAndChatQueryOptions({ id: taskId, archived: false }),
 	);
+	const [isEditingOpened, { open: openEdit, close: closeEdit }] =
+		useDisclosure(false);
 
 	const [downloading, setDownloading] = useState<boolean>(false);
 	const [currentTaskURL, setCurrentTaskURL] = useState<string>('');
@@ -61,7 +64,14 @@ export const TaskPage = () => {
 					<Stack gap="xs">
 						<Group justify="space-between">
 							<Title order={3}>Задание</Title>
-							<Button size="xs" leftSection={<IconEdit size={16} />}>
+							<Button
+								size="xs"
+								leftSection={<IconEdit size={16} />}
+								onClick={() => {
+									openEdit();
+									console.log('isEditingOpened в Page', isEditingOpened);
+								}}
+							>
 								Редактировать
 							</Button>
 						</Group>
@@ -139,7 +149,11 @@ export const TaskPage = () => {
 					</Stack>
 				</Grid.Col>
 			</Grid>
-			<Edit task={task} />
+			<Edit
+				task={task as unknown as Task}
+				opened={isEditingOpened}
+				onClose={closeEdit}
+			/>
 		</Stack>
 	);
 };
