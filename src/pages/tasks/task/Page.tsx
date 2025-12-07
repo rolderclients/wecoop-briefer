@@ -19,6 +19,7 @@ import { downloadPDF, Files, SimpleEditor } from '@/front';
 import { Route } from '@/routes/_authed/tasks/$taskId';
 import { ScrollArea } from '~/ui';
 import { TaskFiles } from './Files';
+import { Edit } from './forms';
 
 export const TaskPage = () => {
 	const { taskId } = useParams({ from: Route.id });
@@ -138,6 +139,7 @@ export const TaskPage = () => {
 					</Stack>
 				</Grid.Col>
 			</Grid>
+			<Edit task={task} />
 		</Stack>
 	);
 };
