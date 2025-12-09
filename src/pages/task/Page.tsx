@@ -35,14 +35,14 @@ export const UnautorizedTaskPage = () => {
 		taskWithBriefAndChatQueryOptions({ id: `task:${taskId}`, archived: false }),
 	);
 
-	// Локальные состояния
+	// Состояния
 	const [newComment, setNewComment] = useState<string>('');
 	const [createButtonLoading, setCreateButtonLoading] =
 		useState<boolean>(false);
 	const [downloading, setDownloading] = useState<boolean>(false);
 	const [openedModal, { open, close }] = useDisclosure(false);
 
-	// Локальные функции
+	// Функции и хуки
 	const createMutation = useMutaitionWithInvalidate<CreateComment>(
 		createCommentFn,
 		['comments', task.id],
@@ -112,7 +112,12 @@ export const UnautorizedTaskPage = () => {
 
 						<Paper withBorder radius="md" h="100%">
 							<Stack justify="space-between" h="100%">
-								<ScrollArea p="xl" h="calc(100vh - 300px)">
+								<ScrollArea
+									autoScroll={true}
+									scrollToBottomOnInit={true}
+									p="xl"
+									h="calc(100vh - 300px)"
+								>
 									<Stack>
 										{comments?.map((iComment: Comment) => {
 											return (
