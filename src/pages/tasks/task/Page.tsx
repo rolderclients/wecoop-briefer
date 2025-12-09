@@ -1,4 +1,5 @@
 import {
+	ActionIcon,
 	Box,
 	Button,
 	CopyButton,
@@ -8,9 +9,16 @@ import {
 	Stack,
 	Text,
 	Title,
+	Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconEdit, IconFileTypePdf } from '@tabler/icons-react';
+import {
+	IconDownload,
+	IconEdit,
+	IconFile,
+	IconFileTypePdf,
+	IconLink,
+} from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
@@ -41,13 +49,25 @@ export const TaskPage = () => {
 	return (
 		<Stack pb="xl" pt="sm">
 			<Group justify="space-between">
-				<Group justify="flex-start">
+				<Group justify="flex-start" align="center">
 					<Title>{task.title}</Title>
 					<CopyButton value={currentTaskURL}>
-						{({ copied, copy }) => (
-							<Button color={copied ? 'teal' : 'blue'} onClick={copy}>
-								{copied ? 'Ссылка скопирована' : 'Сформировать ссылку'}
-							</Button>
+						{({ copy }) => (
+							// <Button color={copied ? 'teal' : 'blue'} onClick={copy}>
+							// 	{copied ? 'Ссылка скопирована' : 'Сформировать ссылку'}
+							// </Button>
+							<Tooltip
+								label="Сформировать ссылку"
+								color="dark"
+								position="bottom"
+								offset={10}
+								openDelay={100}
+								closeDelay={100}
+							>
+								<ActionIcon variant="subtle" c="green" onClick={() => copy}>
+									<IconLink size={16} />
+								</ActionIcon>
+							</Tooltip>
 						)}
 					</CopyButton>
 				</Group>
@@ -62,22 +82,14 @@ export const TaskPage = () => {
 			<Grid gutter="xl" overflow="hidden">
 				<Grid.Col span={4}>
 					<Stack gap="xs">
-						<Group justify="space-between">
+						{/*<Paper withBorder radius="md">*/}
+						<Group justify="flex-start">
 							<Title order={3}>Задание</Title>
-							<Button
-								size="xs"
-								leftSection={<IconEdit size={16} />}
-								onClick={() => {
-									openEdit();
-									console.log('isEditingOpened в Page', isEditingOpened);
-								}}
-							>
-								Редактировать
-							</Button>
 						</Group>
+						{/*</Paper>*/}
 						<Paper withBorder radius="md">
-							<ScrollArea>
-								<Stack px="md" pt="sm" h="calc(100vh - 147px)">
+							<ScrollArea h="calc(99vh - 200px)">
+								<Stack px="md" pt="sm" h="calc(99vh - 200px)">
 									<Box style={{ whiteSpace: 'pre-wrap' }}>
 										<Text c="dimmed">Компания</Text>
 										<Text>{task.company.title}</Text>
@@ -97,53 +109,82 @@ export const TaskPage = () => {
 								<ScrollArea.ScrollButton />
 							</ScrollArea>
 						</Paper>
+						<Group justify="flex-end">
+							<Button
+								loading={downloading}
+								component="div"
+								size="xs"
+								color="green"
+								variant="light"
+								leftSection={<IconDownload size={16} />}
+								onClick={async () => {
+									setDownloading(true);
+									await downloadPDF(task.brief?.content || '', 'brief.pdf');
+									setDownloading(false);
+								}}
+							>
+								Скачать файлы
+							</Button>
+							<Button
+								size="xs"
+								leftSection={<IconEdit size={16} />}
+								onClick={() => {
+									openEdit();
+									console.log('isEditingOpened в Page', isEditingOpened);
+								}}
+							>
+								Редактировать
+							</Button>
+						</Group>
 					</Stack>
 				</Grid.Col>
 
 				<Grid.Col span={8}>
 					<Stack gap="xs">
-						<Group justify="space-between">
+						{/*<Paper withBorder radius="md">*/}
+						<Group justify="flex-start">
 							<Title order={3}>Бриф</Title>
-
-							<Group>
-								<Button
-									loading={downloading}
-									component="div"
-									size="xs"
-									color="green"
-									variant="light"
-									leftSection={<IconFileTypePdf size={16} />}
-									onClick={async () => {
-										setDownloading(true);
-										await downloadPDF(task.brief?.content || '', 'brief.pdf');
-										setDownloading(false);
-									}}
-								>
-									Скачать PDF
-								</Button>
-
-								<Link
-									key={task.id}
-									to="/tasks/$taskId/brief"
-									params={{ taskId: task.id }}
-								>
-									<Button
-										component="div"
-										size="xs"
-										leftSection={<IconEdit size={16} />}
-									>
-										Редактировать
-									</Button>
-								</Link>
-							</Group>
 						</Group>
+						{/*</Paper>*/}
 
 						<SimpleEditor
-							height="calc(100vh - 147px)"
+							height="calc(99vh - 200px)"
 							initialContent={task.brief?.content}
 							initialEditable={false}
 							initialDisabledToolbar
 						/>
+
+						<Group justify="flex-end">
+							<Button
+								loading={downloading}
+								component="div"
+								size="xs"
+								color="green"
+								variant="light"
+								leftSection={<IconFileTypePdf size={16} />}
+								onClick={async () => {
+									setDownloading(true);
+									await downloadPDF(task.brief?.content || '', 'brief.pdf');
+									setDownloading(false);
+								}}
+							>
+								Скачать PDF
+							</Button>
+
+							<Link
+								key={task.id}
+								to="/tasks/$taskId/brief"
+								params={{ taskId: task.id }}
+							>
+								<Button
+									component="div"
+									size="xs"
+									leftSection={<IconEdit size={16} />}
+								>
+									Редактировать
+								</Button>
+							</Link>
+						</Group>
 					</Stack>
 				</Grid.Col>
 			</Grid>
