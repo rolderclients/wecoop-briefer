@@ -48,10 +48,6 @@ export const UnautorizedTaskPage = () => {
 		['comments', task.id],
 	);
 
-	console.log('taskId', taskId);
-	console.log('task', task);
-	console.log('comments', comments);
-
 	return (
 		<Stack pb="xl" pt="sm">
 			<Group justify="flex-end">

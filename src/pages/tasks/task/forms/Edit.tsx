@@ -78,8 +78,6 @@ export const Edit = ({ opened, task, onClose }: EditProps) => {
 		onClose();
 	};
 
-	console.log('isEditingOpened в Edit', opened);
-
 	return (
 		<Modal
 			opened={opened}

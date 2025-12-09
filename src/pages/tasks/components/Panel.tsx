@@ -14,7 +14,6 @@ export const Panel = () => {
 
 	// Когда дебаунсед значение изменилось - вызываем поиск
 	useEffect(() => {
-		console.log('debouncedSearchValue', debouncedSearchValue);
 		setSearchString(debouncedSearchValue || '');
 	}, [debouncedSearchValue, setSearchString]);
 

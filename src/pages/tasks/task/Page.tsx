@@ -43,7 +43,6 @@ export const TaskPage = () => {
 	const [currentTaskURL, setCurrentTaskURL] = useState<string>('');
 
 	useEffect(() => {
-		console.log('url', `${location.origin}/task/${taskId}`);
 		setCurrentTaskURL(`${location.origin}/task/${taskId.replace('task:', '')}`);
 	}, [taskId]);
 
@@ -132,7 +131,6 @@ export const TaskPage = () => {
 								leftSection={<IconEdit size={16} />}
 								onClick={() => {
 									openEdit();
-									console.log('isEditingOpened в Page', isEditingOpened);
 								}}
 							>
 								Редактировать

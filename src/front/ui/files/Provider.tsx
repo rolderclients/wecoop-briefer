@@ -163,7 +163,6 @@ export const Provider = ({
 						})),
 					);
 
-				console.log('filesWithTemporalURL', filesWithTemporalURL);
 				for (const fileWithTemporalURL of filesWithTemporalURL) {
 					downloadFileByURL(fileWithTemporalURL.url, fileWithTemporalURL.name);
 				}

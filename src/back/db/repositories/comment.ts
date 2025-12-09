@@ -14,8 +14,6 @@ const getCommentsFn = createServerFn({ method: 'GET' })
 		const taskId = data.taskId.includes(':')
 			? new RecordId('task', data.taskId.split(':')[1]) // Не достаточно просто подаствить task:12w21e1e12 в eq('task', task)
 			: data.taskId;
-		console.log('data.task:', data.taskId);
-		console.log('task:', taskId);
 
 		const [result] = await db
 			.query(surql`SELECT *

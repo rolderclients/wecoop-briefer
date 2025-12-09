@@ -69,8 +69,6 @@ export const downloadPDF = async (
 		: `${fileName}.pdf`;
 
 	try {
-		// console.log('downloadPDF: 📤 Начинаем скачивание PDF:', finalFileName);
-
 		// Получаем PDF buffer от сервера
 		const serializedBuffer = await generatePDFFn({
 			data: {
@@ -90,7 +88,6 @@ export const downloadPDF = async (
 
 		try {
 			downloadFileByURL(url, finalFileName);
-			// console.log('downloadPDF: ✅ PDF успешно скачан:', finalFileName);
 		} finally {
 			// Освобождаем URL в любом случае
 			URL.revokeObjectURL(url);

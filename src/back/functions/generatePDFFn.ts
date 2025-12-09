@@ -86,8 +86,6 @@ export const generatePDFFn = createServerFn({ method: 'POST' })
 		let page: Page | null = null;
 
 		try {
-			// console.log('generatePDFFn: 🚀 Запуск генерации PDF...');
-
 			// Создаем браузер с оптимизированными настройками
 			const config = await getBrowserConfig();
 			browser = await puppeteer.launch(config);
@@ -98,8 +96,6 @@ export const generatePDFFn = createServerFn({ method: 'POST' })
 			// Настраиваем страницу
 			await setupPage(page);
 
-			// console.log('generatePDFFn: 📄 Загружаем HTML контент...');
-
 			// Устанавливаем контент с таймаутом
 			await page.setContent(data.htmlData, {
 				waitUntil: ['networkidle0', 'domcontentloaded'],
@@ -108,8 +104,6 @@ export const generatePDFFn = createServerFn({ method: 'POST' })
 
 			// Ждем загрузки всех ресурсов
 			await page.evaluateHandle('document.fonts.ready');
-
-			// console.log('generatePDFFn: 📋 Генерируем PDF...');
 
 			// Объединяем дефолтные и пользовательские настройки
 			const pdfOptions = {
@@ -127,7 +121,6 @@ export const generatePDFFn = createServerFn({ method: 'POST' })
 				timeout: 60000, // 60 секунд для генерации PDF
 			});
 
-			// console.log('generatePDFFn: ✅ PDF успешно сгенерирован');
 			return bufferToSerializable(Buffer.from(pdfBuffer));
 		} catch (error) {
 			console.error('❌ Ошибка при генерации PDF:', error);
@@ -139,11 +132,9 @@ export const generatePDFFn = createServerFn({ method: 'POST' })
 			try {
 				if (page) {
 					await page.close();
-					// console.log('generatePDFFn: 📄 Страница закрыта');
 				}
 				if (browser) {
 					await browser.close();
-					// console.log('generatePDFFn: 🌐 Браузер закрыт');
 				}
 			} catch (cleanupError) {
 				console.error(
