@@ -43,3 +43,5 @@ const schema = await schemaFile.text();
 
 await db.query(schema);
 await db.close();
+
+console.log('Database schema setup completed.');
