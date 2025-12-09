@@ -13,13 +13,13 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { nanoid } from 'nanoid/non-secure';
 import { createContext, useContext } from 'react';
 import type { FileWithPath } from 'react-dropzone';
-import { deleteObjectFn } from '@/back';
+import { deleteObjectFn, getSignedFileUrlFn } from '@/back';
 import {
 	createFilesFn,
 	deleteFilesFn,
 	filesQueryOptions,
 } from '@/back/db/repositories/file';
-import { useMutaitionWithInvalidate } from '@/front';
+import { downloadFileByURL, useMutaitionWithInvalidate } from '@/front';
 import type { CreateFile, File } from '@/types';
 import {
 	clientRejectionsNotificatons,
@@ -31,6 +31,7 @@ interface FilesContext {
 	onDrop: DropzoneProps['onDrop'];
 	onReject: DropzoneProps['onReject'];
 	deleteFile: (file: File) => void;
+	downloadAllFiles: () => Promise<void>;
 	accept: string[];
 	maxFilesTotal: number;
 	maxFilesPerUpload: number;
@@ -151,6 +152,29 @@ export const Provider = ({
 		deleteFile: (file) => {
 			deleteObjectFn({ data: file.s3Key });
 			deleteMutation.mutate([file.id]);
+		},
+		downloadAllFiles: async () => {
+			try {
+				const filesWithTemporalURL: { url: Promise<string>; name: string }[] =
+					await Promise.all(
+						files.map((file) => ({
+							url: getSignedFileUrlFn({ data: { s3Key: file.s3Key } }),
+							name: file.originalName,
+						})),
+					);
+
+				console.log('filesWithTemporalURL', filesWithTemporalURL);
+				for (const fileWithTemporalURL of filesWithTemporalURL) {
+					downloadFileByURL(fileWithTemporalURL.url, fileWithTemporalURL.name);
+				}
+			} catch (error) {
+				console.error(error);
+				notifications.show({
+					title: 'Ошибка скачивания',
+					message: 'Не удалось получить ссылки на файлы',
+					color: 'red',
+				});
+			}
 		},
 		accept: fileTypes,
 		maxFilesTotal,

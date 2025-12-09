@@ -1,5 +1,5 @@
 import { generatePDFFn } from '@/back/functions/generatePDFFn';
-import { defaultErrorNotification } from '@/front';
+import { defaultErrorNotification, downloadFileByURL } from '@/front';
 
 // Интерфейсы для типизации 📝
 interface PDFOptions {
@@ -89,21 +89,7 @@ export const downloadPDF = async (
 		const url = URL.createObjectURL(pdfBlob);
 
 		try {
-			// Создаем и настраиваем ссылку для скачивания
-			const link = document.createElement('a');
-			link.href = url;
-			link.download = finalFileName;
-			link.style.display = 'none';
-
-			// Добавляем в DOM, кликаем и удаляем
-			document.body.appendChild(link);
-			link.click();
-
-			// Небольшая задержка перед удалением для корректной работы
-			setTimeout(() => {
-				document.body.removeChild(link);
-			}, 100);
-
+			downloadFileByURL(url, finalFileName);
 			// console.log('downloadPDF: ✅ PDF успешно скачан:', finalFileName);
 		} finally {
 			// Освобождаем URL в любом случае
