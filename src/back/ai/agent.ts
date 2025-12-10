@@ -5,7 +5,9 @@ import type { ModelName } from './types';
 
 export const schema = object({
 	document: string().describe('Документ в формате HTML для редактора.'),
-	chat: string().describe('Сообщения в чат для пользователя.'),
+	chat: string().describe(
+		'Сообщения в чат для пользователя. Markdown с поддержкой GitHub Flavored Markdown, LaTeX, Mermaid диаграмм и подсветки синтаксиса.',
+	),
 });
 
 export const createAgent = (model: ModelName, userPrompt: string) =>

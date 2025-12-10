@@ -155,13 +155,12 @@ export const Provider = ({
 		},
 		downloadAllFiles: async () => {
 			try {
-				const filesWithTemporalURL: { url: Promise<string>; name: string }[] =
-					await Promise.all(
-						files.map((file) => ({
-							url: getSignedFileUrlFn({ data: { s3Key: file.s3Key } }),
-							name: file.originalName,
-						})),
-					);
+				const filesWithTemporalURL = await Promise.all(
+					files.map(async (file) => ({
+						url: await getSignedFileUrlFn({ data: { s3Key: file.s3Key } }),
+						name: file.originalName,
+					})),
+				);
 
 				for (const fileWithTemporalURL of filesWithTemporalURL) {
 					downloadFileByURL(fileWithTemporalURL.url, fileWithTemporalURL.name);

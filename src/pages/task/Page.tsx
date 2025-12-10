@@ -131,7 +131,7 @@ export const UnautorizedTaskPage = () => {
 															justify="space-between"
 														>
 															<Text c="cyan" size="xs">
-																{task.company.title}
+																{task.company?.title}
 															</Text>
 															<Text c="cyan" size="xs">
 																{dayjs(iComment.time.created).format(

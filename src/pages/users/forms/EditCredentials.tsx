@@ -1,29 +1,25 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <> */
-import { Group, Modal, Stack } from '@mantine/core';
+import { Accordion, Group, Modal, Stack, Switch } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-//@ts-expect-error
-import generatePassword from 'omgopass';
-import { useEffect } from 'react';
+import { revalidateLogic } from '@tanstack/react-form';
+import { useEffect, useState } from 'react';
 import z from 'zod/v4';
 import type { CredentialsUser } from '@/front';
 import { blurOnError, filedsSchema, useAppForm } from '~/ui';
 import { useUsers } from '../provider';
+import classes from './switch.module.css';
 
 const schema = z.object({
 	id: filedsSchema.id,
 	role: filedsSchema.role,
 	username: filedsSchema.username,
-	newPassword: filedsSchema.password,
+	newPassword: filedsSchema.password.optional(),
 });
 
 const defaultValues: CredentialsUser = {
 	id: '',
 	role: 'manager',
 	username: '',
-	newPassword: generatePassword({
-		minSyllableLength: 2,
-		maxSyllableLength: 2,
-	}),
 };
 
 export const EditCredentials = () => {
@@ -37,6 +33,7 @@ export const EditCredentials = () => {
 
 	const form = useAppForm({
 		defaultValues,
+		validationLogic: revalidateLogic(),
 		validators: {
 			onSubmit: schema.refine(
 				(data) =>
@@ -52,7 +49,7 @@ export const EditCredentials = () => {
 		onSubmitInvalid: blurOnError,
 		onSubmit: async ({ value }) => {
 			await updateCredentialsMutation.mutateAsync(value);
-			closeEditCredentials();
+			closeForm();
 			notifications.show({
 				message: `Данные доступа учетной записи сотрудника "${selectedUser?.name}" изменены`,
 				color: 'green',
@@ -69,10 +66,18 @@ export const EditCredentials = () => {
 		}
 	}, [form, selectedUser]);
 
+	const [passwordWillChange, setPasswordWillChange] = useState(false);
+
+	const closeForm = () => {
+		setPasswordWillChange(false);
+		form.setFieldValue('newPassword', undefined);
+		closeEditCredentials();
+	};
+
 	return (
 		<Modal
 			opened={editCredentialsOpened}
-			onClose={closeEditCredentials}
+			onClose={closeForm}
 			title={`Изменение данных доступа сотрудника "${selectedUser?.name}"`}
 		>
 			<form
@@ -104,19 +109,49 @@ export const EditCredentials = () => {
 						)}
 					/>
 
-					<form.AppField
-						name="newPassword"
-						children={(field) => (
-							<field.TextPassowrdField
-								label="Новый пароль"
-								placeholder="Введите новый пароль"
-							/>
-						)}
-					/>
+					<Accordion
+						variant="separated"
+						mt="sm"
+						onChange={() => setPasswordWillChange((p) => !p)}
+						onClick={(e) => e.preventDefault()}
+					>
+						<Accordion.Item value="pass">
+							<Accordion.Control>
+								<Switch
+									color="orange"
+									label="Установить новый пароль"
+									checked={passwordWillChange}
+									readOnly
+									classNames={{
+										body: classes.pointer,
+										track: classes.pointer,
+										labelWrapper: classes.pointer,
+										label: classes.pointer,
+									}}
+								/>
+							</Accordion.Control>
+							<Accordion.Panel>
+								<form.AppField
+									name="newPassword"
+									validators={{
+										onDynamic: passwordWillChange
+											? filedsSchema.password
+											: undefined,
+									}}
+									children={(field) => (
+										<field.TextPassowrdField
+											label="Новый пароль"
+											placeholder="Введите новый пароль"
+										/>
+									)}
+								/>
+							</Accordion.Panel>
+						</Accordion.Item>
+					</Accordion>
 
 					<Group ml="auto" mt="lg">
 						<form.AppForm>
-							<form.CancelButton onClick={closeEditCredentials} />
+							<form.CancelButton onClick={closeForm} />
 						</form.AppForm>
 
 						<form.AppForm>

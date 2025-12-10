@@ -92,11 +92,11 @@ export const TaskPage = () => {
 								<Stack px="md" pt="sm" h="calc(99vh - 200px)">
 									<Box style={{ whiteSpace: 'pre-wrap' }}>
 										<Text c="dimmed">Компания</Text>
-										<Text>{task.company.title}</Text>
+										<Text>{task.company?.title}</Text>
 									</Box>
 									<Box style={{ whiteSpace: 'pre-wrap' }}>
 										<Text c="dimmed">О компании</Text>
-										<Text>{task.company.info}</Text>
+										<Text>{task.company?.info}</Text>
 									</Box>
 									<Box style={{ whiteSpace: 'pre-wrap' }}>
 										<Text c="dimmed">Описание</Text>
