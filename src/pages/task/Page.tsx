@@ -14,11 +14,8 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import { taskWithBriefAndChatQueryOptions } from '@/back';
-import {
-	commentsQueryOptions,
-	createCommentFn,
-} from '@/back/db/repositories/comment';
+import { taskWithBriefAndCommentsQueryOptions } from '@/back';
+import { createCommentFn } from '@/back/db/repositories/comment';
 import { Textarea } from '@/components/ui/textarea';
 import { downloadPDF, SimpleEditor, useMutaitionWithInvalidate } from '@/front';
 import { Route } from '@/routes/task.$taskId';
@@ -28,12 +25,11 @@ import { ScrollArea } from '~/ui';
 export const UnautorizedTaskPage = () => {
 	// Входные данные
 	const { taskId } = useParams({ from: Route.id });
-	const { data: comments } = useSuspenseQuery(
-		commentsQueryOptions(`task:${taskId}`),
-	);
 	const { data: task } = useSuspenseQuery(
-		taskWithBriefAndChatQueryOptions({ id: `task:${taskId}`, archived: false }),
+		taskWithBriefAndCommentsQueryOptions(`task:${taskId}`),
 	);
+
+	console.log('taskWithComments', task);
 
 	// Состояния
 	const [newComment, setNewComment] = useState<string>('');
@@ -45,7 +41,7 @@ export const UnautorizedTaskPage = () => {
 	// Функции и хуки
 	const createMutation = useMutaitionWithInvalidate<CreateComment>(
 		createCommentFn,
-		['comments', task.id],
+		['taskWithBriefAndComments', task.id],
 	);
 
 	return (
@@ -119,7 +115,7 @@ export const UnautorizedTaskPage = () => {
 									h="calc(100vh - 300px)"
 								>
 									<Stack>
-										{comments?.map((iComment: Comment) => {
+										{task.comments?.map((iComment: Comment) => {
 											return (
 												<Paper
 													key={iComment.id}

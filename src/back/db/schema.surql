@@ -55,16 +55,16 @@ DEFINE FIELD OVERWRITE archived ON task TYPE bool DEFAULT false;
 DEFINE FIELD OVERWRITE files ON task COMPUTED <~file;
 DEFINE FIELD OVERWRITE service ON task TYPE record<service> REFERENCE ON DELETE IGNORE;
 DEFINE FIELD OVERWRITE brief ON task TYPE record<brief> DEFAULT (CREATE ONLY brief).id;
+DEFINE FIELD OVERWRITE comments ON task COMPUTED <~comment;
 DEFINE FIELD OVERWRITE chat ON task TYPE record<chat> DEFAULT (CREATE ONLY chat).id;
 DEFINE FIELD OVERWRITE time ON task TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON task TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON task TYPE datetime VALUE time::now();
 
-
 // Comment for task
 DEFINE TABLE OVERWRITE comment TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
 DEFINE FIELD OVERWRITE content ON comment TYPE string;
-DEFINE FIELD OVERWRITE task ON comment TYPE record<task> REFERENCE ON DELETE UNSET;
+DEFINE FIELD OVERWRITE task ON comment TYPE record<task> REFERENCE ON DELETE IGNORE;
 DEFINE FIELD OVERWRITE time ON comment TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON comment TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON comment TYPE datetime VALUE time::now();

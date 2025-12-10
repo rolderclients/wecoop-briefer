@@ -5,6 +5,7 @@ import type {
 	CreateTask,
 	Task,
 	TaskWithBriefAndChat,
+	TaskWithBriefAndComments,
 	UpdateTask,
 } from '@/types';
 import { getDB } from '..';
@@ -90,6 +91,43 @@ export const taskWithBriefAndChatQueryOptions = (data: {
 	queryOptions<TaskWithBriefAndChat>({
 		queryKey: ['taskWithBriefAndChat', data.id, data.archived],
 		queryFn: () => getTaskWithBriefAndChatFn({ data }),
+	});
+
+const getTaskWithBriefAndCommentsFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: string) => data)
+	.handler(async ({ data }) => {
+		const db = await getDB();
+
+		console.log('1 data', data);
+
+		if (data === 'task:/task/$taskId') return null;
+
+		const taskId = await fromDTO(data);
+		console.log('2 taskId', taskId);
+		const [result] = await db
+			.query(surql`			SELECT
+          *,
+	        service.{ id, title },
+	        brief.{ id, content },
+					commentss.*
+        FROM ONLY ${taskId}
+        `)
+			.json()
+			.collect<[TaskWithBriefAndComments]>();
+
+		//  ONLY ${taskId}
+		//
+		//
+		result.comments = result.commentss;
+
+		console.log('3 result', result);
+		return result || null;
+	});
+
+export const taskWithBriefAndCommentsQueryOptions = (taskId: string) =>
+	queryOptions<TaskWithBriefAndComments>({
+		queryKey: ['taskWithBriefAndComments', taskId],
+		queryFn: () => getTaskWithBriefAndCommentsFn({ data: taskId }),
 	});
 
 export const createTaskFn = createServerFn({ method: 'POST' })

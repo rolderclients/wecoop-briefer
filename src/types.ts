@@ -136,6 +136,12 @@ export interface TaskWithBriefAndChat
 	};
 }
 
+export interface TaskWithBriefAndComments
+	extends Omit<Task, 'brief' | 'chat' | 'prompt'> {
+	brief: Brief;
+	comments: Comment[];
+}
+
 export interface CreateTask {
 	title: string;
 	content?: string;
