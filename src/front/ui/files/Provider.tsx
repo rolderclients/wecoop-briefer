@@ -164,7 +164,10 @@ export const Provider = ({
 					);
 
 				for (const fileWithTemporalURL of filesWithTemporalURL) {
-					downloadFileByURL(fileWithTemporalURL.url, fileWithTemporalURL.name);
+					downloadFileByURL(
+						fileWithTemporalURL.url as unknown as string,
+						fileWithTemporalURL.name,
+					);
 				}
 			} catch (error) {
 				console.error(error);
