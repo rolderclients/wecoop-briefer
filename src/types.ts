@@ -161,7 +161,7 @@ export interface UpdateTask {
 // Comment for task
 export interface Comment {
 	id: string;
-	value: string;
+	content: string;
 	task: string; // тут id задачи
 	time: {
 		created: string;
@@ -170,7 +170,7 @@ export interface Comment {
 }
 
 export interface CreateComment {
-	value: string;
+	content: string;
 	task: string; // тут id задачи
 }
 

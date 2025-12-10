@@ -63,8 +63,8 @@ DEFINE FIELD OVERWRITE time.updated ON task TYPE datetime VALUE time::now();
 
 // Comment for task
 DEFINE TABLE OVERWRITE comment TYPE NORMAL SCHEMAFULL PERMISSIONS FULL;
-DEFINE FIELD OVERWRITE value ON comment TYPE string;
-DEFINE FIELD OVERWRITE task ON comment TYPE record<task> REFERENCE ON DELETE IGNORE;
+DEFINE FIELD OVERWRITE content ON comment TYPE string;
+DEFINE FIELD OVERWRITE task ON comment TYPE record<task> REFERENCE ON DELETE UNSET;
 DEFINE FIELD OVERWRITE time ON comment TYPE object DEFAULT { };
 DEFINE FIELD OVERWRITE time.created ON comment TYPE datetime DEFAULT time::now() READONLY;
 DEFINE FIELD OVERWRITE time.updated ON comment TYPE datetime VALUE time::now();

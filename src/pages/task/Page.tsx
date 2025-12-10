@@ -146,7 +146,7 @@ export const UnautorizedTaskPage = () => {
 														</Group>
 														<Group p="xs">
 															<Text c="teal" style={{ whiteSpace: 'pre-wrap' }}>
-																{iComment.value}
+																{iComment.content}
 															</Text>
 														</Group>
 													</Stack>
@@ -186,7 +186,7 @@ export const UnautorizedTaskPage = () => {
 							onClick={async () => {
 								setCreateButtonLoading(true);
 								await createMutation.mutateAsync({
-									value: newComment,
+									content: newComment,
 									task: task.id,
 								});
 								setNewComment('');
