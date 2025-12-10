@@ -158,6 +158,22 @@ export interface UpdateTask {
 	archived?: boolean;
 }
 
+// Comment for task
+export interface Comment {
+	id: string;
+	value: string;
+	task: string; // тут id задачи
+	time: {
+		created: string;
+		updated: string;
+	};
+}
+
+export interface CreateComment {
+	value: string;
+	task: string; // тут id задачи
+}
+
 // File
 export interface File extends Item {
 	originalName: string;

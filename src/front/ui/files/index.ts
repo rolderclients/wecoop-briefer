@@ -13,3 +13,4 @@ export const Files = {
 };
 
 export { useFiles };
+export type { FilesRef } from './Root';
