@@ -29,7 +29,7 @@ export type UpdateUser = Omit<
 export type CredentialsUser = {
 	id: string;
 	username: string;
-	newPassword: string;
+	newPassword?: string;
 	role: User['role'];
 };
 export type BlockUser = { id: string; block: boolean };

@@ -1,49 +1,35 @@
-import { Group, Text } from '@mantine/core';
-import { Dropzone, type DropzoneProps } from '@mantine/dropzone';
-import { IconFile, IconUpload, IconX } from '@tabler/icons-react';
-import { useFiles } from './Provider';
+import { forwardRef, useImperativeHandle } from 'react';
+import type { File } from '@/types';
+import { type FilesProps, Provider, useFiles } from './Provider';
 
-export const Root = (props: DropzoneProps) => {
-	const { isPending } = useFiles();
+export interface FilesRef {
+	downloadAllFiles: () => Promise<void>;
+	files: File[];
+}
 
-	return (
-		<Dropzone
-			radius="md"
-			// onReject={(files) => console.log('rejected files', files)}
-			maxFiles={10}
-			maxSize={1024 * 1024 * 5}
-			loading={isPending}
-			// accept={IMAGE_MIME_TYPE}
-			{...props}
-		>
-			<Group wrap="nowrap" style={{ pointerEvents: 'none' }}>
-				<Dropzone.Accept>
-					<IconUpload
-						size={52}
-						color="var(--mantine-color-blue-6)"
-						stroke={1.5}
-					/>
-				</Dropzone.Accept>
-				<Dropzone.Reject>
-					<IconX size={52} color="var(--mantine-color-red-6)" stroke={1.5} />
-				</Dropzone.Reject>
-				<Dropzone.Idle>
-					<IconFile
-						size={52}
-						color="var(--mantine-color-dimmed)"
-						stroke={1.5}
-					/>
-				</Dropzone.Idle>
+export const Root = forwardRef<FilesRef, FilesProps>(
+	({ children, ...props }, ref) => {
+		return (
+			<Provider {...props}>
+				<FilesRefHandler ref={ref}>{children}</FilesRefHandler>
+			</Provider>
+		);
+	},
+);
 
-				<div>
-					<Text size="lg" inline>
-						Перетащите или выберите файлы
-					</Text>
-					<Text size="sm" c="dimmed" inline mt={7}>
-						Можно загрузить до 10 файлов. Каждый файл не должен превышать 5 мб.
-					</Text>
-				</div>
-			</Group>
-		</Dropzone>
-	);
-};
+const FilesRefHandler = forwardRef<FilesRef, { children: React.ReactNode }>(
+	({ children }, ref) => {
+		const { files, downloadAllFiles } = useFiles();
+
+		useImperativeHandle(
+			ref,
+			() => ({
+				downloadAllFiles,
+				files,
+			}),
+			[downloadAllFiles, files],
+		);
+
+		return <>{children}</>;
+	},
+);
