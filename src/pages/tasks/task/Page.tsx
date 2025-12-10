@@ -13,6 +13,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
+	IconCheck,
 	IconDownload,
 	IconEdit,
 	IconFileTypePdf,
@@ -52,7 +53,7 @@ export const TaskPage = () => {
 				<Group justify="flex-start" align="center">
 					<Title>{task.title}</Title>
 					<CopyButton value={currentTaskURL}>
-						{({ copy }) => (
+						{({ copied, copy }) => (
 							// <Button color={copied ? 'teal' : 'blue'} onClick={copy}>
 							// 	{copied ? 'Ссылка скопирована' : 'Сформировать ссылку'}
 							// </Button>
@@ -64,8 +65,8 @@ export const TaskPage = () => {
 								openDelay={100}
 								closeDelay={100}
 							>
-								<ActionIcon variant="subtle" c="green" onClick={() => copy}>
-									<IconLink size={16} />
+								<ActionIcon variant="subtle" c="green" onClick={copy}>
+									{copied ? <IconCheck size={16} /> : <IconLink size={16} />}
 								</ActionIcon>
 							</Tooltip>
 						)}
@@ -88,15 +89,15 @@ export const TaskPage = () => {
 						</Group>
 						{/*</Paper>*/}
 						<Paper withBorder radius="md">
-							<ScrollArea h="calc(99vh - 200px)">
-								<Stack px="md" pt="sm" h="calc(99vh - 200px)">
+							<ScrollArea h="calc(100vh - 200px)">
+								<Stack px="md" pt="sm" h="calc(100vh - 200px)">
 									<Box style={{ whiteSpace: 'pre-wrap' }}>
 										<Text c="dimmed">Компания</Text>
-										<Text>{task.company.title}</Text>
+										<Text>{task.company?.title}</Text>
 									</Box>
 									<Box style={{ whiteSpace: 'pre-wrap' }}>
 										<Text c="dimmed">О компании</Text>
-										<Text>{task.company.info}</Text>
+										<Text>{task.company?.info}</Text>
 									</Box>
 									<Box style={{ whiteSpace: 'pre-wrap' }}>
 										<Text c="dimmed">Описание</Text>
@@ -148,7 +149,7 @@ export const TaskPage = () => {
 						{/*</Paper>*/}
 
 						<SimpleEditor
-							height="calc(99vh - 200px)"
+							height="calc(100vh - 200px)"
 							initialContent={task.brief?.content}
 							initialEditable={false}
 							initialDisabledToolbar
