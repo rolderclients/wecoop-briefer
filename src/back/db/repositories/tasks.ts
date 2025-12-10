@@ -98,34 +98,26 @@ const getTaskWithBriefAndCommentsFn = createServerFn({ method: 'POST' })
 	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		console.log('1 data', data);
-
+		// Вот это место надо поправить, так как при открытии страницы в surreal улетает такой странный id и запрос зависает
 		if (data === 'task:/task/$taskId') return null;
 
 		const taskId = await fromDTO(data);
-		console.log('2 taskId', taskId);
 		const [result] = await db
 			.query(surql`			SELECT
           *,
 	        service.{ id, title },
 	        brief.{ id, content },
-					commentss.*
+					comments.*
         FROM ONLY ${taskId}
         `)
 			.json()
 			.collect<[TaskWithBriefAndComments]>();
 
-		//  ONLY ${taskId}
-		//
-		//
-		result.comments = result.commentss;
-
-		console.log('3 result', result);
 		return result || null;
 	});
 
 export const taskWithBriefAndCommentsQueryOptions = (taskId: string) =>
-	queryOptions<TaskWithBriefAndComments>({
+	queryOptions<TaskWithBriefAndComments | null>({
 		queryKey: ['taskWithBriefAndComments', taskId],
 		queryFn: () => getTaskWithBriefAndCommentsFn({ data: taskId }),
 	});
