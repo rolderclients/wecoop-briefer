@@ -37,3 +37,56 @@
 ## Остальное
 
 - `src/lib` - на этой папке завязана автоматизация двух библиотек - Better Auth и Vercel AI Elements. Поэтому, ничего там не делаем кроме интеграций этих библиотек. ВАЖНО! Не елать там index.ts с экспортами, иначе, все накроется медным тазом! Да так, что придется пересобирать все с 0, т.к. вообще не понятно, чтор это из-за этого.
+
+# direnv и .envrc
+
+direnv - это утилита, которая может применять локальные env параметры (пеерменные) либо запускать команды при переходе в папаку проекта в терминале.
+Так как переменные мы используем через .env.local, envrc мы используем для запуска flox при каждом переходе в папку проекта в терминале или запуске терминалав zed/vscode.
+
+Для настройки нужно сначала установить его, например
+
+```sh
+sudo apt-get install direnv
+```
+
+Затем нужно создать файл .envrc с командой (flox activate) (у нас в проекте уже есть).
+
+Затем, разрешаем direnv командой
+```sh
+direnv allow
+```
+
+И подключаем ег ок терминалу
+```sh
+eval "$(direnv hook zsh)"  # для zsh
+# или
+eval "$(direnv hook bash)"  # для bash
+```
+
+Проверяем. Выходим из папки
+```sh
+cd ..
+```
+
+И возвращаемся в неё
+```sh
+cd briefer
+```
+
+Терминал должен выглядеть Так
+```sh
+vezdexod-pc:briefer (vezdexod*) $ direnv allow
+# direnv: loading ~/programsVezdexod/Projects/wecoop/briefer/.envrc
+# direnv: using flox
+# ✅ You are now using the environment 'briefer'.
+# To stop using this environment, type 'exit'
+vezdexod-pc:briefer (vezdexod*) $ eval "$(direnv hook zsh)"
+vezdexod-pc:briefer (vezdexod*) $ cd ..
+# direnv: unloading
+vezdexod-pc:wecoop $ cd briefer
+# direnv: loading ~/programsVezdexod/Projects/wecoop/briefer/.envrc
+# direnv: using flox
+# ✅ You are now using the environment 'briefer'.
+# To stop using this environment, type 'exit'
+vezdexod-pc:briefer (vezdexod*) $
+```

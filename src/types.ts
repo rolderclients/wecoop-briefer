@@ -111,13 +111,12 @@ export interface AddChatMessage {
 }
 
 // Task
-
 export interface Task extends Item {
 	title: string;
 	content?: string;
 	brief: string;
 	chat: string;
-	company: {
+	company?: {
 		title?: string;
 		info?: string;
 	};
@@ -157,4 +156,45 @@ export interface UpdateTask {
 	};
 	service?: string;
 	archived?: boolean;
+}
+
+// Comment for task
+export interface Comment {
+	id: string;
+	value: string;
+	task: string; // тут id задачи
+	time: {
+		created: string;
+		updated: string;
+	};
+}
+
+export interface CreateComment {
+	value: string;
+	task: string; // тут id задачи
+}
+
+// File
+export interface File extends Item {
+	originalName: string;
+	s3Key: string;
+	type: string;
+	size: number;
+	task: string;
+}
+
+export interface CreateFile {
+	originalName: string;
+	s3Key: string;
+	type: string;
+	size: number;
+	task: string;
+}
+
+export interface UpdateFile {
+	originalName?: string;
+	s3Key?: string;
+	type?: string;
+	size?: number;
+	task?: string;
 }

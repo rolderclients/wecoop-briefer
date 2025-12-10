@@ -26,6 +26,7 @@ export const PromptsList = ({ prompts }: { prompts: Prompt[] }) => {
 				<PromptPaper
 					key={prompt.id}
 					prompt={prompt}
+					prompts={prompts}
 					enabledPromptId={enabledPromptId}
 					setEnabledPromptId={setEnabledPromptId}
 				/>
@@ -36,16 +37,17 @@ export const PromptsList = ({ prompts }: { prompts: Prompt[] }) => {
 
 const PromptPaper = ({
 	prompt,
+	prompts,
 	enabledPromptId,
 	setEnabledPromptId,
 }: {
 	prompt: Prompt;
+	prompts: Prompt[];
 	enabledPromptId: string | null;
 	setEnabledPromptId: (promptId: string | null) => void;
 }) => {
 	const { paperHovered, paperRef } = usePaperHover();
 	const {
-		prompts,
 		selectedIds,
 		setSelectedIds,
 		isArchived,

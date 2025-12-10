@@ -11,9 +11,25 @@ import { getDB } from '..';
 import { fromDTO, fromDTOs } from '../utils';
 
 const getTasksFn = createServerFn({ method: 'GET' })
-	.inputValidator((data: { archived: boolean }) => data)
-	.handler(async ({ data: { archived = false } }) => {
+	.inputValidator(
+		(data: { archived: boolean; searchString?: string | undefined }) => data,
+	)
+	.handler(async ({ data: { archived, searchString } }) => {
 		const db = await getDB();
+
+		if (searchString) {
+			const [result] = await db
+				.query(surql`SELECT
+			           *,
+			           service.{ id, title }
+			         FROM task
+			         WHERE ${eq('archived', archived)} AND title @@ ${searchString}
+			  `)
+				.json()
+				.collect<[Task[]]>();
+
+			return result;
+		}
 
 		const [result] = await db
 			.query(surql`SELECT
@@ -21,25 +37,28 @@ const getTasksFn = createServerFn({ method: 'GET' })
           service.{ id, title }
         FROM task
         WHERE ${eq('archived', archived)}
-        ORDER BY title NUMERIC;`)
+        ORDER BY time.created NUMERIC DESC;`)
 			.json()
 			.collect<[Task[]]>();
 
 		return result;
 	});
 
-export const tasksQueryOptions = (archived: boolean) =>
+export const tasksQueryOptions = (
+	archived: boolean,
+	searchString?: string | undefined,
+) =>
 	queryOptions<Task[]>({
-		queryKey: ['tasks', archived],
-		queryFn: () => getTasksFn({ data: { archived } }),
+		queryKey: ['tasks', archived, searchString],
+		queryFn: () => getTasksFn({ data: { archived, searchString } }),
 	});
 
 const getTaskWithBriefAndChatFn = createServerFn({ method: 'POST' })
-	.inputValidator((data: string) => data)
+	.inputValidator((data: { id: string; archived: boolean }) => data)
 	.handler(async ({ data }) => {
 		const db = await getDB();
 
-		const id = await fromDTO(data);
+		const { id, archived } = await fromDTO(data);
 		const [result] = await db
 			.query(surql`SELECT
           *,
@@ -56,17 +75,21 @@ const getTaskWithBriefAndChatFn = createServerFn({ method: 'POST' })
               title
             }
           } as prompt
-        FROM ONLY ${id}`)
+        FROM ONLY ${id}
+        WHERE ${eq('archived', archived)}`)
 			.json()
 			.collect<[TaskWithBriefAndChat]>();
 
-		return result;
+		return result || null;
 	});
 
-export const taskWithBriefAndChatQueryOptions = (taskId: string) =>
+export const taskWithBriefAndChatQueryOptions = (data: {
+	id: string;
+	archived: boolean;
+}) =>
 	queryOptions<TaskWithBriefAndChat>({
-		queryKey: ['taskWithBriefAndChat', taskId],
-		queryFn: () => getTaskWithBriefAndChatFn({ data: taskId }),
+		queryKey: ['taskWithBriefAndChat', data.id, data.archived],
+		queryFn: () => getTaskWithBriefAndChatFn({ data }),
 	});
 
 export const createTaskFn = createServerFn({ method: 'POST' })
