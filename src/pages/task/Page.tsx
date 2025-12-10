@@ -29,7 +29,7 @@ export const UnautorizedTaskPage = () => {
 	// Входные данные
 	const { taskId } = useParams({ from: Route.id });
 	const { data: comments } = useSuspenseQuery(
-		commentsQueryOptions({ taskId: `task:${taskId}` }),
+		commentsQueryOptions(`task:${taskId}`),
 	);
 	const { data: task } = useSuspenseQuery(
 		taskWithBriefAndChatQueryOptions({ id: `task:${taskId}`, archived: false }),
