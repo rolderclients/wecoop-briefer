@@ -37,7 +37,7 @@ const getTasksFn = createServerFn({ method: 'GET' })
           service.{ id, title }
         FROM task
         WHERE ${eq('archived', archived)}
-        ORDER BY time.created NUMERIC DESC;`)
+        ORDER BY time.created DESC;`)
 			.json()
 			.collect<[Task[]]>();
 
