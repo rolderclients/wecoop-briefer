@@ -173,7 +173,7 @@ export const Provider = ({
 				console.error(error);
 				notifications.show({
 					title: 'Ошибка скачивания',
-					message: 'Не удалось получить ссылки на файлы',
+					message: `Не удалось получить ссылки на файлы: ${error}`,
 					color: 'red',
 				});
 			}
