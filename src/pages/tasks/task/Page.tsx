@@ -24,7 +24,6 @@ import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { taskWithBriefAndChatQueryOptions } from '@/back';
 import { downloadPDF, SimpleEditor } from '@/front';
-import type { FilesRef } from '@/front/ui/files/Root';
 import { Route } from '@/routes/_authed/tasks/$taskId';
 import type { Task } from '@/types';
 import { ScrollArea } from '~/ui';
@@ -36,7 +35,6 @@ export const TaskPage = () => {
 	const { data: task } = useSuspenseQuery(
 		taskWithBriefAndChatQueryOptions({ id: taskId, archived: false }),
 	);
-	const filesRef = useRef<FilesRef>(null);
 	const [isEditingOpened, { open: openEdit, close: closeEdit }] =
 		useDisclosure(false);
 
@@ -104,7 +102,7 @@ export const TaskPage = () => {
 										<Text>{task.content}</Text>
 									</Box>
 
-									<TaskFiles ref={filesRef} taskId={task.id} />
+									<TaskFiles taskId={task.id} />
 								</Stack>
 
 								<ScrollArea.ScrollButton />
@@ -113,7 +111,7 @@ export const TaskPage = () => {
 						<Group justify="flex-end">
 							<Button
 								loading={downloading}
-								disabled={!filesRef.current?.files?.length}
+								// disabled={!filesRef.current?.files?.length}
 								component="div"
 								size="xs"
 								color="green"
@@ -121,7 +119,7 @@ export const TaskPage = () => {
 								leftSection={<IconDownload size={16} />}
 								onClick={async () => {
 									setDownloading(true);
-									await filesRef.current?.downloadAllFiles();
+									// await filesRef.current?.downloadAllFiles();
 									setDownloading(false);
 								}}
 							>
