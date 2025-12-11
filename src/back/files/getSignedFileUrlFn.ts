@@ -3,12 +3,12 @@ import { createServerFn } from '@tanstack/react-start';
 import z from 'zod/v4';
 import { getS3Client } from './getS3Client';
 
-const Schema = z.object({
+const S3KeySchema = z.object({
 	s3Key: z.string(),
 });
 
 export const getSignedFileUrlFn = createServerFn({ method: 'POST' })
-	.inputValidator(Schema)
+	.inputValidator(S3KeySchema)
 	.handler(async ({ data: { s3Key } }) => {
 		const bucket = process.env.BUCKET_NAME;
 		if (!bucket) throw new Error('BUCKET_NAME environment variable is not set');
