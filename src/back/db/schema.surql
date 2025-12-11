@@ -72,6 +72,7 @@ DEFINE FIELD OVERWRITE time.updated ON comment TYPE datetime VALUE time::now();
 // Delete brief and files on task deletion
 DEFINE EVENT OVERWRITE task_deleted ON task WHEN $event = 'DELETE' THEN {
     DELETE $before.brief.id;
+    DELETE comment WHERE id IN $before.comments.id;
     DELETE file WHERE id IN $before.files.id;
 };
 
