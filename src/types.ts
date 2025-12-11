@@ -136,6 +136,12 @@ export interface TaskWithBriefAndChat
 	};
 }
 
+export interface TaskWithBriefAndComments
+	extends Omit<Task, 'brief' | 'chat' | 'prompt'> {
+	brief: Brief;
+	comments: Comment[];
+}
+
 export interface CreateTask {
 	title: string;
 	content?: string;
@@ -161,7 +167,7 @@ export interface UpdateTask {
 // Comment for task
 export interface Comment {
 	id: string;
-	value: string;
+	content: string;
 	task: string; // тут id задачи
 	time: {
 		created: string;
@@ -170,7 +176,7 @@ export interface Comment {
 }
 
 export interface CreateComment {
-	value: string;
+	content: string;
 	task: string; // тут id задачи
 }
 
@@ -198,3 +204,23 @@ export interface UpdateFile {
 	size?: number;
 	task?: string;
 }
+
+// ==Скачаивание PDF==
+// Интерфейсы для типизации 📝
+export interface PDFOptions {
+	format?: 'A4' | 'A3' | 'Letter';
+	margin?: {
+		top?: string;
+		bottom?: string;
+		left?: string;
+		right?: string;
+	};
+	printBackground?: boolean;
+}
+
+// Serializable Buffer тип
+export interface SerializableBuffer {
+	data: number[];
+	type: 'Buffer';
+}
+// ==/Скачаивание PDF==

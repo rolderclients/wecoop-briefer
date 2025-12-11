@@ -1,23 +1,6 @@
 import { generatePDFFn } from '@/back/functions/generatePDFFn';
 import { defaultErrorNotification, downloadFileByURL } from '@/front';
-
-// Интерфейсы для типизации 📝
-interface PDFOptions {
-	format?: 'A4' | 'A3' | 'Letter';
-	margin?: {
-		top?: string;
-		bottom?: string;
-		left?: string;
-		right?: string;
-	};
-	printBackground?: boolean;
-}
-
-// Serializable Buffer type для TanStack
-interface SerializableBuffer {
-	data: number[];
-	type: 'Buffer';
-}
+import type { PDFOptions, SerializableBuffer } from '@/types';
 
 // Конвертация serializable формата в Uint8Array (клиентская сторона)
 const serializableToUint8Array = (

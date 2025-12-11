@@ -19,7 +19,7 @@ export const serverErrorNotificaton = (error: ClientUploadError) => {
 		title: serverErrorCodes[error.type],
 		message: error.message,
 		color: 'red',
-		autoClose: 5000,
+		autoClose: false,
 	});
 };
 

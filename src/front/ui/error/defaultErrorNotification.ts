@@ -5,5 +5,5 @@ export const defaultErrorNotification = (error: Error) =>
 		title: 'Системная ошибка',
 		message: error.message,
 		color: 'red',
-		autoClose: 5000,
+		autoClose: false,
 	});
