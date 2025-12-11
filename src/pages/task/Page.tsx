@@ -4,7 +4,6 @@ import {
 	Group,
 	Modal,
 	Paper,
-	ScrollArea,
 	Stack,
 	Text,
 	Title,
@@ -14,7 +13,7 @@ import { IconFileTypePdf } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { taskWithBriefAndCommentsQueryOptions } from '@/back';
 import { createCommentFn } from '@/back/db/repositories/comment';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,12 +25,13 @@ import {
 } from '@/front';
 import { Route } from '@/routes/task.$taskId';
 import type { Comment, CreateComment } from '@/types';
+import { ScrollArea } from '~/ui';
 
 export const UnautorizedTaskPage = () => {
 	// Входные данные
 	const { taskId } = useParams({ from: Route.id });
 	const { data: task } = useSuspenseQuery(
-		taskWithBriefAndCommentsQueryOptions(`task:${taskId}`),
+		taskWithBriefAndCommentsQueryOptions(taskId),
 	);
 
 	// Состояния
@@ -47,24 +47,7 @@ export const UnautorizedTaskPage = () => {
 		['taskWithBriefAndComments', task.id],
 	);
 
-	// Скролим вниз, при открытии страницы
-	const viewport = useRef<HTMLDivElement>(null);
-
-	const scrollToBottom = useCallback(() => {
-		if (viewport.current) {
-			viewport.current.scrollTo({
-				top: viewport.current.scrollHeight,
-				behavior: 'smooth',
-			});
-		}
-	}, []);
-
-	// При добавлении комментариев скролим вниз
-	useEffect(() => {
-		if (task?.comments?.length) scrollToBottom();
-	}, [task.comments, scrollToBottom]);
-
-	if (task) {
+	if (!task.archived) {
 		return (
 			<Stack pb="xl" pt="sm">
 				<Group justify="flex-end">
@@ -130,11 +113,12 @@ export const UnautorizedTaskPage = () => {
 							<Paper withBorder radius="md" h="100%">
 								<Stack justify="space-between" h="100%">
 									<ScrollArea
+										autoScroll
+										scrollToBottomOnInit
 										type="hover"
 										offsetScrollbars={false}
 										p="xl"
 										h="calc(100vh - 300px)"
-										viewportRef={viewport}
 									>
 										<Stack>
 											{task.comments?.map((iComment: Comment) => {
@@ -175,7 +159,7 @@ export const UnautorizedTaskPage = () => {
 												);
 											})}
 										</Stack>
-										{/*<ScrollArea.ScrollButton />*/}
+										<ScrollArea.ScrollButton />
 									</ScrollArea>
 									<Group w="100%" justify="center" mb="50px">
 										<Button radius="xl" bg="green" onClick={open}>
@@ -223,6 +207,6 @@ export const UnautorizedTaskPage = () => {
 			</Stack>
 		);
 	} else {
-		return <DefaultNotFoundComponent></DefaultNotFoundComponent>;
+		return <DefaultNotFoundComponent />;
 	}
 };

@@ -1,9 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
-import dayjs from 'dayjs';
 import { eq, surql } from 'surrealdb';
 import type {
-	Comment,
 	CreateTask,
 	Task,
 	TaskWithBriefAndChat,
@@ -108,21 +106,11 @@ const getTaskWithBriefAndCommentsFn = createServerFn({ method: 'POST' })
           *,
 	        service.{ id, title },
 	        brief.{ id, content },
-					comments.*
+					(SELECT * FROM comments.* ORDER BY time.created) as comments
         FROM ONLY ${taskId}
         `)
 			.json()
 			.collect<[TaskWithBriefAndComments]>();
-
-		// Сортируем по дате - пока на бэке, надо понять, как в базе в взапросе
-		if (result?.comments?.length) {
-			result.comments = result.comments
-				.slice()
-				.sort(
-					(a: Comment, b: Comment) =>
-						dayjs(a.time.created).valueOf() - dayjs(b.time.created).valueOf(),
-				);
-		}
 
 		return result;
 	});
