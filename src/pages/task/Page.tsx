@@ -6,6 +6,7 @@ import {
 	Paper,
 	Stack,
 	Text,
+	Textarea,
 	Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -16,7 +17,6 @@ import dayjs from 'dayjs';
 import { useState } from 'react';
 import { taskWithBriefAndCommentsQueryOptions } from '@/back';
 import { createCommentFn } from '@/back/db/repositories/comment';
-import { Textarea } from '@/components/ui/textarea';
 import {
 	DefaultNotFoundComponent,
 	downloadPDF,
@@ -174,11 +174,17 @@ export const UnautorizedTaskPage = () => {
 				<Modal
 					size="50%"
 					opened={openedModal}
-					onClose={close}
+					onClose={() => {
+						close();
+						setNewComment('');
+					}}
 					title="Новый комментарий"
 				>
 					<Stack>
 						<Textarea
+							autosize
+							minRows={4}
+							maxRows={15}
 							value={newComment}
 							onChange={(event) => setNewComment(event.currentTarget.value)}
 						></Textarea>
