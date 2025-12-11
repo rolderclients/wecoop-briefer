@@ -39,7 +39,10 @@ export const UnautorizedTaskPage = () => {
 	const [createButtonLoading, setCreateButtonLoading] =
 		useState<boolean>(false);
 	const [downloading, setDownloading] = useState<boolean>(false);
-	const [openedModal, { open, close }] = useDisclosure(false);
+	const [openedCreateModal, { open: openCreate, close: closeCreate }] =
+		useDisclosure(false);
+	const [openedViewModal, { open: openView, close: closeView }] =
+		useDisclosure(false);
 
 	// Функции и хуки
 	const createMutation = useMutaitionWithInvalidate<CreateComment>(
@@ -72,11 +75,11 @@ export const UnautorizedTaskPage = () => {
 
 								<Group>
 									<Button
-										disabled={true}
 										component="div"
 										size="xs"
 										color="green"
 										variant="light"
+										onClick={openView}
 									>
 										Просмотр
 									</Button>
@@ -162,7 +165,7 @@ export const UnautorizedTaskPage = () => {
 										<ScrollArea.ScrollButton />
 									</ScrollArea>
 									<Group w="100%" justify="center" mb="50px">
-										<Button radius="xl" bg="green" onClick={open}>
+										<Button radius="xl" bg="green" onClick={openCreate}>
 											Добавить комментарий
 										</Button>
 									</Group>
@@ -173,9 +176,9 @@ export const UnautorizedTaskPage = () => {
 				</Grid>
 				<Modal
 					size="50%"
-					opened={openedModal}
+					opened={openedCreateModal}
 					onClose={() => {
-						close();
+						closeCreate();
 						setNewComment('');
 					}}
 					title="Новый комментарий"
@@ -202,12 +205,30 @@ export const UnautorizedTaskPage = () => {
 									});
 									setNewComment('');
 									setCreateButtonLoading(false);
-									close();
+									closeCreate();
 								}}
 							>
 								Добавить комментарий
 							</Button>
 						</Group>
+					</Stack>
+				</Modal>
+				<Modal
+					fullScreen
+					opened={openedViewModal}
+					onClose={() => {
+						closeView();
+						setNewComment('');
+					}}
+					title={task.title}
+				>
+					<Stack>
+						<SimpleEditor
+							height="calc(100vh - 100px)"
+							initialContent={task.brief?.content}
+							initialEditable={false}
+							initialDisabledToolbar
+						/>
 					</Stack>
 				</Modal>
 			</Stack>
