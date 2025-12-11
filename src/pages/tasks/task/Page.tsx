@@ -21,7 +21,7 @@ import {
 } from '@tabler/icons-react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { taskWithBriefAndChatQueryOptions } from '@/back';
 import { downloadPDF, SimpleEditor } from '@/front';
 import { Route } from '@/routes/_authed/tasks/$taskId';
