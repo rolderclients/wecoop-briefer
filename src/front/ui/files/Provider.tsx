@@ -13,11 +13,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { nanoid } from 'nanoid/non-secure';
 import { createContext, useContext } from 'react';
 import type { FileWithPath } from 'react-dropzone';
-import {
-	deleteObjectFn,
-	getSignedFilesUrlsFn,
-	getSignedFileUrlFn,
-} from '@/back';
+import { deleteObjectFn, getSignedFilesUrlsFn } from '@/back';
 import {
 	createFilesFn,
 	deleteFilesFn,
@@ -159,21 +155,6 @@ export const Provider = ({
 		},
 		downloadAllFiles: async () => {
 			try {
-				// const filesWithTemporalURL: { url: Promise<string>; name: string }[] =
-				// 	await Promise.all(
-				// 		files.map((file) => ({
-				// 			url: getSignedFileUrlFn({ data: { s3Key: file.s3Key } }),
-				// 			name: file.originalName,
-				// 		})),
-				// 	);
-
-				// for (const fileWithTemporalURL of filesWithTemporalURL) {
-				// 	downloadFileByURL(
-				// 		fileWithTemporalURL.url as unknown as string,
-				// 		fileWithTemporalURL.name,
-				// 	);
-				// }
-
 				const fileUrls = await getSignedFilesUrlsFn({
 					data: { s3Keys: files.map((file) => file.s3Key) },
 				});
