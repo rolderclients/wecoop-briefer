@@ -9,6 +9,6 @@ export const authErrorNotification = (error: AuthError) => {
 		title: parsedError.message,
 		message: parsedError.details,
 		color: 'red',
-		autoClose: 5000,
+		autoClose: false,
 	});
 };
