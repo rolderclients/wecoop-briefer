@@ -102,7 +102,6 @@ export const TaskPage = () => {
 							<Group justify="flex-start">
 								<Title order={3}>Задание</Title>
 							</Group>
-
 							<Paper withBorder radius="md">
 								<ScrollArea h="calc(100vh - 175px)">
 									<Stack px="md" pt="sm" h="calc(100vh - 175px)">

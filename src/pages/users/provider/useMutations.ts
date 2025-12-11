@@ -20,6 +20,7 @@ export const useMutations = () => {
 				name: data.name,
 				email: data.email,
 				password: data.password,
+				//@ts-expect-error
 				role: data.role,
 				data: {
 					username: data.username,
@@ -56,15 +57,18 @@ export const useMutations = () => {
 		CredentialsUser
 	>({
 		mutationFn: async (data) => {
+			console.log(data);
 			await admin.updateUser({
 				userId: data.id,
 				data: { username: data.username, role: data.role },
 			});
+			//@ts-expect-error
 			await admin.setRole({ userId: data.id, role: data.role });
-			await admin.setUserPassword({
-				userId: data.id,
-				newPassword: data.newPassword,
-			});
+			if (data.newPassword)
+				await admin.setUserPassword({
+					userId: data.id,
+					newPassword: data.newPassword,
+				});
 		},
 		onSettled: async (_, error, vars) => {
 			if (error) authErrorNotification(error);

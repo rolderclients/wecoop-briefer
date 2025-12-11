@@ -116,7 +116,7 @@ export interface Task extends Item {
 	content?: string;
 	brief: string;
 	chat: string;
-	company: {
+	company?: {
 		title?: string;
 		info?: string;
 	};
