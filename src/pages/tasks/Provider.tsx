@@ -58,9 +58,17 @@ export const TasksProvider = ({ children }: { children: ReactNode }) => {
 	const [searchString, setSearchString] = useState<string>('');
 
 	// Заменил на useQuery для поиска, так как useSuspenseQuery останавливает страницу и она пееррендеривается при вводе текста в строку поиска
-	const { data: tasks = [] } = useQuery(
+	//
+	// Разделил на задачи, получаемые при SSR (строки поиска на старте нет) и на результат поиска
+	const { data: initTasks = [] } = useSuspenseQuery(
+		tasksQueryOptions(isArchived, ''),
+	);
+
+	const { data: searchedTasks = [] } = useQuery(
 		tasksQueryOptions(isArchived, searchString),
 	);
+
+	const tasks = searchString ? searchedTasks : initTasks;
 
 	const { data: services } = useSuspenseQuery(
 		servicesWithEnbledPromptsQueryOptions(),
