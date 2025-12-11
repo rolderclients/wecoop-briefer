@@ -15,7 +15,7 @@ export const deleteObjectsFn = createServerFn({ method: 'POST' })
 
 		const s3 = getS3Client();
 
-		const deleteResult = await Promise.all(
+		await Promise.all(
 			s3Keys.map((iKey) =>
 				deleteObject(s3, {
 					bucket,
@@ -23,6 +23,4 @@ export const deleteObjectsFn = createServerFn({ method: 'POST' })
 				}),
 			),
 		);
-
-		console.log('deleteObjectsFn: deleteResult', deleteResult);
 	});
