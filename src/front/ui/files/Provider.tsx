@@ -13,7 +13,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { nanoid } from 'nanoid/non-secure';
 import { createContext, useContext } from 'react';
 import type { FileWithPath } from 'react-dropzone';
-import { deleteObjectFn, getSignedFilesUrlsFn } from '@/back';
+import { deleteObjectFn, deleteObjectsFn, getSignedFilesUrlsFn } from '@/back';
 import {
 	createFilesFn,
 	deleteFilesFn,
@@ -31,6 +31,7 @@ interface FilesContext {
 	onDrop: DropzoneProps['onDrop'];
 	onReject: DropzoneProps['onReject'];
 	deleteFile: (file: File) => void;
+	deleteFiles: (files: File[]) => void;
 	downloadAllFiles: () => Promise<void>;
 	accept: string[];
 	maxFilesTotal: number;
@@ -152,6 +153,12 @@ export const Provider = ({
 		deleteFile: (file) => {
 			deleteObjectFn({ data: file.s3Key });
 			deleteMutation.mutate([file.id]);
+		},
+		deleteFiles: (files) => {
+			// Сначала удаляем файлы с бакета
+			deleteObjectsFn({ data: { s3Keys: files.map((file) => file.s3Key) } });
+			// Потом удаляем записи о файлах из базы
+			deleteMutation.mutate(files.map((file) => file.id));
 		},
 		downloadAllFiles: async () => {
 			try {
