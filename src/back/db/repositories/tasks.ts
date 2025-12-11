@@ -1,7 +1,9 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
+import dayjs from 'dayjs';
 import { eq, surql } from 'surrealdb';
 import type {
+	Comment,
 	CreateTask,
 	Task,
 	TaskWithBriefAndChat,
@@ -21,10 +23,11 @@ const getTasksFn = createServerFn({ method: 'GET' })
 		if (searchString) {
 			const [result] = await db
 				.query(surql`SELECT
-			           *,
-			           service.{ id, title }
-			         FROM task
-			         WHERE ${eq('archived', archived)} AND title @@ ${searchString}
+			       *,
+			       service.{ id, title }
+			    FROM task
+					WHERE ${eq('archived', archived)} AND title @@ ${searchString}
+					ORDER BY time.created DESC;
 			  `)
 				.json()
 				.collect<[Task[]]>();
@@ -81,7 +84,7 @@ const getTaskWithBriefAndChatFn = createServerFn({ method: 'POST' })
 			.json()
 			.collect<[TaskWithBriefAndChat]>();
 
-		return result || null;
+		return result;
 	});
 
 export const taskWithBriefAndChatQueryOptions = (data: {
@@ -99,11 +102,9 @@ const getTaskWithBriefAndCommentsFn = createServerFn({ method: 'POST' })
 		const db = await getDB();
 
 		// Вот это место надо поправить, так как при открытии страницы в surreal улетает такой странный id и запрос зависает
-		if (data === 'task:/task/$taskId') return null;
-
 		const taskId = await fromDTO(data);
 		const [result] = await db
-			.query(surql`			SELECT
+			.query(surql`SELECT
           *,
 	        service.{ id, title },
 	        brief.{ id, content },
@@ -113,11 +114,21 @@ const getTaskWithBriefAndCommentsFn = createServerFn({ method: 'POST' })
 			.json()
 			.collect<[TaskWithBriefAndComments]>();
 
-		return result || null;
+		// Сортируем по дате - пока на бэке, надо понять, как в базе в взапросе
+		if (result?.comments?.length) {
+			result.comments = result.comments
+				.slice()
+				.sort(
+					(a: Comment, b: Comment) =>
+						dayjs(a.time.created).valueOf() - dayjs(b.time.created).valueOf(),
+				);
+		}
+
+		return result;
 	});
 
 export const taskWithBriefAndCommentsQueryOptions = (taskId: string) =>
-	queryOptions<TaskWithBriefAndComments | null>({
+	queryOptions<TaskWithBriefAndComments>({
 		queryKey: ['taskWithBriefAndComments', taskId],
 		queryFn: () => getTaskWithBriefAndCommentsFn({ data: taskId }),
 	});

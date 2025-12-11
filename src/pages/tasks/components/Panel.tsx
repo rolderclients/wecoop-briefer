@@ -1,21 +1,20 @@
 import { Grid, Group, Paper, Switch, TextInput } from '@mantine/core';
-import { useDebouncedValue } from '@mantine/hooks';
+import { useDebouncedCallback } from '@mantine/hooks';
 import { IconArchive, IconRestore, IconTrash } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Create } from '../forms';
 import { useTasks } from '../Provider';
 import { ArchivateRestoreDelete } from './ArchivateRestoreDelete';
 
 export const Panel = () => {
-	const { setSearchString, isArchived, setIsArchived } = useTasks();
+	const { isArchived, setIsArchived, searchString, setSearchString } =
+		useTasks();
 
-	const [searchValue, setSearchValue] = useState<string | undefined>('');
-	const [debouncedSearchValue] = useDebouncedValue(searchValue, 300);
+	const [searchValue, setSearchValue] = useState(searchString);
 
-	// Когда дебаунсед значение изменилось - вызываем поиск
-	useEffect(() => {
-		setSearchString(debouncedSearchValue || '');
-	}, [debouncedSearchValue, setSearchString]);
+	const handleSearch = useDebouncedCallback(async (query: string) => {
+		setSearchString(query);
+	}, 300);
 
 	return (
 		<Paper radius="md" withBorder py="sm" px="md">
@@ -58,8 +57,9 @@ export const Panel = () => {
 						value={searchValue}
 						onChange={(event) => {
 							setSearchValue(event.currentTarget.value);
+							handleSearch(event.currentTarget.value);
 						}}
-					></TextInput>
+					/>
 				</Grid.Col>
 
 				<Grid.Col span="content">
