@@ -168,6 +168,7 @@ export const Provider = ({
 					title: 'Ошибка скачивания',
 					message: `Не удалось получить ссылки на файлы: ${error}`,
 					color: 'red',
+					autoClose: false,
 				});
 			}
 		},

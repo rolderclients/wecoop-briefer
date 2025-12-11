@@ -48,11 +48,11 @@ export const TaskPage = () => {
 	const [currentTaskURL, setCurrentTaskURL] = useState<string>('');
 
 	useEffect(() => {
-		setCurrentTaskURL(`${location.origin}/task/${taskId.replace('task:', '')}`);
+		setCurrentTaskURL(`${location.origin}/task/${taskId}`);
 	}, [taskId]);
 
 	return (
-		<Stack pb="xl" pt="sm">
+		<Stack pt="sm" pb="lg">
 			<Group justify="space-between">
 				<Group justify="flex-start" align="center">
 					<Title>{task.title}</Title>
@@ -63,7 +63,7 @@ export const TaskPage = () => {
 								color="dark"
 								position="bottom"
 								offset={10}
-								openDelay={100}
+								openDelay={500}
 								closeDelay={100}
 							>
 								<ActionIcon variant="subtle" c="green" onClick={copy}>
@@ -99,14 +99,13 @@ export const TaskPage = () => {
 							maxFilesPerUpload={10}
 							maxFileSize={1024 * 1024 * 10}
 						>
-							{/*<Paper withBorder radius="md">*/}
 							<Group justify="flex-start">
 								<Title order={3}>Задание</Title>
 							</Group>
-							{/*</Paper>*/}
+
 							<Paper withBorder radius="md">
-								<ScrollArea h="calc(100vh - 200px)">
-									<Stack px="md" pt="sm" h="calc(100vh - 200px)">
+								<ScrollArea h="calc(100vh - 175px)">
+									<Stack px="md" pt="sm" h="calc(100vh - 175px)">
 										<Box style={{ whiteSpace: 'pre-wrap' }}>
 											<Text c="dimmed">Компания</Text>
 											<Text>{task.company?.title}</Text>
@@ -147,14 +146,12 @@ export const TaskPage = () => {
 
 				<Grid.Col span={8}>
 					<Stack gap="xs">
-						{/*<Paper withBorder radius="md">*/}
 						<Group justify="flex-start">
 							<Title order={3}>Бриф</Title>
 						</Group>
-						{/*</Paper>*/}
 
 						<SimpleEditor
-							height="calc(100vh - 200px)"
+							height="calc(100vh - 175px)"
 							initialContent={task.brief?.content}
 							initialEditable={false}
 							initialDisabledToolbar
