@@ -64,7 +64,7 @@ const TaskPaper = ({ task }: { task: Task }) => {
 						<Text inline>{task.title}</Text>
 					</Grid.Col>
 					<Grid.Col span="auto">
-						<Text inline>{task.service.title}</Text>
+						<Text inline>{task.service?.title}</Text>
 					</Grid.Col>
 					<Grid.Col span="auto">
 						<Text inline>{task.company?.title}</Text>

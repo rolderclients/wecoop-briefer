@@ -1,24 +1,7 @@
 import chromium from '@sparticuz/chromium';
 import { createServerFn } from '@tanstack/react-start';
 import puppeteer, { type Browser, type Page } from 'puppeteer-core';
-
-// Интерфейсы для типизации 📝
-interface PDFOptions {
-	format?: 'A4' | 'A3' | 'Letter';
-	margin?: {
-		top?: string;
-		bottom?: string;
-		left?: string;
-		right?: string;
-	};
-	printBackground?: boolean;
-}
-
-// Serializable Buffer тип
-interface SerializableBuffer {
-	data: number[];
-	type: 'Buffer';
-}
+import type { PDFOptions, SerializableBuffer } from '@/types';
 
 // Конфигурация браузера для оптимизации 🚀
 const getBrowserConfig = async () => ({

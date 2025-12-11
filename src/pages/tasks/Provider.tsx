@@ -1,7 +1,6 @@
 import { useDisclosure } from '@mantine/hooks';
 import {
 	type UseMutationResult,
-	useQuery,
 	useSuspenseQuery,
 } from '@tanstack/react-query';
 import { useNavigate, useSearch } from '@tanstack/react-router';
@@ -26,7 +25,6 @@ import type { CreateTask, ServiceWithPrompts, Task, UpdateTask } from '@/types';
 
 interface TasksContext {
 	tasks: Task[];
-	setSearchString: (searchString: string) => void;
 	services: ServiceWithPrompts[];
 	createMutation: UseMutationResult<void, Error, CreateTask, unknown>;
 	updateMutation: UseMutationResult<void, Error, UpdateTask, unknown>;
@@ -38,6 +36,8 @@ interface TasksContext {
 	setSelectedTask: (task: Task | null) => void;
 	isArchived: boolean;
 	setIsArchived: (archived: boolean) => void;
+	searchString?: string;
+	setSearchString: (searchString: string) => void;
 	isCreateOpened: boolean;
 	openCreate: () => void;
 	closeCreate: () => void;
@@ -55,10 +55,9 @@ export const TasksProvider = ({ children }: { children: ReactNode }) => {
 		select: (data) => !!data.archived,
 	});
 
-	const [searchString, setSearchString] = useState<string>('');
+	const { searchString } = useSearch({ from: Route.id });
 
-	// Заменил на useQuery для поиска, так как useSuspenseQuery останавливает страницу и она пееррендеривается при вводе текста в строку поиска
-	const { data: tasks = [] } = useQuery(
+	const { data: tasks } = useSuspenseQuery(
 		tasksQueryOptions(isArchived, searchString),
 	);
 
@@ -97,7 +96,6 @@ export const TasksProvider = ({ children }: { children: ReactNode }) => {
 
 	const value = {
 		tasks,
-		setSearchString,
 		services,
 		createMutation,
 		updateMutation,
@@ -110,6 +108,13 @@ export const TasksProvider = ({ children }: { children: ReactNode }) => {
 		isArchived,
 		setIsArchived: (archived: boolean) =>
 			navigate({ search: () => ({ archived }) }),
+		searchString,
+		setSearchString: (searchString: string) =>
+			navigate({
+				search: () => ({
+					searchString,
+				}),
+			}),
 		isCreateOpened,
 		openCreate,
 		closeCreate,

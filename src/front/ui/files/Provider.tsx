@@ -13,7 +13,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { nanoid } from 'nanoid/non-secure';
 import { createContext, useContext } from 'react';
 import type { FileWithPath } from 'react-dropzone';
-import { deleteObjectFn, getSignedFileUrlFn } from '@/back';
+import { deleteObjectFn, getSignedFilesUrlsFn } from '@/back';
 import {
 	createFilesFn,
 	deleteFilesFn,
@@ -155,22 +155,20 @@ export const Provider = ({
 		},
 		downloadAllFiles: async () => {
 			try {
-				const filesWithTemporalURL = await Promise.all(
-					files.map(async (file) => ({
-						url: await getSignedFileUrlFn({ data: { s3Key: file.s3Key } }),
-						name: file.originalName,
-					})),
-				);
+				const fileUrls = await getSignedFilesUrlsFn({
+					data: { s3Keys: files.map((file) => file.s3Key) },
+				});
 
-				for (const fileWithTemporalURL of filesWithTemporalURL) {
-					downloadFileByURL(fileWithTemporalURL.url, fileWithTemporalURL.name);
+				for (const [index, file] of files.entries()) {
+					downloadFileByURL(fileUrls[index], file.originalName);
 				}
 			} catch (error) {
 				console.error(error);
 				notifications.show({
 					title: 'Ошибка скачивания',
-					message: 'Не удалось получить ссылки на файлы',
+					message: `Не удалось получить ссылки на файлы: ${error}`,
 					color: 'red',
+					autoClose: false,
 				});
 			}
 		},

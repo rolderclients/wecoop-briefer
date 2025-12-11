@@ -5,6 +5,7 @@ import type {
 	CreateTask,
 	Task,
 	TaskWithBriefAndChat,
+	TaskWithBriefAndComments,
 	UpdateTask,
 } from '@/types';
 import { getDB } from '..';
@@ -20,10 +21,11 @@ const getTasksFn = createServerFn({ method: 'GET' })
 		if (searchString) {
 			const [result] = await db
 				.query(surql`SELECT
-			           *,
-			           service.{ id, title }
-			         FROM task
-			         WHERE ${eq('archived', archived)} AND title @@ ${searchString}
+			       *,
+			       service.{ id, title }
+			    FROM task
+					WHERE ${eq('archived', archived)} AND title @@ ${searchString}
+					ORDER BY time.created DESC;
 			  `)
 				.json()
 				.collect<[Task[]]>();
@@ -37,7 +39,7 @@ const getTasksFn = createServerFn({ method: 'GET' })
           service.{ id, title }
         FROM task
         WHERE ${eq('archived', archived)}
-        ORDER BY time.created NUMERIC DESC;`)
+        ORDER BY time.created DESC;`)
 			.json()
 			.collect<[Task[]]>();
 
@@ -80,7 +82,7 @@ const getTaskWithBriefAndChatFn = createServerFn({ method: 'POST' })
 			.json()
 			.collect<[TaskWithBriefAndChat]>();
 
-		return result || null;
+		return result;
 	});
 
 export const taskWithBriefAndChatQueryOptions = (data: {
@@ -90,6 +92,33 @@ export const taskWithBriefAndChatQueryOptions = (data: {
 	queryOptions<TaskWithBriefAndChat>({
 		queryKey: ['taskWithBriefAndChat', data.id, data.archived],
 		queryFn: () => getTaskWithBriefAndChatFn({ data }),
+	});
+
+const getTaskWithBriefAndCommentsFn = createServerFn({ method: 'POST' })
+	.inputValidator((data: string) => data)
+	.handler(async ({ data }) => {
+		const db = await getDB();
+
+		// Вот это место надо поправить, так как при открытии страницы в surreal улетает такой странный id и запрос зависает
+		const taskId = await fromDTO(data);
+		const [result] = await db
+			.query(surql`SELECT
+          *,
+	        service.{ id, title },
+	        brief.{ id, content },
+					(SELECT * FROM comments.* ORDER BY time.created) as comments
+        FROM ONLY ${taskId}
+        `)
+			.json()
+			.collect<[TaskWithBriefAndComments]>();
+
+		return result;
+	});
+
+export const taskWithBriefAndCommentsQueryOptions = (taskId: string) =>
+	queryOptions<TaskWithBriefAndComments>({
+		queryKey: ['taskWithBriefAndComments', taskId],
+		queryFn: () => getTaskWithBriefAndCommentsFn({ data: taskId }),
 	});
 
 export const createTaskFn = createServerFn({ method: 'POST' })

@@ -38,7 +38,7 @@ export const Provider = ({
 					title: 'Ошибка сервера ИИ',
 					message: e.message,
 					color: 'red',
-					autoClose: 5000,
+					autoClose: false,
 				});
 			},
 		});
