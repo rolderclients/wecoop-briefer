@@ -8,6 +8,7 @@ import z from 'zod/v4';
 import type { CreateUser } from '@/front';
 import { blurOnError, filedsSchema, useAppForm } from '~/ui';
 import { useUsers } from '../provider';
+import { useState } from 'react';
 
 const schema = z.object({
 	name: filedsSchema.name,
@@ -17,18 +18,21 @@ const schema = z.object({
 	password: filedsSchema.password,
 });
 
-const defaultValues: CreateUser = {
-	name: '',
-	email: '',
-	role: 'manager',
-	username: '',
-	password: generatePassword({
-		minSyllableLength: 2,
-		maxSyllableLength: 2,
-	}),
-};
-
 export const Create = () => {
+	
+  // Положил внутрь компоненты, чтобы каждый раз при открытии создания пользователя было новое значние пароля
+  // А через useState, чтобы пароль не пеерзаписывался при каждом рендере
+  const [defaultValues] = useState<CreateUser>({
+    name: '',
+    email: '',
+    role: 'manager',
+    username: '',
+    password: generatePassword({
+      minSyllableLength: 2,
+      maxSyllableLength: 2,
+    }),
+  });
+
 	const { users, createMutation, createOpened, openCreate, closeCreate } =
 		useUsers();
 
