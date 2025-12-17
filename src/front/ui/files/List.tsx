@@ -20,7 +20,7 @@ export const List = (props: StackProps) => {
 };
 
 const FilePaper = ({ file }: { file: FyleType }) => {
-	const { isPending, deleteFile } = useFiles();
+	const { isPending, deleteFiles } = useFiles();
 	const { paperHovered, paperRef } = usePaperHover();
 
 	return (
@@ -60,7 +60,7 @@ const FilePaper = ({ file }: { file: FyleType }) => {
 					color="red"
 					onClick={(e) => {
 						e.stopPropagation();
-						deleteFile(file);
+						deleteFiles([file]);
 					}}
 				>
 					<IconTrash size={20} />
