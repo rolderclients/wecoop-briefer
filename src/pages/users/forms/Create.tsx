@@ -89,7 +89,7 @@ export const Create = () => {
 						<form.AppField
 							name="name"
 							children={(field) => (
-								<field.TextField label="Имя" placeholder="Введите имя" />
+								<field.TextField label="ФИО" placeholder="Введите ФИО" />
 							)}
 						/>
 
