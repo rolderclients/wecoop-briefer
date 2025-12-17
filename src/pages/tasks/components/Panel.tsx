@@ -1,7 +1,7 @@
 import { Grid, Group, Paper, Switch, TextInput } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { IconArchive, IconRestore, IconTrash } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Create } from '../forms';
 import { useTasks } from '../Provider';
 import { ArchivateRestoreDelete } from './ArchivateRestoreDelete';
@@ -10,7 +10,19 @@ export const Panel = () => {
 	const { isArchived, setIsArchived, searchString, setSearchString } =
 		useTasks();
 
-	const [searchValue, setSearchValue] = useState(searchString);
+	const [searchValue, setSearchValue] = useState<string | undefined>('');
+
+	useEffect(() => {
+		setSearchValue(searchString);
+	}, [searchString]);
+
+	console.log('searchString', searchString);
+	console.log('searchValue', searchValue);
+
+	// Сбрасываем состояние у TextInput при повтороном открытии страницы
+	useEffect(() => {
+		if (!searchString) setSearchValue('');
+	}, [searchString]);
 
 	const handleSearch = useDebouncedCallback(async (query: string) => {
 		setSearchString(query);

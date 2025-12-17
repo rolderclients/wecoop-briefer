@@ -17,7 +17,7 @@ const schema = z.object({
 	password: filedsSchema.password,
 });
 
-const defaultValues: CreateUser = {
+const getDefaultValues = (): CreateUser => ({
 	name: '',
 	email: '',
 	role: 'manager',
@@ -26,14 +26,14 @@ const defaultValues: CreateUser = {
 		minSyllableLength: 2,
 		maxSyllableLength: 2,
 	}),
-};
+});
 
 export const Create = () => {
 	const { users, createMutation, createOpened, openCreate, closeCreate } =
 		useUsers();
 
 	const form = useAppForm({
-		defaultValues,
+		defaultValues: getDefaultValues(),
 		validators: {
 			onSubmit: schema
 				.refine((data) => !users.some((user) => user.email === data.email), {
@@ -67,7 +67,7 @@ export const Create = () => {
 					ml="auto"
 					leftSection={<IconPlus size={20} />}
 					onClick={() => {
-						form.reset();
+						form.reset(getDefaultValues());
 						openCreate();
 					}}
 				/>
@@ -89,7 +89,7 @@ export const Create = () => {
 						<form.AppField
 							name="name"
 							children={(field) => (
-								<field.TextField label="Имя" placeholder="Введите имя" />
+								<field.TextField label="ФИО" placeholder="Введите ФИО" />
 							)}
 						/>
 

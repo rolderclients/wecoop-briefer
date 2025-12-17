@@ -50,12 +50,13 @@ const TasksContext = createContext<TasksContext | null>(null);
 
 export const TasksProvider = ({ children }: { children: ReactNode }) => {
 	const navigate = useNavigate({ from: Route.fullPath });
-	const isArchived = useSearch({
+	const { isArchived, searchString } = useSearch({
 		from: Route.id,
-		select: (data) => !!data.archived,
+		select: (data) => ({
+			isArchived: !!data.archived,
+			searchString: data.searchString,
+		}),
 	});
-
-	const { searchString } = useSearch({ from: Route.id });
 
 	const { data: tasks } = useSuspenseQuery(
 		tasksQueryOptions(isArchived, searchString),
@@ -87,7 +88,7 @@ export const TasksProvider = ({ children }: { children: ReactNode }) => {
 	useEffect(() => {
 		setSelectedIds([]);
 		setSelectedTask(null);
-	}, [isArchived]);
+	}, [isArchived, searchString]);
 
 	const [isCreateOpened, { open: openCreate, close: closeCreate }] =
 		useDisclosure(false);
