@@ -90,7 +90,7 @@ export const taskWithBriefAndChatQueryOptions = (data: {
 	archived: boolean;
 }) =>
 	queryOptions<TaskWithBriefAndChat>({
-		queryKey: ['taskWithBriefAndChat', data.id, data.archived],
+		queryKey: ['taskWithBriefAndChat', data.id],
 		queryFn: () => getTaskWithBriefAndChatFn({ data }),
 	});
 

@@ -42,7 +42,8 @@ export const Edit = ({ opened, task, onClose }: EditProps) => {
 	);
 
 	const updateMutation = useMutaitionWithInvalidate<UpdateTask>(updateTaskFn, [
-		'tasks',
+		'taskWithBriefAndChat',
+		task.id,
 	]);
 
 	const form = useAppForm({
