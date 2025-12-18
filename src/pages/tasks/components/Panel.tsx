@@ -16,9 +16,6 @@ export const Panel = () => {
 		setSearchValue(searchString);
 	}, [searchString]);
 
-	console.log('searchString', searchString);
-	console.log('searchValue', searchValue);
-
 	// Сбрасываем состояние у TextInput при повтороном открытии страницы
 	useEffect(() => {
 		if (!searchString) setSearchValue('');
