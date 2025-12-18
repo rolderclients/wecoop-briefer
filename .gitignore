@@ -13,3 +13,9 @@ count.txt
 todos.json
 
 tmp
+better-auth_migrations
+devops/**/env.ts
+yc_key.json
+
+# sst
+.sst

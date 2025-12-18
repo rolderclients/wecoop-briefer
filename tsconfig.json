@@ -22,8 +22,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
+      "~/*": ["./external/*"],
     }
   },
-  "include": ["src"],
+  "include": ["src", "external", "devops"],
   "exclude": ["node_modules"]
 }

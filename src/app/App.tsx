@@ -1,10 +1,10 @@
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { HeadContent, Outlet, Scripts } from '@tanstack/react-router';
+import { HeadContent, Scripts } from '@tanstack/react-router';
 import { useEffect } from 'react';
-
-// import { AuthProvider } from './auth';
-// import { Shell } from './Shell';
+import { AuthProvider } from '@/front';
+import { Shell } from './shell';
+import { theme } from './theme';
 
 const SetTimeZoneCookie = () => {
 	useEffect(() => {
@@ -23,17 +23,15 @@ export const App = () => {
 				<ColorSchemeScript defaultColorScheme="auto" />
 			</head>
 			<body>
-				<MantineProvider defaultColorScheme="auto">
-					{/*<AuthProvider>*/}
+				<MantineProvider defaultColorScheme="auto" theme={theme}>
 					<Notifications />
-					TEST
-					<Outlet />
-					{/*<Shell />*/}
-					{/*</AuthProvider>*/}
+
+					<AuthProvider>
+						<Shell />
+					</AuthProvider>
 				</MantineProvider>
 
 				<SetTimeZoneCookie />
-
 				<Scripts />
 			</body>
 		</html>

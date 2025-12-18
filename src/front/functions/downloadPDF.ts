@@ -1,0 +1,100 @@
+import { generatePDFFn } from '@/back/functions/generatePDFFn';
+import { defaultErrorNotification, downloadFileByURL } from '@/front';
+import type { PDFOptions, SerializableBuffer } from '@/types';
+
+// Конвертация serializable формата в Uint8Array (клиентская сторона)
+const serializableToUint8Array = (
+	serializable: SerializableBuffer,
+): Uint8Array => {
+	return new Uint8Array(serializable.data);
+};
+
+// Утилита для безопасного создания Blob 🛡️
+const createPDFBlob = (pdfData: Uint8Array): Blob => {
+	try {
+		// Создаем новый ArrayBuffer для совместимости
+		const arrayBuffer = new ArrayBuffer(pdfData.length);
+		const view = new Uint8Array(arrayBuffer);
+		view.set(pdfData);
+		return new Blob([arrayBuffer], { type: 'application/pdf' });
+	} catch {
+		defaultErrorNotification(
+			'downloadPDF: Не удалось создать PDF blob' as unknown as Error,
+		);
+		throw new Error('Не удалось создать PDF blob');
+	}
+};
+
+// Функция для скачивания с улучшенным error handling 📥
+export const downloadPDF = async (
+	html: string,
+	fileName: string,
+	options?: PDFOptions,
+): Promise<void> => {
+	// Валидация входных параметров
+	if (!html || typeof html !== 'string' || html.trim().length === 0) {
+		defaultErrorNotification(
+			'downloadPDF: HTML контент не может быть пустым' as unknown as Error,
+		);
+		throw new Error('HTML контент не может быть пустым');
+	}
+
+	if (!fileName || typeof fileName !== 'string') {
+		defaultErrorNotification(
+			'downloadPDF: Имя файла должно быть указано' as unknown as Error,
+		);
+		throw new Error('Имя файла должно быть указано');
+	}
+
+	// Добавляем расширение если его нет
+	const finalFileName = fileName.endsWith('.pdf')
+		? fileName
+		: `${fileName}.pdf`;
+
+	try {
+		// Получаем PDF buffer от сервера
+		const serializedBuffer = await generatePDFFn({
+			data: {
+				htmlData: html,
+				options,
+			},
+		});
+
+		// Конвертируем в Uint8Array для браузера
+		const pdfData = serializableToUint8Array(serializedBuffer);
+
+		// Создаем безопасный Blob
+		const pdfBlob = createPDFBlob(pdfData);
+
+		// Создаем URL для скачивания
+		const url = URL.createObjectURL(pdfBlob);
+
+		try {
+			downloadFileByURL(url, finalFileName);
+		} finally {
+			// Освобождаем URL в любом случае
+			URL.revokeObjectURL(url);
+		}
+	} catch (error) {
+		console.error('downloadPDF: ❌ Ошибка при скачивании PDF:', error);
+		defaultErrorNotification(error as Error);
+
+		// Более детальная информация об ошибке
+		if (error instanceof Error) {
+			defaultErrorNotification(
+				`downloadPDF: Не удалось скачать PDF: ${error.message}` as unknown as Error,
+			);
+			throw new Error(`downloadPDF: Не удалось скачать PDF: ${error.message}`);
+		} else {
+			defaultErrorNotification(
+				'downloadPDF: Произошла неизвестная ошибка при скачивании PDF' as unknown as Error,
+			);
+			throw new Error(
+				'downloadPDF: Произошла неизвестная ошибка при скачивании PDF',
+			);
+		}
+	}
+};
+
+// Экспортируем типы для использования в других файлах
+export type { PDFOptions };
