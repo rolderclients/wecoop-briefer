@@ -57,7 +57,6 @@ export const useMutations = () => {
 		CredentialsUser
 	>({
 		mutationFn: async (data) => {
-			console.log(data);
 			await admin.updateUser({
 				userId: data.id,
 				data: { username: data.username, role: data.role },
